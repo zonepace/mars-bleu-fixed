@@ -245,106 +245,247 @@ BADGE_REWARDS = [
     # index 0 : < 20 km
     ("Roi du Canapé 🛋️", "Tu as lâché la télécommande. Héroïque."),
     # 20 km
-    ("Trotteur Prudent 🐢", "Le premier pas, c’est le plus dur. Le deuxième aussi. Le troisième pareil. Mais bon."),
+    (
+        "Trotteur Prudent 🐢",
+        "Le premier pas, c’est le plus dur. Le deuxième aussi. Le troisième pareil. Mais bon.",
+    ),
     # 40 km
-    ("Joggeur du Dimanche 🚶", "Tu cours. Officiellement. Ta famille ne te croit pas encore."),
+    (
+        "Joggeur du Dimanche 🚶",
+        "Tu cours. Officiellement. Ta famille ne te croit pas encore.",
+    ),
     # 60 km
     ("Mollets en Devenir 🦵", "Tes chaussures ont commencé à te respecter timidement."),
     # 80 km
-    ("Candidat Sérieux 📋", "Tu as dépensé plus en running qu’en pizza. La rupture est en cours."),
+    (
+        "Candidat Sérieux 📋",
+        "Tu as dépensé plus en running qu’en pizza. La rupture est en cours.",
+    ),
     # 100 km
-    ("Centurion du Bitume 💯", "100 km. C’est 100 000 mètres. Ça fait beaucoup de zéros dans le vide."),
+    (
+        "Boule d'Acier 🍑",
+        "Tu peux faire du vélo pendant plus de 200km sans avoir de douleur.",
+    ),
     # 120 km
-    ("Forrest en Formation 🏃💨", "Cours Forrest, cours. Mais à ton rythme, hein, pas la peine de se blesser."),
+    (
+        "Killian Jornet en Carton 🏃💨",
+        "Cours Killian, cours. Mais à ton rythme, hein, pas la peine de se blesser.",
+    ),
     # 140 km
-    ("Brûleur de Semelles 🔥", "Le vent commence à te regarder bizarrement. Il sent la concurrence."),
+    (
+        "Brûleur de Semelles 🔥",
+        "Le vent commence à te regarder bizarrement. Il sent la concurrence.",
+    ),
     # 160 km
-    ("Cyborg des Faubourgs 🦾", "Mi-humain, mi-moteur diesel. Le mécanicien est impressionné."),
+    (
+        "Cyborg des Faubourgs 🦾",
+        "Mi-humain, mi-moteur diesel. Le mécanicien est impressionné.",
+    ),
     # 180 km
     ("Rocket Man 🚀", "La NASA a mis ton dossier dans la pile ‘à surveiller’."),
     # 200 km
-    ("Explorateur du Macadam 🌍", "200 km. Tu aurais pu aller jusqu’en Belgique. Tu aurais pu."),
+    (
+        "Explorateur du Macadam 🌍",
+        "200 km. Tu aurais pu aller jusqu’en Belgique. Tu aurais pu.",
+    ),
     # 220 km
-    ("Alien du Sport 👽", "Tes collègues se demandent si tu dors vraiment ou si tu cours pendant ce temps-là."),
+    (
+        "Alien du Sport 👽",
+        "Tes collègues se demandent si tu dors vraiment ou si tu cours pendant ce temps-là.",
+    ),
     # 240 km
     ("Marathonien Autoproclamé 🏛️", "L’Olympe a reçu ton CV. Ils étudient le dossier."),
     # 260 km
-    ("Conquérant des Ronds-Points 🛤️", "Tu connais chaque craquelure du bitume par son prénom."),
+    (
+        "Conquérant des Ronds-Points 🛤️",
+        "Tu connais chaque craquelure du bitume par son prénom.",
+    ),
     # 280 km
-    ("Avaleur de Bornes 🎯", "Les panneaux kilométriques font des cauchemars avec toi dedans."),
+    (
+        "Avaleur de Bornes 🎯",
+        "Les panneaux kilométriques font des cauchemars avec toi dedans.",
+    ),
     # 300 km
-    ("Phénomène Météo 🌪️", "Météo France t’a officiellement classé ‘perturbation localisée’."),
+    (
+        "Phénomène Météo 🌪️",
+        "Météo France t’a officiellement classé ‘perturbation localisée’.",
+    ),
     # 320 km
-    ("Chameau Turbo 🏜️", "Même les chameaux t’ont demandé ton secret. Tu as refusé de répondre."),
+    (
+        "Chameau Turbo 🏜️",
+        "Même les chameaux t’ont demandé ton secret. Tu as refusé de répondre.",
+    ),
     # 340 km
-    ("Coureur Quantique ⚛️", "Tu existes sur plusieurs parcours simultanément. Schrödinger était moins actif."),
+    (
+        "Coureur Quantique ⚛️",
+        "Tu existes sur plusieurs parcours simultanément. Schrödinger était moins actif.",
+    ),
     # 360 km
-    ("Gladiateur du Goudron ⚔️", "Ave César ! Les km te saluent. César aussi, à contrecœur."),
+    (
+        "Gladiateur du Goudron ⚔️",
+        "Ave César ! Les km te saluent. César aussi, à contrecœur.",
+    ),
     # 380 km
-    ("Comète Humaine ☄️", "Tu laisses une traînée de sueur cosmique. Spectaculaire et légèrement repoussant."),
+    (
+        "Comète Humaine ☄️",
+        "Tu laisses une traînée de sueur cosmique. Spectaculaire et légèrement repoussant.",
+    ),
     # 400 km
-    ("GPS Dépassé 🦾", "Le GPS a rendu les armes. Tu vas dans des endroits qu’il ne connaît pas."),
+    (
+        "GPS Dépassé 🦾",
+        "Le GPS a rendu les armes. Tu vas dans des endroits qu’il ne connaît pas.",
+    ),
     # 420 km
-    ("Prophète de la Foulée 📜", "Tes kilomètres sont cités dans des groupes WhatsApp que tu ne soupçonnes pas."),
+    (
+        "Prophète de la Foulée 📜",
+        "Tes kilomètres sont cités dans des groupes WhatsApp que tu ne soupçonnes pas.",
+    ),
     # 440 km
-    ("Sphinx du Running 🦁", "Personne ne comprend comment tu fais. Toi non plus, mais tu continues."),
+    (
+        "Sphinx du Running 🦁",
+        "Personne ne comprend comment tu fais. Toi non plus, mais tu continues.",
+    ),
     # 460 km
-    ("Nomade Cosmique 🌌", "Tu cours entre les étoiles. Ou presque. C’est surtout le périphérique, mais dans ta tête…"),
+    (
+        "Nomade Cosmique 🌌",
+        "Tu cours entre les étoiles. Ou presque. C’est surtout le périphérique, mais dans ta tête…",
+    ),
     # 480 km
-    ("Légende en Fabrication ⚡", "Dans 1000 ans, les historiens auront une section entière sur toi."),
+    (
+        "Légende en Fabrication ⚡",
+        "Dans 1000 ans, les historiens auront une section entière sur toi.",
+    ),
     # 500 km
-    ("Forgeron de l’Endurance 🔨", "500 km forgés à la sueur. Ton enclume, c’est le bitume."),
+    (
+        "Forgeron de l’Endurance 🔨",
+        "500 km forgés à la sueur. Ton enclume, c’est le bitume.",
+    ),
     # 520 km
-    ("Titan des Kilomètres 🗿", "Les montagnes s’écartent. Les collines font une haie d’honneur."),
+    (
+        "Titan des Kilomètres 🗿",
+        "Les montagnes s’écartent. Les collines font une haie d’honneur.",
+    ),
     # 540 km
-    ("Dompteur d’Horizons 🌅", "L’horizon recule chaque fois que tu approches. Il a peur."),
+    (
+        "Dompteur d’Horizons 🌅",
+        "L’horizon recule chaque fois que tu approches. Il a peur.",
+    ),
     # 560 km
-    ("Phénix de l’Asphalte 🔥🦅", "Tu renais à chaque kilomètre. Et tu es encore plus agaçant qu’avant."),
+    (
+        "Phénix de l’Asphalte 🔥🦅",
+        "Tu renais à chaque kilomètre. Et tu es encore plus agaçant qu’avant.",
+    ),
     # 580 km
-    ("Demi-Dieu en Approche 👑", "Zeus a commandé tes chaussures pour voir ce que ça fait."),
+    (
+        "Demi-Dieu en Approche 👑",
+        "Zeus a commandé tes chaussures pour voir ce que ça fait.",
+    ),
     # === TIER LÉGENDAIRE (600 km+) ===
     # 600 km
-    ("⭐ LÉGENDAIRE ⭐ Seigneur des Foulées 🐉", "Les médecins étudient tes mollets en cours magistral. La salle est comble."),
+    (
+        "⭐ LÉGENDAIRE ⭐ Seigneur des Foulées 🐉",
+        "Les médecins étudient tes mollets en cours magistral. La salle est comble.",
+    ),
     # 620 km
-    ("⭐ LÉGENDAIRE ⭐ Arpenteur des Galaxies 🪐", "Pluton t’a envoyé un message : ‘Respect. Sincèrement.’"),
+    (
+        "⭐ LÉGENDAIRE ⭐ Arpenteur des Galaxies 🪐",
+        "Pluton t’a envoyé un message : ‘Respect. Sincèrement.’",
+    ),
     # 640 km
-    ("⭐ LÉGENDAIRE ⭐ Requin du Bitume 🦈", "La route disparaît sous tes pieds avant que tu arrives dessus."),
+    (
+        "⭐ LÉGENDAIRE ⭐ Requin du Bitume 🦈",
+        "La route disparaît sous tes pieds avant que tu arrives dessus.",
+    ),
     # 660 km
-    ("⭐ LÉGENDAIRE ⭐ Architecte de l’Impossible 🏗️", "Tu construis l’impossible un km à la fois. Le chantier est rentable."),
+    (
+        "⭐ LÉGENDAIRE ⭐ Architecte de l’Impossible 🏗️",
+        "Tu construis l’impossible un km à la fois. Le chantier est rentable.",
+    ),
     # 680 km
-    ("⭐ LÉGENDAIRE ⭐ Voyageur Interstellaire 🛸", "Houston, on l’a perdu. Il est beaucoup trop loin. On abandonne le suivi."),
+    (
+        "⭐ LÉGENDAIRE ⭐ Voyageur Interstellaire 🛸",
+        "Houston, on l’a perdu. Il est beaucoup trop loin. On abandonne le suivi.",
+    ),
     # 700 km
-    ("⭐ LÉGENDAIRE ⭐ Entité Cosmique 🌌", "La NASA a annulé un satellite pour te suivre en direct. Budget bien utilisé."),
+    (
+        "⭐ LÉGENDAIRE ⭐ Entité Cosmique 🌌",
+        "La NASA a annulé un satellite pour te suivre en direct. Budget bien utilisé.",
+    ),
     # 720 km
-    ("⭐ LÉGENDAIRE ⭐ Chuck Norris du Running 🥋", "Chuck Norris court derrière TOI. Il essaie de prendre des notes."),
+    (
+        "⭐ LÉGENDAIRE ⭐ Chuck Norris du Running 🥋",
+        "Chuck Norris court derrière TOI. Il essaie de prendre des notes.",
+    ),
     # 740 km
-    ("⭐ LÉGENDAIRE ⭐ Déclaration d’Intention 🏆", "Tu ne cours plus. Tu déclares solennellement une intention de te déplacer vite."),
+    (
+        "⭐ LÉGENDAIRE ⭐ Déclaration d’Intention 🏆",
+        "Tu ne cours plus. Tu déclares solennellement une intention de te déplacer vite.",
+    ),
     # 760 km
-    ("⭐ LÉGENDAIRE ⭐ Tempête Certifiée 🌩️", "Même les jours où tu ne cours pas, le sol tremble par habitude."),
+    (
+        "⭐ LÉGENDAIRE ⭐ Tempête Certifiée 🌩️",
+        "Même les jours où tu ne cours pas, le sol tremble par habitude.",
+    ),
     # 780 km
-    ("⭐ LÉGENDAIRE ⭐ Aimant Gravitationnel 🧲", "Les kilomètres viennent à toi maintenant. Tu n’as plus à les chercher."),
+    (
+        "⭐ LÉGENDAIRE ⭐ Aimant Gravitationnel 🧲",
+        "Les kilomètres viennent à toi maintenant. Tu n’as plus à les chercher.",
+    ),
     # 800 km
-    ("⭐ LÉGENDAIRE ⭐ Dieu Vivant du Bitume 👑", "Les ronds-points portent ton prénom. Officieusement, mais quand même."),
+    (
+        "⭐ LÉGENDAIRE ⭐ Dieu Vivant du Bitume 👑",
+        "Les ronds-points portent ton prénom. Officieusement, mais quand même.",
+    ),
     # 820 km
-    ("⭐ LÉGENDAIRE ⭐ Carburant Illimité ⛽", "Les scientifiques veulent étudier ton métabolisme. Elon Musk veut le breveter."),
+    (
+        "⭐ LÉGENDAIRE ⭐ Carburant Illimité ⛽",
+        "Les scientifiques veulent étudier ton métabolisme. Elon Musk veut le breveter.",
+    ),
     # 840 km
-    ("⭐ LÉGENDAIRE ⭐ Usine à Records 🏭", "Tu produis des km comme d’autres produisent des excuses. Industriellement."),
+    (
+        "⭐ LÉGENDAIRE ⭐ Usine à Records 🏭",
+        "Tu produis des km comme d’autres produisent des excuses. Industriellement.",
+    ),
     # 860 km
-    ("⭐ LÉGENDAIRE ⭐ Boss Absolu 👊", "La discipline ne te sert plus le café. Elle te demande la permission de te parler."),
+    (
+        "⭐ LÉGENDAIRE ⭐ Boss Absolu 👊",
+        "La discipline ne te sert plus le café. Elle te demande la permission de te parler.",
+    ),
     # 880 km
-    ("⭐ LÉGENDAIRE ⭐ Collectionneur de Saisons 📅", "Tu ne coches plus des cases. Tu remplis des encyclopédies."),
+    (
+        "⭐ LÉGENDAIRE ⭐ Collectionneur de Saisons 📅",
+        "Tu ne coches plus des cases. Tu remplis des encyclopédies.",
+    ),
     # 900 km
-    ("⭐ MYTHIQUE ⭐ Transcendance Totale 🔮", "Tu es devenu quelque chose que la science ne peut pas encore nommer. Les linguistes travaillent dessus."),
+    (
+        "⭐ MYTHIQUE ⭐ Transcendance Totale 🔮",
+        "Tu es devenu quelque chose que la science ne peut pas encore nommer. Les linguistes travaillent dessus.",
+    ),
     # 920 km
-    ("⭐ MYTHIQUE ⭐ Anti-Matière du Sport 🌀", "La flemme a non seulement déménagé — elle a changé de planète et coupé le contact."),
+    (
+        "⭐ MYTHIQUE ⭐ Anti-Matière du Sport 🌀",
+        "La flemme a non seulement déménagé — elle a changé de planète et coupé le contact.",
+    ),
     # 940 km
-    ("⭐ MYTHIQUE ⭐ Monstre Incompris 🧟", "Ton entourage dit ‘mais pourquoi ?’ Tu réponds avec les yeux d’un être supérieur."),
+    (
+        "⭐ MYTHIQUE ⭐ Monstre Incompris 🧟",
+        "Ton entourage dit ‘mais pourquoi ?’ Tu réponds avec les yeux d’un être supérieur.",
+    ),
     # 960 km
-    ("⭐ MYTHIQUE ⭐ Mythe Vivant 🏛️", "On parle de toi au café du coin. Et dans les cafés des coins adjacents."),
+    (
+        "⭐ MYTHIQUE ⭐ Mythe Vivant 🏛️",
+        "On parle de toi au café du coin. Et dans les cafés des coins adjacents.",
+    ),
     # 980 km
-    ("⭐ MYTHIQUE ⭐ Force de la Nature 🌊", "Tu n’es plus une personne. Tu es un phénomène météorologique qui court."),
+    (
+        "⭐ MYTHIQUE ⭐ Force de la Nature 🌊",
+        "Tu n’es plus une personne. Tu es un phénomène météorologique qui court.",
+    ),
     # 1000 km
-    ("☠️ ULTIME LÉGENDAIRE ☠️ 1000 km Accomplis ✅", "Les dieux de l’Olympe ont annulé leur abonnement salle de sport par honte. Bravo."),
+    (
+        "☠️ ULTIME LÉGENDAIRE ☠️ 1000 km Accomplis ✅",
+        "Les dieux de l’Olympe ont annulé leur abonnement salle de sport par honte. Bravo.",
+    ),
 ]
 
 
@@ -374,6 +515,23 @@ def get_badge_progress(km):
     km_restants = next_threshold - km
     next_badge_label, _ = get_fun_badge(next_threshold)
     return (percent, km_restants, next_badge_label)
+
+
+def get_denivele_comment(denivele_val: str) -> str:
+    """Retourne un commentaire fun sur le dénivelé, ou '' si absent/nul."""
+    try:
+        d = int(denivele_val or 0)
+    except ValueError:
+        return ""
+    if d <= 0:
+        return ""
+    if d >= 2000:
+        return f"⛰️ {d} m D+ — tu gravis des montagnes !"
+    if d >= 1000:
+        return f"⛰️ {d} m D+ — impressionnant grimpeur !"
+    if d >= 500:
+        return f"⛰️ {d} m D+ en prime !"
+    return f"⛰️ {d} m D+ au compteur."
 
 
 def build_teams(participants_sorted):
@@ -565,7 +723,7 @@ JOURNEY_MILESTONES = [
         4_000,
         "\U0001f30d",
         "Hors d'Europe",
-        "On quitte le continent, adios ! \u2708\ufe0f",
+        "On quitte le continent, adios les boloss, on se casse au soleil ! \u2708\ufe0f",
     ),
     (
         5_500,
@@ -673,6 +831,12 @@ def generate_team_page(team, rank, members, is_fun=False):
         badge_html = ""
         if is_fun:
             badge_label, badge_motiv = get_fun_badge(km_float(p))
+            denivele_comment = get_denivele_comment(denivele_val)
+            denivele_html = (
+                f'<small class="fun-denivele">{denivele_comment}</small>'
+                if denivele_comment
+                else ""
+            )
             progress = get_badge_progress(km_float(p))
             progress_html = ""
             if progress:
@@ -687,6 +851,7 @@ def generate_team_page(team, rank, members, is_fun=False):
                 f'<div class="member-badge">'
                 f'<span class="fun-badge">🏅 {badge_label}</span>'
                 f'<small class="fun-motivation">{badge_motiv}</small>'
+                f"{denivele_html}"
                 f"{progress_html}"
                 f"</div>"
             )
@@ -819,6 +984,7 @@ body {
 }
 [data-theme="dark"] body { --fun-bg: #0f172a; --fun-dot: #1e293b; }
 .fun-motivation { color: #e91e63; font-style: italic; font-size: 0.8rem; font-weight: bold; }
+.fun-denivele { display: block; color: #10b981; font-size: 0.78rem; font-style: italic; font-weight: 600; margin-top: 0.2rem; line-height: 1.3; word-break: break-word; }
 .fun-badge { font-size: 0.85rem !important; display: inline-block; padding: 0.3rem 0.8rem; border-radius: 6px; background: rgba(251, 191, 36, 0.15) !important; color: #fbbf24 !important; font-weight: 600; }
 .member-card:hover {
   transform: scale(1.02) rotate(-1deg) !important; transition: transform 0.1s;
@@ -1242,6 +1408,13 @@ def generate_html(participants, is_fun=False):
             )
             if is_fun:
                 badge_label, badge_motiv = get_fun_badge(km_float(p))
+                denivele_val = p.get("denivele", "")
+                denivele_comment = get_denivele_comment(denivele_val)
+                denivele_html = (
+                    f'<br><small class="fun-denivele">{denivele_comment}</small>'
+                    if denivele_comment
+                    else ""
+                )
                 progress = get_badge_progress(km_float(p))
                 progress_html = ""
                 if progress:
@@ -1255,6 +1428,7 @@ def generate_html(participants, is_fun=False):
                 lines.append(
                     f'<td data-label="Badge"><span class="tag is-warning is-light fun-badge">{badge_label}</span>'
                     f'<br><small class="fun-motivation">{badge_motiv}</small>'
+                    f"{denivele_html}"
                     f"{progress_html}</td>"
                 )
             lines.append("</tr>")
@@ -1727,6 +1901,16 @@ body {
   font-style: italic;
   font-size: 0.8rem;
   font-weight: bold;
+}
+.fun-denivele {
+  display: block;
+  color: #10b981;
+  font-size: 0.78rem;
+  font-style: italic;
+  font-weight: 600;
+  margin-top: 0.2rem;
+  line-height: 1.3;
+  word-break: break-word;
 }
 .fun-badge {
   font-size: 0.85rem !important;
