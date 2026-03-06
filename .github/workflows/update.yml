@@ -2,7 +2,7 @@ name: Mise à jour des résultats Mars Bleu
 
 on:
   schedule:
-    - cron: '0 * * * *'
+    - cron: "0 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -19,10 +19,16 @@ jobs:
       - name: Configurer Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: uv sync
+        run: uv sync
 
       - name: Récupérer et générer
-        run: python3 scrape.py
+        run: uv run python3 scrape.py
 
       - name: Déployer sur GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
@@ -30,4 +36,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./
           publish_branch: gh-pages
-          exclude_assets: '.github,scrape.py,.git*'
+          exclude_assets: ".github,scrape.py,.git*"
