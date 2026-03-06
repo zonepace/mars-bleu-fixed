@@ -427,6 +427,13 @@ def generate_team_page(team, rank, members, is_fun=False):
             f'</div>'
         ).replace(",", " ")
 
+    # Rotating motivational quotes (fun only)
+    fun_quotes_html = ""
+    if is_fun:
+        fun_quotes_html = """<div id="fun-quotes" class="fun-quotes-banner">
+  <span id="fun-quote-text"></span>
+</div>"""
+
     # Navigation links
     back_link = "fun.html" if is_fun else "index.html"
     back_label = "🤓 Retour au classement" if not is_fun else "🤪 Retour au classement fun"
@@ -470,7 +477,132 @@ body {
 [data-theme="light"] .journey-step.locked { background: rgba(0,0,0,0.02); border-left-color: #cbd5e1; }
 [data-theme="light"] .journey-bar { background: #e2e8f0; }
 [data-theme="light"] .journey-passed summary { color: #5b21b6; }
+/* Achievement toast notifications */
+.fun-toast {
+  position: fixed;
+  right: -400px;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #2d3436, #636e72);
+  color: white;
+  border-radius: 12px;
+  border-left: 5px solid #feca57;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+  z-index: 9999;
+  font-weight: bold;
+  font-size: 0.95rem;
+  max-width: 350px;
+  transition: right 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+.fun-toast.show {
+  right: 20px;
+}
+/* Rotating quotes banner */
+.fun-quotes-banner {
+  max-width: 800px;
+  margin: 0 auto 1rem;
+  text-align: center;
+  padding: 1.2rem 2rem;
+  background: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+  background-size: 300% 300%;
+  animation: gradient-shift 4s ease infinite;
+  border-radius: 16px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #1a1a2e;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  min-height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+#fun-quote-text {
+  transition: opacity 0.5s ease;
+}
+[data-theme="light"] .fun-quotes-banner {
+  color: #1a1a2e;
+}
+[data-theme="light"] .fun-toast {
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  color: #1e293b;
+  border-left-color: #f59e0b;
+}
 </style>"""
+
+    fun_script = ""
+    if is_fun:
+        fun_script = """
+<script>
+window.addEventListener('load', function() {{
+    var allToasts = [
+      "\\ud83c\\udfc6 Achievement: Tu as ouvert la page ! +10 points motivation",
+      "\\ud83c\\udfc6 Achievement: Stalker de classement d\\u00e9tect\\u00e9 !",
+      "\\ud83c\\udfc6 Achievement: Mode Fun activ\\u00e9 ! Tu g\\u00e8res !",
+      "\\ud83d\\udc40 Achievement: Espionnage de concurrents en cours...",
+      "\\ud83e\\uddb6 Achievement: Tes mollets ont senti ta pr\\u00e9sence",
+      "\\ud83c\\udf55 Achievement: Calories brul\\u00e9es = 1 pizza gratuite",
+      "\\ud83d\\udca9 Achievement: Tu scrolles au lieu de courir !",
+      "\\ud83e\\udd21 Achievement: Fan n\\u00b01 du Mode Fun",
+      "\\ud83d\\ude34 Achievement: Le canap\\u00e9 pleure ton absence",
+      "\\ud83e\\uddd0 Achievement: Analyse tactique du classement"
+    ];
+    var toasts = [];
+    var indices = [];
+    while (toasts.length < 3 && indices.length < allToasts.length) {{
+      var ri = Math.floor(Math.random() * allToasts.length);
+      if (indices.indexOf(ri) === -1) {{ indices.push(ri); toasts.push(allToasts[ri]); }}
+    }}
+    function showToast(msg, delay, topOffset) {{
+      setTimeout(function() {{
+        var t = document.createElement('div');
+        t.className = 'fun-toast';
+        t.textContent = msg;
+        t.style.top = topOffset + 'px';
+        document.body.appendChild(t);
+        setTimeout(function() {{ t.classList.add('show'); }}, 50);
+        setTimeout(function() {{
+          t.classList.remove('show');
+          setTimeout(function() {{ t.remove(); }}, 600);
+        }}, 4000);
+      }}, delay);
+    }}
+    showToast(toasts[0], 3500, 20);
+    showToast(toasts[1], 5500, 90);
+    showToast(toasts[2], 7500, 160);
+
+    // Rotating motivational quotes
+    var quotes = [
+      "La sueur, c'est juste tes bourrelets qui pleurent \\ud83d\\ude2d",
+      "Cours comme si le dernier pain au chocolat t'attendait \\ud83e\\udd50",
+      "Tes fesses te remercieront... un jour \\ud83c\\udf51",
+      "On n'est pas l\\u00e0 pour souffrir... ah si en fait \\ud83d\\ude05",
+      "Chaque kilom\\u00e8tre te rapproche de Mars ! \\ud83d\\ude80",
+      "Le canap\\u00e9 est ton ennemi. Le bitume est ton ami. \\ud83d\\udeb6",
+      "T'as pas fait tout \\u00e7a pour abandonner maintenant ! \\ud83d\\udcaa",
+      "M\\u00eame un escargot finit par arriver \\ud83d\\udc0c",
+      "Ton corps te d\\u00e9teste l\\u00e0, mais il t'aimera demain \\u2764\\ufe0f",
+      "Si t'arrives \\u00e0 lire \\u00e7a en courant, ralentis pas ! \\ud83c\\udfc3",
+      "Cours plus vite que ta digestion \\ud83d\\udca9"
+    ];
+    var quoteEl = document.getElementById('fun-quote-text');
+    if (quoteEl) {{
+      var qi = 0;
+      quoteEl.textContent = quotes[0];
+      setInterval(function() {{
+        quoteEl.style.opacity = '0';
+        setTimeout(function() {{
+          qi = (qi + 1) % quotes.length;
+          quoteEl.textContent = quotes[qi];
+          quoteEl.style.opacity = '1';
+        }}, 500);
+      }}, 4000);
+    }}
+}});
+</script>"""
 
     return f"""<!DOCTYPE html>
 <html lang="fr" data-theme="light">
@@ -611,6 +743,8 @@ body {{ background: var(--bg); color: var(--text); font-family: var(--font-body)
     <a href="{switch_fun_link}" class="button is-warning is-rounded">{switch_fun_label}</a>
   </div>
 
+  {fun_quotes_html}
+
   {journey_html}
 
   <h2 style="font-family:var(--font-heading);font-size:1.4rem;margin-bottom:1rem;">Membres de l'équipe</h2>
@@ -637,6 +771,7 @@ themeToggle.addEventListener('click', function() {{
   updateIcon(nxt);
 }});
 </script>
+{fun_script}
 </body>
 </html>"""
 
