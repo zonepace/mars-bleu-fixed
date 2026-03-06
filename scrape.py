@@ -3,12 +3,14 @@
 et génère un site HTML statique avec Bulma."""
 
 import html as html_mod
-import json
 import re
 import sys
+import time
 import unicodedata
 import urllib.request
 from datetime import datetime, timezone
+
+from bs4 import BeautifulSoup
 
 BASE_URL = "https://www.zapsports.com/ext/app_page_web/su-res-detail-503-{offset}-100.htm"
 OFFSETS = [0, 100, 200, 300, 400]
@@ -42,69 +44,109 @@ def slugify(text):
     return text.strip("-")
 
 
-def clean(s):
-    """Nettoie une cellule HTML : supprime les balises, normalise les espaces."""
-    return html_mod.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", s))).strip()
 
-
-def fetch_page(offset):
-    """Récupère une page de résultats depuis ZapSports."""
+def fetch_page(offset, retries=2):
+    """Récupère une page de résultats depuis ZapSports (avec retry)."""
     url = BASE_URL.format(offset=offset)
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return resp.read().decode("latin-1")
+    for attempt in range(retries + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                raw = resp.read()
+                try:
+                    return raw.decode("utf-8")
+                except UnicodeDecodeError:
+                    return raw.decode("latin-1")
+        except Exception as e:
+            if attempt < retries:
+                print(f"    Erreur (tentative {attempt + 1}/{retries + 1}): {e}. Retry...")
+                time.sleep(5)
+            else:
+                raise
+
+
+def parse_detail(text, p):
+    """Extrait les champs de la ligne de détail (texte brut) dans le dict participant."""
+    m = re.search(r"Dossard n[o°]\s*(\d+)", text)
+    if m:
+        p["dossard"] = m.group(1)
+    m = re.search(r"D[ée]nivel[ée]\s*:\s*(\d+)\s*m", text)
+    if m:
+        p["denivele"] = m.group(1)
+    m = re.search(r"Temps\s*:\s*([\d:]+)", text)
+    if m:
+        p["temps"] = m.group(1)
+    m = re.search(r"Place cat\.\s*temporaire\s*:\s*(\d+)", text)
+    if m:
+        p["place_cat"] = m.group(1)
+    m = re.search(r"Place temporaire\s*:\s*(\d+)", text)
+    if m:
+        p["place"] = m.group(1)
 
 
 def parse_page(page_html):
-    """Parse une page HTML et retourne la liste des participants."""
+    """Parse une page HTML avec BeautifulSoup et retourne la liste des participants."""
     participants = []
-    table_match = re.search(r"<table[^>]*>(.*?)</table>", page_html, re.DOTALL)
-    if not table_match:
+    soup = BeautifulSoup(page_html, "html.parser")
+    table = soup.find("table")
+    if not table:
         return participants
-    table = table_match.group(1)
-    rows = re.findall(r"<tr[^>]*>(.*?)</tr>", table, re.DOTALL)
+
+    rows = table.find_all("tr")
+    if not rows:
+        return participants
+
+    # Build column index map from header row
+    header_cells = rows[0].find_all(["th", "td"])
+    col_map = {}
+    for idx, th in enumerate(header_cells):
+        text = th.get_text(" ", strip=True).lower()
+        if "seance" in text:
+            col_map["nb_seances"] = idx
+        elif "km" in text:
+            col_map["km"] = idx
+        elif "nom" in text:
+            col_map["nom"] = idx
+        elif "sexe" in text:
+            col_map["sexe"] = idx
+        elif "cat" in text:
+            col_map["categorie"] = idx
+        elif "entreprise" in text:
+            col_map["entreprise"] = idx
+        elif "equipe" in text or "équipe" in text:
+            col_map["equipe"] = idx
+
+    def get_col(cells, key, default=""):
+        idx = col_map.get(key)
+        if idx is None or idx >= len(cells):
+            return default
+        return cells[idx].get_text(" ", strip=True)
 
     i = 1  # skip header row
     while i < len(rows):
-        cells = re.findall(r"<td[^>]*>(.*?)</td>", rows[i], re.DOTALL)
-        if len(cells) >= 7:
-            nom = clean(cells[3])
+        tds = rows[i].find_all("td")
+        if len(tds) > 2:
+            nom = get_col(tds, "nom")
             if nom:
                 p = {
-                    "nb_seances": clean(cells[1]),
-                    "km": clean(cells[2]),
+                    "nb_seances": get_col(tds, "nb_seances"),
+                    "km": get_col(tds, "km"),
                     "nom": nom,
-                    "sexe": clean(cells[4]),
-                    "categorie": clean(cells[5]),
-                    "equipe": clean(cells[6]),
+                    "sexe": get_col(tds, "sexe"),
+                    "categorie": get_col(tds, "categorie"),
+                    "entreprise": get_col(tds, "entreprise"),
+                    "equipe": get_col(tds, "equipe"),
                     "dossard": "",
                     "denivele": "",
                     "temps": "",
                     "place": "",
                     "place_cat": "",
                 }
-                # Check next row for detail line
+                # Check next row for detail line (single <td>)
                 if i + 1 < len(rows):
-                    detail_cells = re.findall(
-                        r"<td[^>]*>(.*?)</td>", rows[i + 1], re.DOTALL
-                    )
-                    if len(detail_cells) == 1:
-                        detail = clean(detail_cells[0])
-                        m = re.search(r"Dossard n° (\d+)", detail)
-                        if m:
-                            p["dossard"] = m.group(1)
-                        m = re.search(r"Dénivelé : (\d+)m", detail)
-                        if m:
-                            p["denivele"] = m.group(1)
-                        m = re.search(r"Temps : ([\d:]+)", detail)
-                        if m:
-                            p["temps"] = m.group(1)
-                        m = re.search(r"Place temporaire : (\d+)", detail)
-                        if m:
-                            p["place"] = m.group(1)
-                        m = re.search(r"Place cat\. temporaire : (\d+)", detail)
-                        if m:
-                            p["place_cat"] = m.group(1)
+                    next_tds = rows[i + 1].find_all("td")
+                    if len(next_tds) == 1:
+                        parse_detail(next_tds[0].get_text(" ", strip=True), p)
                         i += 1
                 participants.append(p)
         i += 1
@@ -112,10 +154,32 @@ def parse_page(page_html):
 
 
 
+def _detect_offsets(first_page_html):
+    """Détecte dynamiquement tous les offsets depuis la pagination."""
+    soup = BeautifulSoup(first_page_html, "html.parser")
+    offsets = set(OFFSETS)  # fallback to hardcoded offsets
+    for a in soup.find_all("a", href=True):
+        m = re.search(r"su-res-detail-\d+-(\d+)-100\.htm", a["href"])
+        if m:
+            offsets.add(int(m.group(1)))
+    return sorted(offsets)
+
+
 def scrape_all():
-    """Récupère tous les participants depuis les 5 pages."""
+    """Récupère tous les participants (détection dynamique des pages)."""
     all_participants = []
-    for offset in OFFSETS:
+    print("  Récupération page offset=0 (détection pagination)...")
+    first_html = fetch_page(0)
+    offsets = _detect_offsets(first_html)
+    print(f"  Pages détectées : offsets={offsets}")
+
+    participants = parse_page(first_html)
+    print(f"    → {len(participants)} participants")
+    all_participants.extend(participants)
+
+    for offset in offsets:
+        if offset == 0:
+            continue
         print(f"  Récupération page offset={offset}...")
         page_html = fetch_page(offset)
         participants = parse_page(page_html)
@@ -179,8 +243,10 @@ def generate_html(participants):
             '<th data-sort="nom">Nom <i class="fas fa-sort sort-icon"></i></th>',
             '<th data-sort="km">Km <i class="fas fa-sort sort-icon"></i></th>',
             '<th data-sort="seances">Séances <i class="fas fa-sort sort-icon"></i></th>',
+            '<th data-sort="denivele">Dénivelé <i class="fas fa-sort sort-icon"></i></th>',
             "<th>Sexe</th>",
             "<th>Catégorie</th>",
+            "<th>Entreprise</th>",
             "</tr></thead>",
             "<tbody>",
         ]
@@ -192,16 +258,25 @@ def generate_html(participants):
             )
             cat_tag = f'<span class="tag tag-cat">{esc(cat_fr(p["categorie"]))}</span>'
             lines.append(
-                f'<tr data-nom="{esc(p["nom"].lower())}" '
+                f'<tr class="participant-row" style="cursor:pointer" '
+                f'data-nom="{esc(p["nom"].lower())}" '
                 f'data-km="{km_float(p)}" '
-                f'data-seances="{esc(p["nb_seances"])}">'
+                f'data-seances="{esc(p["nb_seances"])}" '
+                f'data-dossard="{esc(p.get("dossard", ""))}" '
+                f'data-denivele="{esc(p.get("denivele", ""))}" '
+                f'data-temps="{esc(p.get("temps", ""))}" '
+                f'data-place="{esc(p.get("place", ""))}" '
+                f'data-place-cat="{esc(p.get("place_cat", ""))}">'
             )
             lines.append(f'<td class="has-text-grey">{idx}</td>')
             lines.append(f'<td><strong>{esc(p["nom"])}</strong></td>')
             lines.append(f'<td class="has-text-weight-semibold">{esc(p["km"])}</td>')
             lines.append(f'<td>{esc(p["nb_seances"])}</td>')
+            denivele_val = p.get("denivele", "")
+            lines.append(f'<td>{esc(denivele_val)}{" m" if denivele_val else ""}</td>')
             lines.append(f"<td>{sexe_tag}</td>")
             lines.append(f"<td>{cat_tag}</td>")
+            lines.append(f'<td class="has-text-grey">{esc(p.get("entreprise", ""))}</td>')
             lines.append("</tr>")
         lines.append("</tbody></table>")
         return "\n".join(lines)
@@ -222,10 +297,10 @@ def generate_html(participants):
 
     teams = []
     for key, members in equipe_members.items():
-        total_km = sum(km_float(p) for p in members)
+        team_km = sum(km_float(p) for p in members)
         teams.append({
             "equipe": equipe_original_name[key],
-            "km": f"{total_km:.1f}".replace(".", ","),
+            "km": f"{team_km:.1f}".replace(".", ","),
             "nb_equipier": len(members),
         })
     teams.sort(key=lambda t: float(t["km"].replace(",", ".")), reverse=True)
@@ -267,14 +342,16 @@ def generate_html(participants):
         color = "is-danger" if s_code == "F" else "is-info"
         tab_sexe_parts.append(
             f'<div class="section-box" id="sexe-{s_code.lower()}">'
-            f'<div class="section-box-title">'
+            f'<div class="section-box-title" onclick="toggleSection(this)" style="cursor:pointer">'
             f'<i class="fas {icon}"></i> {esc(s_label)} '
             f'<span class="tag tag-km">{s_km:.1f} km</span> '
             f'<span class="tag tag-count">{len(members)} participante{"s" if len(members) > 1 else ""}</span>'
+            f'<i class="fas fa-chevron-right equipe-chevron" style="margin-left:auto"></i>'
             f"</div>"
+            f'<div class="section-detail" style="display:none">'
         )
         tab_sexe_parts.append(render_table(members))
-        tab_sexe_parts.append("</div>")
+        tab_sexe_parts.append("</div></div>")
     tab_sexe = "\n".join(tab_sexe_parts)
 
     # Onglet Par Catégorie
@@ -703,6 +780,15 @@ th[data-sort]:hover {{
   font-size: 1.1rem;
   color: var(--accent);
 }}
+.section-box-title i.equipe-chevron {{
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  transition: transform 0.25s ease, color 0.2s;
+}}
+.section-box.is-open .section-box-title i.equipe-chevron {{
+  transform: rotate(90deg);
+  color: var(--accent);
+}}
 
 /* ── Équipe blocks ── */
 .equipe-block {{
@@ -765,6 +851,34 @@ th[data-sort]:hover {{
   border-radius: 0 0 var(--radius-sm) var(--radius-sm);
   padding: 0.75rem;
   background: var(--bg-card);
+}}
+
+/* ── Participant detail row ── */
+.participant-detail-row td {{
+  background: var(--bg-card-hover);
+  padding: 0.75rem 1rem 0.75rem 2.5rem !important;
+  border-bottom: 1px solid var(--border-light) !important;
+}}
+.participant-detail-row .detail-tags {{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}}
+.participant-detail-row .detail-tag {{
+  background: var(--tag-count-bg);
+  color: var(--tag-count-text);
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 0.3em 0.7em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}}
+.participant-detail-row .detail-tag i {{
+  font-size: 0.7rem;
+  opacity: 0.7;
 }}
 
 /* ── Footer ── */
@@ -831,19 +945,19 @@ th[data-sort]:hover {{
   <div class="tabs-container">
     <div class="tabs is-medium" id="main-tabs">
       <ul>
-        <li class="is-active" data-tab="general"><a href="#general"><i class="fas fa-list-ol mr-2"></i>Général</a></li>
-        <li data-tab="equipe"><a href="#equipe"><i class="fas fa-users mr-2"></i>Par Équipe</a></li>
+        <li class="is-active" data-tab="equipe"><a href="#equipe"><i class="fas fa-users mr-2"></i>Par Équipe</a></li>
+        <li data-tab="general"><a href="#general"><i class="fas fa-list-ol mr-2"></i>Général</a></li>
         <li data-tab="sexe"><a href="#sexe"><i class="fas fa-venus-mars mr-2"></i>Par Sexe</a></li>
         <li data-tab="categorie"><a href="#categorie"><i class="fas fa-layer-group mr-2"></i>Par Catégorie</a></li>
       </ul>
     </div>
   </div>
 
-  <div id="tab-general" class="tab-content is-active">
-    {tab_general}
-  </div>
-  <div id="tab-equipe" class="tab-content">
+  <div id="tab-equipe" class="tab-content is-active">
     {tab_equipe}
+  </div>
+  <div id="tab-general" class="tab-content">
+    {tab_general}
   </div>
   <div id="tab-sexe" class="tab-content">
     {tab_sexe}
@@ -896,11 +1010,19 @@ function toggleEquipe(summary) {{
   detail.style.display = block.classList.contains('is-open') ? 'block' : 'none';
 }}
 
+// Toggle section-box (sexe, categorie) expand/collapse
+function toggleSection(title) {{
+  var box = title.closest('.section-box');
+  var detail = box.querySelector('.section-detail');
+  box.classList.toggle('is-open');
+  detail.style.display = box.classList.contains('is-open') ? 'block' : 'none';
+}}
+
 // Hash routing on load
 function handleHash() {{
   var hash = location.hash.replace('#', '');
   if (!hash) return;
-  var tabs = ['general', 'equipe', 'sexe', 'categorie'];
+  var tabs = ['equipe', 'general', 'sexe', 'categorie'];
   if (tabs.indexOf(hash) !== -1) {{
     activateTab(hash);
     return;
@@ -916,13 +1038,84 @@ function handleHash() {{
 handleHash();
 window.addEventListener('hashchange', handleHash);
 
-// Recherche
+// Recherche (onglet actif uniquement)
+function applySearch(q) {{
+  var activeTab = document.querySelector('.tab-content.is-active');
+  if (!activeTab) return;
+  var equipeBlocks = activeTab.querySelectorAll('.equipe-block');
+  if (equipeBlocks.length > 0) {{
+    equipeBlocks.forEach(function(block) {{
+      var teamName = (block.querySelector('.equipe-name')?.textContent || '').toLowerCase();
+      var members = block.querySelectorAll('tbody tr[data-nom]');
+      var match = teamName.includes(q);
+      if (!match) {{
+        members.forEach(function(row) {{
+          if ((row.getAttribute('data-nom') || '').includes(q)) match = true;
+        }});
+      }}
+      block.style.display = match ? '' : 'none';
+    }});
+    // Auto-expand if exactly one team matches
+    var visibleBlocks = Array.from(equipeBlocks).filter(function(b) {{ return b.style.display !== 'none'; }});
+    if (visibleBlocks.length === 1) {{
+      visibleBlocks[0].classList.add('is-open');
+      var detail = visibleBlocks[0].querySelector('.equipe-detail');
+      if (detail) detail.style.display = 'block';
+    }} else {{
+      equipeBlocks.forEach(function(block) {{
+        block.classList.remove('is-open');
+        var detail = block.querySelector('.equipe-detail');
+        if (detail) detail.style.display = 'none';
+      }});
+    }}
+  }} else {{
+    activeTab.querySelectorAll('tbody tr').forEach(function(row) {{
+      if (row.classList.contains('participant-detail-row')) {{ row.remove(); return; }}
+      var nom = row.getAttribute('data-nom') || '';
+      row.style.display = nom.includes(q) ? '' : 'none';
+    }});
+  }}
+}}
 document.getElementById('search').addEventListener('input', function() {{
-  var q = this.value.toLowerCase();
-  document.querySelectorAll('tbody tr').forEach(function(row) {{
-    var nom = row.getAttribute('data-nom') || '';
-    row.style.display = nom.includes(q) ? '' : 'none';
+  applySearch(this.value.toLowerCase());
+}});
+// Reset search display when switching tabs
+document.querySelectorAll('#main-tabs li').forEach(function(tab) {{
+  tab.addEventListener('click', function() {{
+    var q = document.getElementById('search').value.toLowerCase();
+    setTimeout(function() {{ applySearch(q); }}, 0);
   }});
+}});
+
+// Toggle participant detail row
+document.addEventListener('click', function(e) {{
+  var row = e.target.closest('tr.participant-row');
+  if (!row) return;
+  var next = row.nextElementSibling;
+  if (next && next.classList.contains('participant-detail-row')) {{
+    next.remove();
+    return;
+  }}
+  var fields = [
+    {{key: 'dossard', label: 'Dossard', icon: 'fa-hashtag'}},
+    {{key: 'denivele', label: 'Dénivelé', icon: 'fa-mountain', suffix: ' m'}},
+    {{key: 'temps', label: 'Temps', icon: 'fa-clock'}},
+    {{key: 'place', label: 'Place temporaire', icon: 'fa-ranking-star'}},
+    {{key: 'place-cat', label: 'Place catégorie', icon: 'fa-medal'}}
+  ];
+  var tags = '';
+  fields.forEach(function(f) {{
+    var val = row.getAttribute('data-' + f.key) || '';
+    if (val) {{
+      tags += '<span class="detail-tag"><i class="fas ' + f.icon + '"></i> ' + f.label + ' : ' + val + (f.suffix || '') + '</span>';
+    }}
+  }});
+  if (!tags) return;
+  var cols = row.querySelectorAll('td').length;
+  var detailRow = document.createElement('tr');
+  detailRow.className = 'participant-detail-row';
+  detailRow.innerHTML = '<td colspan="' + cols + '"><div class="detail-tags">' + tags + '</div></td>';
+  row.after(detailRow);
 }});
 
 // Tri des colonnes
@@ -930,6 +1123,7 @@ document.querySelectorAll('th[data-sort]').forEach(function(th) {{
   th.addEventListener('click', function() {{
     var table = th.closest('table');
     var tbody = table.querySelector('tbody');
+    tbody.querySelectorAll('tr.participant-detail-row').forEach(function(r) {{ r.remove(); }});
     var rows = Array.from(tbody.querySelectorAll('tr'));
     var key = th.dataset.sort;
     var asc = th.classList.toggle('asc');
