@@ -237,8 +237,22 @@ def km_float(p):
         return 0.0
 
 
-def generate_html(participants):
-    """Génère le fichier index.html avec Bulma."""
+def get_fun_badge(km):
+    """Retourne un badge humoristique en fonction des kilomètres parcourus."""
+    if km < 5:
+        return "Échauffement du fessier 🐌"
+    elif km < 20:
+        return "Trotteur du dimanche 🚶"
+    elif km < 50:
+        return "Mollets en Titane 🦵"
+    elif km < 100:
+        return "Forrest Gump 🏃💨"
+    else:
+        return "Cyborg aux Fesses d'Acier 🦾🍑"
+
+
+def generate_html(participants, is_fun=False):
+    """Génère le fichier HTML avec Bulma (mode standard ou fun)."""
     now = get_paris_time()
     participants_sorted = sorted(participants, key=km_float, reverse=True)
     total_km = sum(km_float(p) for p in participants)
@@ -277,6 +291,7 @@ def generate_html(participants):
             "<th>Sexe</th>",
             "<th>Catégorie</th>",
             "<th>Entreprise</th>",
+            "<th>Badge 🏅</th>" if is_fun else "",
             "</tr></thead>",
             "<tbody>",
         ]
@@ -311,6 +326,11 @@ def generate_html(participants):
             lines.append(
                 f'<td data-label="Entreprise">{esc(p.get("entreprise", ""))}</td>'
             )
+            if is_fun:
+                badge = get_fun_badge(km_float(p))
+                lines.append(
+                    f'<td data-label="Badge"><span class="tag is-warning is-light">{badge}</span></td>'
+                )
             lines.append("</tr>")
         lines.append("</tbody></table>")
         return "\n".join(lines)
@@ -410,12 +430,126 @@ def generate_html(participants):
 
     logo_url = "https://www.iledefrance.ars.sante.fr/system/files/styles/ars_detail_page_content/private/2023-03/vignette_MARSBLEU_0.jpg.webp?itok=1fl-F36g"
 
+    page_title = (
+        "Défi Mars Bleu Connecté 2026 - Résultats"
+        if not is_fun
+        else "Mars Bleu : Opération Bouge Ton Popotin ! 🍑🚀"
+    )
+    hero_title_html = (
+        'Défi <span class="hero-highlight">Mars Bleu</span> Connecté 2026'
+        if not is_fun
+        else 'Opération <span class="hero-highlight">Bouge Ton Popotin</span> 2026 🍑🚀'
+    )
+    hero_subtitle = (
+        f"Résultats en direct &mdash; Mise à jour : {now}"
+        if not is_fun
+        else f"On se bouge contre le cancer ! &mdash; Maj: {now}"
+    )
+
+    total_participants_label = "Participants" if not is_fun else "Fessiers en action 🍑"
+    total_km_label = "Kilomètres" if not is_fun else "Kilomètres (vers Mars 🛸)"
+    nb_equipes_label = "Équipes" if not is_fun else "Meutes Enragées 🐺"
+
+    switch_link = (
+        '<div style="margin-top: 1rem;"><a href="fun.html" class="button is-warning is-rounded">🤪 Mode Fun</a></div>'
+        if not is_fun
+        else '<div style="margin-top: 1rem;"><a href="index.html" class="button is-info is-rounded">🤓 Retour au Mode Sérieux</a></div>'
+    )
+
+    fun_stats = ""
+    if is_fun:
+        baguettes = int(total_km * 1538)
+        fun_stats = f'<div class="notification is-info is-light" style="max-width: 800px; margin: 0 auto 2rem; text-align: center; border-radius: 12px; font-weight: bold; font-size: 1.1rem;">🥖 Déjà l\'équivalent de {baguettes:,} baguettes mises bout à bout ! Plus que {225000000 - total_km:,.0f} km avant d\'atteindre Mars. On ne lâche rien ! 💪</div>'.replace(
+            ",", " "
+        )
+
+    fun_css = ""
+    if is_fun:
+        fun_css = """
+<style>
+/* 🤪 WILD MODE CSS OVERRIDES 🤪 */
+body {
+  font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif !important;
+  background-color: var(--fun-bg, #e0f2fe) !important;
+  background-image: radial-gradient(var(--fun-dot, #bae6fd) 20%, transparent 20%),
+                    radial-gradient(var(--fun-dot, #bae6fd) 20%, transparent 20%) !important;
+  background-position: 0 0, 25px 25px !important;
+  background-size: 50px 50px !important;
+}
+[data-theme="dark"] body {
+  --fun-bg: #0f172a;
+  --fun-dot: #1e293b;
+}
+.site-footer {
+  background: linear-gradient(135deg, var(--hero-from) 0%, var(--hero-via) 40%, var(--hero-to) 100%) !important;
+  color: rgba(255,255,255,0.7) !important;
+  border-top: none !important;
+}
+.site-footer .footer-brand, .site-footer a {
+  color: #ffffff !important;
+}
+.stat-card {
+  animation: bounce 1s infinite alternate !important;
+  border: 4px dashed #ff00ff !important;
+  transform-origin: bottom;
+}
+.stat-card:nth-child(2) { animation-delay: 0.2s !important; border-color: #00ff00 !important; }
+.stat-card:nth-child(3) { animation-delay: 0.4s !important; border-color: #00ffff !important; }
+@keyframes bounce {
+  0% { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(-15px) rotate(2deg); }
+}
+.participant-row:hover {
+  transform: scale(1.02) rotate(-1deg);
+  transition: transform 0.1s;
+  background-color: #ffff00 !important;
+  color: #000 !important;
+  font-weight: bold;
+}
+.button.is-info, .button.is-warning {
+  animation: pulse-button 0.5s infinite alternate !important;
+  font-size: 1.2rem !important;
+  border: 3px solid #000 !important;
+}
+@keyframes pulse-button {
+  0% { transform: scale(1); background-color: #ff00ff; color: white; }
+  100% { transform: scale(1.1); background-color: #00ffff; color: black; }
+}
+.main-content {
+  background: var(--bg-card);
+  border-radius: 20px;
+  box-shadow: 0 0 30px rgba(0,0,0,0.3);
+}
+</style>
+"""
+
+    confetti_script = ""
+    if is_fun:
+        confetti_script = """
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+  window.addEventListener('load', function() {
+    var duration = 3 * 1000;
+    var animationEnd = Date.now() + duration;
+    var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+    function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+    var interval = setInterval(function() {
+      var timeLeft = animationEnd - Date.now();
+      if (timeLeft <= 0) return clearInterval(interval);
+      var particleCount = 50 * (timeLeft / duration);
+      confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+      confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+    }, 250);
+  });
+</script>
+"""
+
     html_content = f"""<!DOCTYPE html>
 <html lang="fr" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Défi Mars Bleu Connecté 2026 - Résultats</title>
+<title>{page_title}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1254,6 +1388,7 @@ th[data-sort]:hover {{
   }}
 }}
 </style>
+{fun_css}
 </head>
 <body>
 
@@ -1267,9 +1402,10 @@ th[data-sort]:hover {{
   <a href="https://www.marsbleuconnecte.fr/#top" target="_blank" title="Aller au site Mars Bleu Connecté">
     <img src="{logo_url}" alt="Mars Bleu" class="hero-logo">
   </a>
-  <h1 class="hero-title">Défi <span class="hero-highlight">Mars Bleu</span> Connecté 2026</h1>
+  <h1 class="hero-title">{hero_title_html}</h1>
   <div class="hero-divider"></div>
-  <p class="hero-subtitle">Résultats en direct &mdash; Mise à jour : {now}</p>
+  <p class="hero-subtitle">{hero_subtitle}</p>
+  {switch_link}
 </div>
 
 <div class="stats-grid">
@@ -1277,26 +1413,27 @@ th[data-sort]:hover {{
     <div class="stat-icon"><i class="fas fa-users"></i></div>
     <div>
       <div class="stat-value">{total_participants}</div>
-      <div class="stat-label">Participants</div>
+      <div class="stat-label">{total_participants_label}</div>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon"><i class="fas fa-road"></i></div>
     <div>
       <div class="stat-value">{total_km:,.1f}</div>
-      <div class="stat-label">Kilomètres</div>
+      <div class="stat-label">{total_km_label}</div>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon"><i class="fas fa-people-group"></i></div>
     <div>
       <div class="stat-value">{nb_equipes}</div>
-      <div class="stat-label">Équipes</div>
+      <div class="stat-label">{nb_equipes_label}</div>
     </div>
   </div>
 </div>
 
 <div class="main-content">
+  {fun_stats}
 
   <div class="search-wrapper">
     <div class="control has-icons-left">
@@ -1538,7 +1675,7 @@ document.addEventListener('DOMContentLoaded', function() {{
   }}
 }});
 </script>
-
+{confetti_script}
 </body>
 </html>"""
     return html_content
@@ -1561,11 +1698,17 @@ def main():
     participants = scrape_all()
     print(f"\nTotal : {len(participants)} participants")
 
-    print("Génération du HTML...")
-    html_content = generate_html(participants)
+    print("Génération du HTML classique...")
+    html_content = generate_html(participants, is_fun=False)
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(html_content)
     print("index.html généré avec succès.")
+
+    print("Génération du HTML délire...")
+    fun_html_content = generate_html(participants, is_fun=True)
+    with open("fun.html", "w", encoding="utf-8") as f:
+        f.write(fun_html_content)
+    print("fun.html généré avec succès.")
 
 
 if __name__ == "__main__":
