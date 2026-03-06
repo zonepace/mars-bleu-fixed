@@ -340,20 +340,20 @@ def generate_team_page(team, rank, members, is_fun=False):
         )
         cat_tag = f'<span class="tag tag-cat">{esc(cat_fr(p["categorie"]))}</span>'
         denivele_val = p.get("denivele", "")
-        table_lines.append(f"<tr>")
-        table_lines.append(f'<td>{idx}</td>')
-        table_lines.append(f'<td><strong>{esc(p["nom"])}</strong></td>')
-        table_lines.append(f'<td><strong>{esc(p["km"])}</strong></td>')
-        table_lines.append(f'<td>{esc(p["nb_seances"])}</td>')
+        table_lines.append(f'<tr class="participant-row">')
+        table_lines.append(f'<td data-label="#">{idx}</td>')
+        table_lines.append(f'<td data-label="Nom"><strong>{esc(p["nom"])}</strong></td>')
+        table_lines.append(f'<td data-label="Km"><strong>{esc(p["km"])}</strong></td>')
+        table_lines.append(f'<td data-label="Séances">{esc(p["nb_seances"])}</td>')
         table_lines.append(
-            f'<td>{esc(denivele_val)}{" m" if denivele_val else ""}</td>'
+            f'<td data-label="Dénivelé">{esc(denivele_val)}{" m" if denivele_val else ""}</td>'
         )
-        table_lines.append(f'<td>{sexe_tag}</td>')
-        table_lines.append(f'<td>{cat_tag}</td>')
+        table_lines.append(f'<td data-label="Sexe">{sexe_tag}</td>')
+        table_lines.append(f'<td data-label="Catégorie">{cat_tag}</td>')
         if is_fun:
             badge_label, badge_motiv = get_fun_badge(km_float(p))
             table_lines.append(
-                f'<td><span class="tag is-warning is-light fun-badge">{badge_label}</span>'
+                f'<td data-label="Badge"><span class="tag is-warning is-light fun-badge">{badge_label}</span>'
                 f'<br><small class="fun-motivation">{badge_motiv}</small></td>'
             )
         table_lines.append("</tr>")
@@ -459,7 +459,6 @@ body {
 .fun-badge { font-size: 0.85rem !important; }
 .participant-row:hover, tr:hover {
   transform: scale(1.02) rotate(-1deg); transition: transform 0.1s;
-  background-color: #ffff00 !important; color: #000 !important; font-weight: bold;
 }
 [data-theme="light"] .journey-container {
   background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
@@ -575,6 +574,33 @@ body {{ background: var(--bg); color: var(--text); font-family: var(--font-body)
 @media (max-width: 768px) {{
   .stats-grid {{ grid-template-columns: 1fr; }}
   .hero-title {{ font-size: 1.5rem; }}
+  .results-table thead {{ display: none; }}
+  .results-table tbody tr.participant-row {{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.2rem;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0.5rem;
+    border-radius: var(--radius);
+  }}
+  .results-table tbody td {{
+    border: none !important;
+    padding: 0.2rem 0 !important;
+    font-size: 0.85rem;
+  }}
+  .results-table tbody td::before {{
+    content: attr(data-label);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    display: block;
+    font-weight: 500;
+  }}
+  .results-table tbody td:nth-child(2) {{
+    grid-column: 1 / -1;
+  }}
 }}
 </style>
 {fun_css_block}
@@ -1074,9 +1100,6 @@ body {
 [data-theme="light"] .podium-km {
   color: #475569;
 }
-[data-theme="light"] .participant-row:hover {
-  color: #1a1a2e !important;
-}
 [data-theme="light"] .fun-quotes-banner {
   color: #1a1a2e;
 }
@@ -1113,9 +1136,6 @@ body {
 .participant-row:hover {
   transform: scale(1.02) rotate(-1deg);
   transition: transform 0.1s;
-  background-color: #ffff00 !important;
-  color: #000 !important;
-  font-weight: bold;
 }
 .button.is-info, .button.is-warning {
   animation: pulse-button 0.5s infinite alternate !important;
