@@ -36,4 +36,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./
           publish_branch: gh-pages
-          exclude_assets: ".github,scrape.py,.git*"
+          exclude_assets: ".github,scrape.py,.gitignore"
