@@ -12,6 +12,7 @@ from datetime import datetime, timedelta, timezone
 
 from bs4 import BeautifulSoup
 
+LOGO_URL = "https://www.iledefrance.ars.sante.fr/system/files/styles/ars_detail_page_content/private/2023-03/vignette_MARSBLEU_0.jpg.webp?itok=1fl-F36g"
 BASE_URL = (
     "https://www.zapsports.com/ext/app_page_web/su-res-detail-503-{offset}-100.htm"
 )
@@ -283,24 +284,104 @@ def build_teams(participants_sorted):
 
 # Milestones partagés entre generate_html et generate_team_page
 JOURNEY_MILESTONES = [
-    (200, "\U0001f1ee\U0001f1f9", "Rome (depuis Nice)", "Andiamo ! Pasta e basta ! \U0001f35d"),
-    (800, "\U0001f1ec\U0001f1f7", "Ath\u00e8nes", "Berceau des JO ! On court comme les anciens ! \U0001f3db\ufe0f"),
-    (1_600, "\U0001f1ea\U0001f1f8", "Madrid", "Ol\u00e9 ! On traverse les Pyr\u00e9n\u00e9es ! \U0001f483"),
+    (
+        200,
+        "\U0001f1ee\U0001f1f9",
+        "Rome (depuis Nice)",
+        "Andiamo ! Pasta e basta ! \U0001f35d",
+    ),
+    (
+        800,
+        "\U0001f1ec\U0001f1f7",
+        "Ath\u00e8nes",
+        "Berceau des JO ! On court comme les anciens ! \U0001f3db\ufe0f",
+    ),
+    (
+        1_600,
+        "\U0001f1ea\U0001f1f8",
+        "Madrid",
+        "Ol\u00e9 ! On traverse les Pyr\u00e9n\u00e9es ! \U0001f483",
+    ),
     (3_000, "\U0001f1ec\U0001f1e7", "Londres", "Keep calm and keep running ! \u2615"),
-    (4_000, "\U0001f30d", "Hors d'Europe", "On quitte le continent, adios ! \u2708\ufe0f"),
-    (5_500, "\U0001f1ea\U0001f1ec", "Le Caire", "Les pyramides en vue ! Pas le temps de visiter ! \U0001f42a"),
-    (7_000, "\U0001f30d", "L'Afrique (cap vers le sud)", "Jambo ! Le soleil tape mais on l\u00e2che rien ! \u2600\ufe0f"),
-    (9_500, "\U0001f1e7\U0001f1f7", "Rio de Janeiro", "Samba et sueur ! Carnaval des mollets ! \U0001f3ad"),
-    (12_000, "\U0001f1fa\U0001f1f8", "Les Am\u00e9riques (cap vers l'ouest)", "Travers\u00e9e de l'Atlantique ! Bonjour New York ! \U0001f5fd"),
-    (16_000, "\U0001f1f2\U0001f1fd", "Mexico", "Arriba arriba ! Tacos rechargement ! \U0001f32e"),
-    (20_000, "\U0001f54c", "L'Inde (cap vers l'est)", "Namaste ! Curry power activated ! \U0001f35b"),
-    (24_000, "\U0001f1f9\U0001f1ed", "Bangkok", "Pad tha\u00ef et massages pour les mollets ! \U0001f35c"),
-    (28_000, "\U0001f3ef", "L'Asie (Japon)", "Konnichiwa ! On est \u00e0 l'autre bout du monde ! \U0001f409"),
-    (32_000, "\U0001f1e6\U0001f1fa", "Sydney", "G'day mate ! Les kangourous nous encouragent ! \U0001f998"),
+    (
+        4_000,
+        "\U0001f30d",
+        "Hors d'Europe",
+        "On quitte le continent, adios ! \u2708\ufe0f",
+    ),
+    (
+        5_500,
+        "\U0001f1ea\U0001f1ec",
+        "Le Caire",
+        "Les pyramides en vue ! Pas le temps de visiter ! \U0001f42a",
+    ),
+    (
+        7_000,
+        "\U0001f30d",
+        "L'Afrique (cap vers le sud)",
+        "Jambo ! Le soleil tape mais on l\u00e2che rien ! \u2600\ufe0f",
+    ),
+    (
+        9_500,
+        "\U0001f1e7\U0001f1f7",
+        "Rio de Janeiro",
+        "Samba et sueur ! Carnaval des mollets ! \U0001f3ad",
+    ),
+    (
+        12_000,
+        "\U0001f1fa\U0001f1f8",
+        "Les Am\u00e9riques (cap vers l'ouest)",
+        "Travers\u00e9e de l'Atlantique ! Bonjour New York ! \U0001f5fd",
+    ),
+    (
+        16_000,
+        "\U0001f1f2\U0001f1fd",
+        "Mexico",
+        "Arriba arriba ! Tacos rechargement ! \U0001f32e",
+    ),
+    (
+        20_000,
+        "\U0001f54c",
+        "L'Inde (cap vers l'est)",
+        "Namaste ! Curry power activated ! \U0001f35b",
+    ),
+    (
+        24_000,
+        "\U0001f1f9\U0001f1ed",
+        "Bangkok",
+        "Pad tha\u00ef et massages pour les mollets ! \U0001f35c",
+    ),
+    (
+        28_000,
+        "\U0001f3ef",
+        "L'Asie (Japon)",
+        "Konnichiwa ! On est \u00e0 l'autre bout du monde ! \U0001f409",
+    ),
+    (
+        32_000,
+        "\U0001f1e6\U0001f1fa",
+        "Sydney",
+        "G'day mate ! Les kangourous nous encouragent ! \U0001f998",
+    ),
     (40_075, "\U0001f310", "Tour de la Terre", "Un tour complet du globe ! \U0001f92f"),
-    (80_000, "\U0001f310\U0001f310", "2x le tour de la Terre", "On repart pour un tour ?! Vous \u00eates malades ! \U0001f92a"),
-    (384_400, "\U0001f319", "La Lune", "Houston, on a un probl\u00e8me... de motivation ! \U0001f9d1\u200d\U0001f680"),
-    (225_000_000, "\U0001f534", "Mars", "Mars... Bleu, la plan\u00e8te, vous avez compris le jeu de mots ? \U0001f60f"),
+    (
+        80_000,
+        "\U0001f310\U0001f310",
+        "2x le tour de la Terre",
+        "On repart pour un tour ?! Vous \u00eates malades ! \U0001f92a",
+    ),
+    (
+        384_400,
+        "\U0001f319",
+        "La Lune",
+        "Houston, on a un probl\u00e8me... de motivation ! \U0001f9d1\u200d\U0001f680",
+    ),
+    (
+        225_000_000,
+        "\U0001f534",
+        "Mars",
+        "Mars... Bleu, la plan\u00e8te, vous avez compris le jeu de mots ? \U0001f60f",
+    ),
 ]
 
 
@@ -327,8 +408,8 @@ def generate_team_page(team, rank, members, is_fun=False):
         )
         cat_tag = f'<span class="tag tag-cat">{esc(cat_fr(p["categorie"]))}</span>'
         denivele_val = p.get("denivele", "")
-        denivele_str = f'{esc(denivele_val)} m dénivelé' if denivele_val else ""
-        details_parts = [f'{esc(p["nb_seances"])} séances']
+        denivele_str = f"{esc(denivele_val)} m dénivelé" if denivele_val else ""
+        details_parts = [f"{esc(p['nb_seances'])} séances"]
         if denivele_str:
             details_parts.append(denivele_str)
         badge_html = ""
@@ -338,22 +419,24 @@ def generate_team_page(team, rank, members, is_fun=False):
                 f'<div class="member-badge">'
                 f'<span class="fun-badge">🏅 {badge_label}</span>'
                 f'<small class="fun-motivation">{badge_motiv}</small>'
-                f'</div>'
+                f"</div>"
             )
-        border_color = "var(--accent)" if idx > 3 else ["#ffd700", "#c0c0c0", "#cd7f32"][idx - 1]
+        border_color = (
+            "var(--accent)" if idx > 3 else ["#ffd700", "#c0c0c0", "#cd7f32"][idx - 1]
+        )
         card_lines.append(
             f'<div class="member-card" style="border-left: 4px solid {border_color};">'
             f'<div class="member-header">'
             f'<span class="member-rank">#{idx}</span>'
             f'<span class="member-name">{esc(p["nom"])}</span>'
             f'<span class="member-km">{esc(p["km"])} km</span>'
-            f'</div>'
+            f"</div>"
             f'<div class="member-details">{" · ".join(details_parts)}</div>'
             f'<div class="member-tags">{sexe_tag} {cat_tag}</div>'
-            f'{badge_html}'
-            f'</div>'
+            f"{badge_html}"
+            f"</div>"
         )
-    card_lines.append('</div>')
+    card_lines.append("</div>")
     member_table = "\n".join(card_lines)
 
     # Journey milestones (fun only, filtered)
@@ -381,11 +464,11 @@ def generate_team_page(team, rank, members, is_fun=False):
                     f'<span class="journey-icon">{icon}</span>'
                     f'<span class="journey-name">{name}</span>'
                     f'<span class="journey-check">✅</span>'
-                    f'</div>'
+                    f"</div>"
                     f'<div class="journey-dist">{dist_fmt} km</div>'
                     f'<div class="journey-bar"><div class="journey-bar-fill" style="width:100%"></div></div>'
                     f'<div class="journey-msg">{msg}</div>'
-                    f'</div>'
+                    f"</div>"
                 )
                 continue
             if not reached and i > last_reached_idx + 4:
@@ -394,8 +477,14 @@ def generate_team_page(team, rank, members, is_fun=False):
                 pct = 100
             else:
                 prev_dist = JOURNEY_MILESTONES[i - 1][0] if i > 0 else 0
-                pct = max(0, min(100, ((team_km - prev_dist) / (dist - prev_dist)) * 100)) if team_km > prev_dist else 0
-            status_cls = "reached" if reached else ("in-progress" if pct > 0 else "locked")
+                pct = (
+                    max(0, min(100, ((team_km - prev_dist) / (dist - prev_dist)) * 100))
+                    if team_km > prev_dist
+                    else 0
+                )
+            status_cls = (
+                "reached" if reached else ("in-progress" if pct > 0 else "locked")
+            )
             check = "✅" if reached else ("🏃" if pct > 0 else "🔒")
             dist_fmt = f"{dist:,}".replace(",", " ")
             filtered.append(
@@ -404,27 +493,27 @@ def generate_team_page(team, rank, members, is_fun=False):
                 f'<span class="journey-icon">{icon}</span>'
                 f'<span class="journey-name">{name}</span>'
                 f'<span class="journey-check">{check}</span>'
-                f'</div>'
+                f"</div>"
                 f'<div class="journey-dist">{dist_fmt} km</div>'
                 f'<div class="journey-bar"><div class="journey-bar-fill" style="width:{pct:.1f}%"></div></div>'
                 f'<div class="journey-msg">{msg}</div>'
-                f'</div>'
+                f"</div>"
             )
         passed_html = ""
         if passed_steps:
             n = len(passed_steps)
             passed_html = (
                 f'<details class="journey-passed">'
-                f'<summary>📜 Étapes précédentes ({n} accomplie{"s" if n > 1 else ""})</summary>'
+                f"<summary>📜 Étapes précédentes ({n} accomplie{'s' if n > 1 else ''})</summary>"
                 f'<div class="journey-milestones">{"".join(passed_steps)}</div>'
-                f'</details>'
+                f"</details>"
             )
         journey_html = (
             f'<div class="journey-container">'
             f'<h3 class="journey-title">🗺️ Voyage de l\'équipe — {team_km:,.1f} km parcourus</h3>'
-            f'{passed_html}'
+            f"{passed_html}"
             f'<div class="journey-milestones">{"".join(filtered)}</div>'
-            f'</div>'
+            f"</div>"
         ).replace(",", " ")
 
     # Rotating motivational quotes (fun only)
@@ -436,7 +525,9 @@ def generate_team_page(team, rank, members, is_fun=False):
 
     # Navigation links
     back_link = "fun.html" if is_fun else "index.html"
-    back_label = "🤓 Retour au classement" if not is_fun else "🤪 Retour au classement fun"
+    back_label = (
+        "🤓 Retour au classement" if not is_fun else "🤪 Retour au classement fun"
+    )
     switch_fun_link = f"equipe-{slug}-fun.html" if not is_fun else f"equipe-{slug}.html"
     switch_fun_label = "🤪 Version Fun" if not is_fun else "🤓 Version Sérieuse"
 
@@ -444,7 +535,7 @@ def generate_team_page(team, rank, members, is_fun=False):
     if is_fun:
         page_title = f"{medal} {team_name} — Bouge Ton Popotin ! 🍑"
 
-    hero_title = f'{medal} {esc(team_name)}'
+    hero_title = f"{medal} {esc(team_name)}"
 
     fun_css_block = ""
     if is_fun:
@@ -720,6 +811,9 @@ body {{ background: var(--bg); color: var(--text); font-family: var(--font-body)
 </div>
 
 <div class="hero-section">
+  <a href="https://www.marsbleuconnecte.fr/#top" target="_blank" title="Aller au site Mars Bleu Connecté">
+   <img src="{LOGO_URL}" alt="Mars Bleu" class="hero-logo">
+  </a>
   <h1 class="hero-title">{hero_title}</h1>
   <p class="hero-subtitle">Équipe classée #{rank} &mdash; Mise à jour : {now}</p>
   <p class="depistage-msg">À partir de 50 ans, je me fais dépister !</p>
@@ -879,18 +973,18 @@ def generate_html(participants, is_fun=False):
             t = teams[i]
             display = "flex" if i < 3 else "none"
             team_entries += (
-                f'<div class="team-podium-entry team-podium-{i+1}" data-index="{i}" style="display:{display}">'
+                f'<div class="team-podium-entry team-podium-{i + 1}" data-index="{i}" style="display:{display}">'
                 f'<span class="podium-medal">{medals[i]}</span>'
                 f'<span class="podium-name" style="color: {podium_colors[i]}">{esc(t["equipe"])}</span>'
                 f'<span class="podium-km">{esc(t["km"])} km</span>'
                 f'<span class="podium-count">{t["nb_equipier"]} équipiers</span>'
-                f'</div>'
+                f"</div>"
             )
         team_podium_html = (
             f'<div class="fun-team-podium" id="fun-team-podium">'
             f'<h3 class="fun-podium-title">🏆 Le Podium des Meutes 🏆</h3>'
             f'<div class="team-podium-entries">{team_entries}</div>'
-            f'</div>'
+            f"</div>"
         )
 
     suffix = "-fun" if is_fun else ""
@@ -914,7 +1008,7 @@ def generate_html(participants, is_fun=False):
             f'<span class="equipe-tags">'
             f'<span class="tag tag-km">{esc(t["km"])} km</span>'
             f'<span class="tag tag-count">{t["nb_equipier"]} équipiers</span>'
-            f'{team_page_link}'
+            f"{team_page_link}"
             f"</span>"
             f'<i class="fas fa-chevron-right equipe-chevron"></i>'
             f"</div>"
@@ -1000,12 +1094,12 @@ def generate_html(participants, is_fun=False):
     fun_stats = ""
     if is_fun:
         baguettes = int(total_km * 1538)
-        pizzas = int(total_km * 3333)       # ~30cm diameter
-        bieres = int(total_km * 4545)       # ~22cm height
-        croissants = int(total_km * 5882)   # ~17cm
-        saucissons = int(total_km * 4000)   # ~25cm
-        camemberts = int(total_km * 9091)   # ~11cm
-        frites = int(total_km * 14286)      # ~7cm
+        pizzas = int(total_km * 3333)  # ~30cm diameter
+        bieres = int(total_km * 4545)  # ~22cm height
+        croissants = int(total_km * 5882)  # ~17cm
+        saucissons = int(total_km * 4000)  # ~25cm
+        camemberts = int(total_km * 9091)  # ~11cm
+        frites = int(total_km * 14286)  # ~7cm
         # Journey milestones (from Nice)
         milestones = JOURNEY_MILESTONES
 
@@ -1029,8 +1123,16 @@ def generate_html(participants, is_fun=False):
                 for pd, _, _, _ in milestones:
                     if pd < dist:
                         prev_dist = pd
-                pct = max(0, min(100, ((total_km - prev_dist) / (dist - prev_dist)) * 100)) if total_km > prev_dist else 0
-            status_cls = "reached" if reached else ("in-progress" if pct > 0 else "locked")
+                pct = (
+                    max(
+                        0, min(100, ((total_km - prev_dist) / (dist - prev_dist)) * 100)
+                    )
+                    if total_km > prev_dist
+                    else 0
+                )
+            status_cls = (
+                "reached" if reached else ("in-progress" if pct > 0 else "locked")
+            )
             check = "✅" if reached else ("🏃" if pct > 0 else "🔒")
             dist_fmt = f"{dist:,}".replace(",", " ")
             step_html = (
@@ -1039,11 +1141,11 @@ def generate_html(participants, is_fun=False):
                 f'<span class="journey-icon">{icon}</span>'
                 f'<span class="journey-name">{name}</span>'
                 f'<span class="journey-check">{check}</span>'
-                f'</div>'
+                f"</div>"
                 f'<div class="journey-dist">{dist_fmt} km</div>'
                 f'<div class="journey-bar"><div class="journey-bar-fill" style="width:{pct:.1f}%"></div></div>'
                 f'<div class="journey-msg">{msg}</div>'
-                f'</div>'
+                f"</div>"
             )
             if reached and i < last_reached_idx:
                 passed_steps.append(step_html)
@@ -1056,35 +1158,39 @@ def generate_html(participants, is_fun=False):
             n = len(passed_steps)
             passed_html = (
                 f'<details class="journey-passed">'
-                f'<summary>📜 Étapes précédentes ({n} accomplie{"s" if n > 1 else ""})</summary>'
+                f"<summary>📜 Étapes précédentes ({n} accomplie{'s' if n > 1 else ''})</summary>"
                 f'<div class="journey-milestones">{"".join(passed_steps)}</div>'
-                f'</details>'
+                f"</details>"
             )
         journey_html = (
             f'<div class="journey-container">'
             f'<h3 class="journey-title">🗺️ Le Voyage depuis Nice — {total_km:,.1f} km parcourus</h3>'
             f'<div class="journey-current-msg">{current_milestone_msg}</div>'
-            f'{passed_html}'
+            f"{passed_html}"
             f'<div class="journey-milestones">{"".join(journey_steps)}</div>'
-            f'</div>'
+            f"</div>"
         ).replace(",", " ")
 
         # Top 3 for podium
-        top3 = participants_sorted[:3] if len(participants_sorted) >= 3 else participants_sorted
+        top3 = (
+            participants_sorted[:3]
+            if len(participants_sorted) >= 3
+            else participants_sorted
+        )
         podium_html = ""
         medals = ["🥇", "🥈", "🥉"]
         podium_colors = ["#FFD700", "#C0C0C0", "#CD7F32"]
         for i, p in enumerate(top3):
             podium_html += (
-                f'<div class="podium-entry podium-{i+1}">'
+                f'<div class="podium-entry podium-{i + 1}">'
                 f'<span class="podium-medal">{medals[i]}</span>'
                 f'<span class="podium-name" style="color: {podium_colors[i]}">{esc(p["nom"])}</span>'
                 f'<span class="podium-km">{esc(p["km"])} km</span>'
                 f'<span class="podium-clap">👏👏👏</span>'
-                f'</div>'
+                f"</div>"
             )
 
-        fun_stats = f'''<div class="notification is-info is-light" id="fun-food-facts" style="max-width: 800px; margin: 0 auto 1rem; text-align: center; border-radius: 12px; font-weight: bold; font-size: 1.1rem;">
+        fun_stats = f"""<div class="notification is-info is-light" id="fun-food-facts" style="max-width: 800px; margin: 0 auto 1rem; text-align: center; border-radius: 12px; font-weight: bold; font-size: 1.1rem;">
   <span id="fun-food-text">🥖 Déjà l'équivalent de {baguettes:,} baguettes mises bout à bout ! 💪</span>
 </div>
 <script>
@@ -1130,7 +1236,7 @@ def generate_html(participants, is_fun=False):
   </div>
   <div class="standing-ovation" id="standing-ovation">👏🎉👏🎉👏🎉👏</div>
 </div>
-'''.replace(",", " ")  # noqa: E501
+""".replace(",", " ")  # noqa: E501
 
     fun_css = ""
     if is_fun:
