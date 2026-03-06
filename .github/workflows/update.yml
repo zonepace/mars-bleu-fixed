@@ -2,7 +2,7 @@ name: Mise à jour des résultats Mars Bleu
 
 on:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "*/30 * * * *"
   workflow_dispatch:
 
 permissions:
