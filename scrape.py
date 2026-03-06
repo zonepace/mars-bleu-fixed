@@ -238,86 +238,122 @@ def km_float(p):
         return 0.0
 
 
-def get_fun_badge(km):
-    """Retourne un badge humoristique + motivation en fonction des kilomètres parcourus."""
-    if km < 2:
-        return ("Roi du Canapé 🛋️", "Le plus dur c'est de se lever !")
-    elif km < 5:
-        return ("Échauffement du fessier 🐌", "Tu as commencé, c'est déjà énorme !")
-    elif km < 10:
-        return ("Trotteur du dimanche 🚶", "Les jambes chauffent !")
-    elif km < 20:
-        return ("Joggeur Motivé 🏃", "Ça commence à sentir l'athlète !")
-    elif km < 35:
-        return ("Mollets en Titane 🦵", "Machine de guerre en formation !")
-    elif km < 50:
-        return ("Athlète du Bitume 💪", "Tu fais peur aux trottoirs !")
-    elif km < 75:
-        return ("Forrest Gump 🏃💨", "INARRÊTABLE !")
-    elif km < 100:
-        return ("Machine Infernale 🔥", "Même le vent te demande de ralentir !")
-    elif km < 150:
-        return ("Cyborg aux Fesses d'Acier 🦾🍑", "LÉGENDE VIVANTE !")
-    elif km < 200:
-        return ("Fusée Humaine 🚀", "La NASA t'a repéré !")
-    elif km < 300:
-        return ("Tour du Monde Sportif 🌍", "Google Maps te suit en direct !")
-    elif km < 400:
-        return ("Extra-Terrestre du Sport 👽", "Tu n'es clairement plus humain !")
-    elif km < 500:
-        return ("Dieu du Marathon 🏛️", "L'Olympe t'attend !")
-    elif km < 550:
-        return ("Conquérant des Routes 🛤️", "Les routes tremblent sur ton passage !")
-    elif km < 600:
-        return ("Avaleur de Bornes 🎯", "Les panneaux kilométriques te supplient d'arrêter !")
-    elif km < 650:
-        return ("Tornade sur Pattes 🌪️", "Météo France t'a classé phénomène naturel !")
-    elif km < 700:
-        return ("Nomade Infatigable 🏜️", "Même les chameaux te demandent des conseils !")
-    elif km < 750:
-        return ("Coureur Quantique ⚛️", "Tu existes simultanément sur plusieurs parcours !")
-    elif km < 800:
-        return ("Gladiateur du Macadam ⚔️", "Ave César, les km te saluent !")
-    elif km < 850:
-        return ("Marathonien des Étoiles ☄️", "Tu laisses une traînée de sueur cosmique !")
-    elif km < 900:
-        return ("Broyeur de Distance 🦾", "Le GPS a abandonné, tu vas trop loin !")
-    elif km < 950:
-        return ("Prophète de la Foulée 📜", "Tes km sont cités dans les textes sacrés !")
-    elif km < 1000:
-        return ("Sphinx du Running 🦁", "Personne ne résout l'énigme de ton endurance !")
-    elif km < 1080:
-        return ("Ultra-Trailer Cosmique 🌌", "Tu cours entre les étoiles !")
-    elif km < 1160:
-        return ("Légende Immortelle ⚡", "On parlera de toi dans 1000 ans !")
-    elif km < 1240:
-        return ("Forgeron de l'Endurance 🔨", "Chaque foulée forge ta légende !")
-    elif km < 1320:
-        return ("Titan des Kilomètres 🗿", "Même les montagnes s'écartent !")
-    elif km < 1400:
-        return ("Dompteur d'Horizons 🌅", "L'horizon recule devant toi !")
-    elif km < 1480:
-        return ("Phénix de l'Asphalte 🔥", "Tu renais à chaque kilomètre !")
-    elif km < 1560:
-        return ("Demi-Dieu de l'Asphalte 👑", "Zeus lui-même est jaloux !")
-    elif km < 1640:
-        return ("Arpenteur des Galaxies 🪐", "Même Pluton te trouve extrême !")
-    elif km < 1720:
-        return ("Mangeur de Bitume 🦈", "La route disparaît sous tes pieds !")
-    elif km < 1800:
-        return ("Architecte de l'Impossible 🏗️", "Tu construis l'impossible un km à la fois !")
-    elif km < 1880:
-        return ("Seigneur des Foulées 🐉", "Les dragons courent derrière toi !")
-    elif km < 1960:
-        return ("Voyageur Interstellaire 🛸", "Houston, on l'a perdu… il est trop loin !")
-    elif km < 2000:
-        return ("Maître de l'Univers 🔮", "L'espace-temps se plie à ta foulée !")
-    else:
-        return ("Chuck Norris du Running 🥋", "Chuck Norris court derrière TOI !")
+# 20 km par niveau jusqu’à 1000 (50 niveaux)
+BADGE_THRESHOLDS = list(range(20, 1000 + 20, 20))
+
+BADGE_REWARDS = [
+    # index 0 : < 20 km
+    ("Roi du Canapé 🛋️", "Tu as lâché la télécommande. Héroïque."),
+    # 20 km
+    ("Trotteur Prudent 🐢", "Le premier pas, c’est le plus dur. Le deuxième aussi. Le troisième pareil. Mais bon."),
+    # 40 km
+    ("Joggeur du Dimanche 🚶", "Tu cours. Officiellement. Ta famille ne te croit pas encore."),
+    # 60 km
+    ("Mollets en Devenir 🦵", "Tes chaussures ont commencé à te respecter timidement."),
+    # 80 km
+    ("Candidat Sérieux 📋", "Tu as dépensé plus en running qu’en pizza. La rupture est en cours."),
+    # 100 km
+    ("Centurion du Bitume 💯", "100 km. C’est 100 000 mètres. Ça fait beaucoup de zéros dans le vide."),
+    # 120 km
+    ("Forrest en Formation 🏃💨", "Cours Forrest, cours. Mais à ton rythme, hein, pas la peine de se blesser."),
+    # 140 km
+    ("Brûleur de Semelles 🔥", "Le vent commence à te regarder bizarrement. Il sent la concurrence."),
+    # 160 km
+    ("Cyborg des Faubourgs 🦾", "Mi-humain, mi-moteur diesel. Le mécanicien est impressionné."),
+    # 180 km
+    ("Rocket Man 🚀", "La NASA a mis ton dossier dans la pile ‘à surveiller’."),
+    # 200 km
+    ("Explorateur du Macadam 🌍", "200 km. Tu aurais pu aller jusqu’en Belgique. Tu aurais pu."),
+    # 220 km
+    ("Alien du Sport 👽", "Tes collègues se demandent si tu dors vraiment ou si tu cours pendant ce temps-là."),
+    # 240 km
+    ("Marathonien Autoproclamé 🏛️", "L’Olympe a reçu ton CV. Ils étudient le dossier."),
+    # 260 km
+    ("Conquérant des Ronds-Points 🛤️", "Tu connais chaque craquelure du bitume par son prénom."),
+    # 280 km
+    ("Avaleur de Bornes 🎯", "Les panneaux kilométriques font des cauchemars avec toi dedans."),
+    # 300 km
+    ("Phénomène Météo 🌪️", "Météo France t’a officiellement classé ‘perturbation localisée’."),
+    # 320 km
+    ("Chameau Turbo 🏜️", "Même les chameaux t’ont demandé ton secret. Tu as refusé de répondre."),
+    # 340 km
+    ("Coureur Quantique ⚛️", "Tu existes sur plusieurs parcours simultanément. Schrödinger était moins actif."),
+    # 360 km
+    ("Gladiateur du Goudron ⚔️", "Ave César ! Les km te saluent. César aussi, à contrecœur."),
+    # 380 km
+    ("Comète Humaine ☄️", "Tu laisses une traînée de sueur cosmique. Spectaculaire et légèrement repoussant."),
+    # 400 km
+    ("GPS Dépassé 🦾", "Le GPS a rendu les armes. Tu vas dans des endroits qu’il ne connaît pas."),
+    # 420 km
+    ("Prophète de la Foulée 📜", "Tes kilomètres sont cités dans des groupes WhatsApp que tu ne soupçonnes pas."),
+    # 440 km
+    ("Sphinx du Running 🦁", "Personne ne comprend comment tu fais. Toi non plus, mais tu continues."),
+    # 460 km
+    ("Nomade Cosmique 🌌", "Tu cours entre les étoiles. Ou presque. C’est surtout le périphérique, mais dans ta tête…"),
+    # 480 km
+    ("Légende en Fabrication ⚡", "Dans 1000 ans, les historiens auront une section entière sur toi."),
+    # 500 km
+    ("Forgeron de l’Endurance 🔨", "500 km forgés à la sueur. Ton enclume, c’est le bitume."),
+    # 520 km
+    ("Titan des Kilomètres 🗿", "Les montagnes s’écartent. Les collines font une haie d’honneur."),
+    # 540 km
+    ("Dompteur d’Horizons 🌅", "L’horizon recule chaque fois que tu approches. Il a peur."),
+    # 560 km
+    ("Phénix de l’Asphalte 🔥🦅", "Tu renais à chaque kilomètre. Et tu es encore plus agaçant qu’avant."),
+    # 580 km
+    ("Demi-Dieu en Approche 👑", "Zeus a commandé tes chaussures pour voir ce que ça fait."),
+    # === TIER LÉGENDAIRE (600 km+) ===
+    # 600 km
+    ("⭐ LÉGENDAIRE ⭐ Seigneur des Foulées 🐉", "Les médecins étudient tes mollets en cours magistral. La salle est comble."),
+    # 620 km
+    ("⭐ LÉGENDAIRE ⭐ Arpenteur des Galaxies 🪐", "Pluton t’a envoyé un message : ‘Respect. Sincèrement.’"),
+    # 640 km
+    ("⭐ LÉGENDAIRE ⭐ Requin du Bitume 🦈", "La route disparaît sous tes pieds avant que tu arrives dessus."),
+    # 660 km
+    ("⭐ LÉGENDAIRE ⭐ Architecte de l’Impossible 🏗️", "Tu construis l’impossible un km à la fois. Le chantier est rentable."),
+    # 680 km
+    ("⭐ LÉGENDAIRE ⭐ Voyageur Interstellaire 🛸", "Houston, on l’a perdu. Il est beaucoup trop loin. On abandonne le suivi."),
+    # 700 km
+    ("⭐ LÉGENDAIRE ⭐ Entité Cosmique 🌌", "La NASA a annulé un satellite pour te suivre en direct. Budget bien utilisé."),
+    # 720 km
+    ("⭐ LÉGENDAIRE ⭐ Chuck Norris du Running 🥋", "Chuck Norris court derrière TOI. Il essaie de prendre des notes."),
+    # 740 km
+    ("⭐ LÉGENDAIRE ⭐ Déclaration d’Intention 🏆", "Tu ne cours plus. Tu déclares solennellement une intention de te déplacer vite."),
+    # 760 km
+    ("⭐ LÉGENDAIRE ⭐ Tempête Certifiée 🌩️", "Même les jours où tu ne cours pas, le sol tremble par habitude."),
+    # 780 km
+    ("⭐ LÉGENDAIRE ⭐ Aimant Gravitationnel 🧲", "Les kilomètres viennent à toi maintenant. Tu n’as plus à les chercher."),
+    # 800 km
+    ("⭐ LÉGENDAIRE ⭐ Dieu Vivant du Bitume 👑", "Les ronds-points portent ton prénom. Officieusement, mais quand même."),
+    # 820 km
+    ("⭐ LÉGENDAIRE ⭐ Carburant Illimité ⛽", "Les scientifiques veulent étudier ton métabolisme. Elon Musk veut le breveter."),
+    # 840 km
+    ("⭐ LÉGENDAIRE ⭐ Usine à Records 🏭", "Tu produis des km comme d’autres produisent des excuses. Industriellement."),
+    # 860 km
+    ("⭐ LÉGENDAIRE ⭐ Boss Absolu 👊", "La discipline ne te sert plus le café. Elle te demande la permission de te parler."),
+    # 880 km
+    ("⭐ LÉGENDAIRE ⭐ Collectionneur de Saisons 📅", "Tu ne coches plus des cases. Tu remplis des encyclopédies."),
+    # 900 km
+    ("⭐ MYTHIQUE ⭐ Transcendance Totale 🔮", "Tu es devenu quelque chose que la science ne peut pas encore nommer. Les linguistes travaillent dessus."),
+    # 920 km
+    ("⭐ MYTHIQUE ⭐ Anti-Matière du Sport 🌀", "La flemme a non seulement déménagé — elle a changé de planète et coupé le contact."),
+    # 940 km
+    ("⭐ MYTHIQUE ⭐ Monstre Incompris 🧟", "Ton entourage dit ‘mais pourquoi ?’ Tu réponds avec les yeux d’un être supérieur."),
+    # 960 km
+    ("⭐ MYTHIQUE ⭐ Mythe Vivant 🏛️", "On parle de toi au café du coin. Et dans les cafés des coins adjacents."),
+    # 980 km
+    ("⭐ MYTHIQUE ⭐ Force de la Nature 🌊", "Tu n’es plus une personne. Tu es un phénomène météorologique qui court."),
+    # 1000 km
+    ("☠️ ULTIME LÉGENDAIRE ☠️ 1000 km Accomplis ✅", "Les dieux de l’Olympe ont annulé leur abonnement salle de sport par honte. Bravo."),
+]
 
 
-# Badge thresholds for progress bar computation
-BADGE_THRESHOLDS = [2, 5, 10, 20, 35, 50, 75, 100, 150, 200, 300, 400, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1080, 1160, 1240, 1320, 1400, 1480, 1560, 1640, 1720, 1800, 1880, 1960, 2000]
+def get_fun_badge(km: float):
+    """Retourne (badge, message) selon les kilomètres."""
+    i = 0
+    while i < len(BADGE_THRESHOLDS) and km >= BADGE_THRESHOLDS[i]:
+        i += 1
+    return BADGE_REWARDS[min(i, len(BADGE_REWARDS) - 1)]
 
 
 def get_badge_progress(km):
@@ -379,10 +415,26 @@ def compute_awards(participants, teams):
     # Roi/Reine du Kilomètre
     if hommes:
         best_h = max(hommes, key=km_float)
-        awards.append({"emoji": "\U0001f3c3", "title": "Roi du Kilom\u00e8tre", "winner": best_h["nom"], "value": f'{best_h["km"]} km', "detail": ""})
+        awards.append(
+            {
+                "emoji": "\U0001f3c3",
+                "title": "Roi du Kilom\u00e8tre",
+                "winner": best_h["nom"],
+                "value": f"{best_h['km']} km",
+                "detail": "",
+            }
+        )
     if femmes:
         best_f = max(femmes, key=km_float)
-        awards.append({"emoji": "\U0001f3c3\u200d\u2640\ufe0f", "title": "Reine du Kilom\u00e8tre", "winner": best_f["nom"], "value": f'{best_f["km"]} km', "detail": ""})
+        awards.append(
+            {
+                "emoji": "\U0001f3c3\u200d\u2640\ufe0f",
+                "title": "Reine du Kilom\u00e8tre",
+                "winner": best_f["nom"],
+                "value": f"{best_f['km']} km",
+                "detail": "",
+            }
+        )
 
     # Le Plus Régulier / La Plus Régulière
     def seances_int(p):
@@ -393,10 +445,26 @@ def compute_awards(participants, teams):
 
     if hommes:
         best_h = max(hommes, key=seances_int)
-        awards.append({"emoji": "\U0001f504", "title": "Le Plus R\u00e9gulier", "winner": best_h["nom"], "value": f'{best_h["nb_seances"]} s\u00e9ances', "detail": ""})
+        awards.append(
+            {
+                "emoji": "\U0001f504",
+                "title": "Le Plus R\u00e9gulier",
+                "winner": best_h["nom"],
+                "value": f"{best_h['nb_seances']} s\u00e9ances",
+                "detail": "",
+            }
+        )
     if femmes:
         best_f = max(femmes, key=seances_int)
-        awards.append({"emoji": "\U0001f504", "title": "La Plus R\u00e9guli\u00e8re", "winner": best_f["nom"], "value": f'{best_f["nb_seances"]} s\u00e9ances', "detail": ""})
+        awards.append(
+            {
+                "emoji": "\U0001f504",
+                "title": "La Plus R\u00e9guli\u00e8re",
+                "winner": best_f["nom"],
+                "value": f"{best_f['nb_seances']} s\u00e9ances",
+                "detail": "",
+            }
+        )
 
     # Le Grimpeur / La Grimpeuse
     def denivele_int(p):
@@ -409,17 +477,43 @@ def compute_awards(participants, teams):
     femmes_d = [p for p in femmes if denivele_int(p) > 0]
     if hommes_d:
         best_h = max(hommes_d, key=denivele_int)
-        awards.append({"emoji": "\u26f0\ufe0f", "title": "Le Grimpeur Fou", "winner": best_h["nom"], "value": f'{best_h.get("denivele", "0")} m D+', "detail": ""})
+        awards.append(
+            {
+                "emoji": "\u26f0\ufe0f",
+                "title": "Le Grimpeur Fou",
+                "winner": best_h["nom"],
+                "value": f"{best_h.get('denivele', '0')} m D+",
+                "detail": "",
+            }
+        )
     if femmes_d:
         best_f = max(femmes_d, key=denivele_int)
-        awards.append({"emoji": "\u26f0\ufe0f", "title": "La Grimpeuse Folle", "winner": best_f["nom"], "value": f'{best_f.get("denivele", "0")} m D+', "detail": ""})
+        awards.append(
+            {
+                "emoji": "\u26f0\ufe0f",
+                "title": "La Grimpeuse Folle",
+                "winner": best_f["nom"],
+                "value": f"{best_f.get('denivele', '0')} m D+",
+                "detail": "",
+            }
+        )
 
     # L'Équipe de Choc (meilleure moyenne km/membre, min 3 membres)
     eligible = [t for t in teams if t["nb_equipier"] >= 3]
     if eligible:
-        best_team = max(eligible, key=lambda t: float(t["km"].replace(",", ".")) / t["nb_equipier"])
+        best_team = max(
+            eligible, key=lambda t: float(t["km"].replace(",", ".")) / t["nb_equipier"]
+        )
         avg = float(best_team["km"].replace(",", ".")) / best_team["nb_equipier"]
-        awards.append({"emoji": "\U0001f465", "title": "L'\u00c9quipe de Choc", "winner": best_team["equipe"], "value": f'{avg:.1f} km/membre', "detail": f'{best_team["nb_equipier"]} \u00e9quipiers'})
+        awards.append(
+            {
+                "emoji": "\U0001f465",
+                "title": "L'\u00c9quipe de Choc",
+                "winner": best_team["equipe"],
+                "value": f"{avg:.1f} km/membre",
+                "detail": f"{best_team['nb_equipier']} \u00e9quipiers",
+            }
+        )
 
     return awards
 
@@ -433,13 +527,15 @@ def compute_battles(teams, max_battles=3):
         km1 = float(teams[i]["km"].replace(",", "."))
         km2 = float(teams[i + 1]["km"].replace(",", "."))
         ecart = km1 - km2
-        pairs.append({
-            "team1": teams[i]["equipe"],
-            "team2": teams[i + 1]["equipe"],
-            "km1": teams[i]["km"],
-            "km2": teams[i + 1]["km"],
-            "ecart": f"{ecart:.1f}".replace(".", ","),
-        })
+        pairs.append(
+            {
+                "team1": teams[i]["equipe"],
+                "team2": teams[i + 1]["equipe"],
+                "km1": teams[i]["km"],
+                "km2": teams[i + 1]["km"],
+                "ecart": f"{ecart:.1f}".replace(".", ","),
+            }
+        )
     pairs.sort(key=lambda x: float(x["ecart"].replace(",", ".")))
     return pairs[:max_battles]
 
@@ -584,7 +680,7 @@ def generate_team_page(team, rank, members, is_fun=False):
                 progress_html = (
                     f'<div class="progress-bar-container">'
                     f'<div class="progress-bar" style="width: {pct:.0f}%"></div>'
-                    f'</div>'
+                    f"</div>"
                     f'<small class="progress-label">Encore {km_rest:.1f} km pour atteindre le niveau {next_badge}</small>'
                 )
             badge_html = (
@@ -1153,13 +1249,13 @@ def generate_html(participants, is_fun=False):
                     progress_html = (
                         f'<div class="progress-bar-container">'
                         f'<div class="progress-bar" style="width: {pct:.0f}%"></div>'
-                        f'</div>'
+                        f"</div>"
                         f'<small class="progress-label">Encore {km_rest:.1f} km pour atteindre le niveau {next_badge}</small>'
                     )
                 lines.append(
                     f'<td data-label="Badge"><span class="tag is-warning is-light fun-badge">{badge_label}</span>'
                     f'<br><small class="fun-motivation">{badge_motiv}</small>'
-                    f'{progress_html}</td>'
+                    f"{progress_html}</td>"
                 )
             lines.append("</tr>")
         lines.append("</tbody></table>")
@@ -1205,21 +1301,25 @@ def generate_html(participants, is_fun=False):
         if awards:
             award_cards = ""
             for a in awards:
-                detail_line = f'<div class="award-detail">{esc(a["detail"])}</div>' if a["detail"] else ""
+                detail_line = (
+                    f'<div class="award-detail">{esc(a["detail"])}</div>'
+                    if a["detail"]
+                    else ""
+                )
                 award_cards += (
                     f'<div class="award-card">'
                     f'<div class="award-emoji">{a["emoji"]}</div>'
                     f'<div class="award-title">{esc(a["title"])}</div>'
                     f'<div class="award-winner">{esc(a["winner"])}</div>'
                     f'<div class="award-value">{esc(a["value"])}</div>'
-                    f'{detail_line}'
-                    f'</div>'
+                    f"{detail_line}"
+                    f"</div>"
                 )
             awards_html = (
                 f'<div class="awards-section">'
                 f'<h3 class="awards-title">\U0001f3c6 Tableau d\'Honneur \U0001f3c6</h3>'
                 f'<div class="awards-grid">{award_cards}</div>'
-                f'</div>'
+                f"</div>"
             )
 
         battles = compute_battles(teams)
@@ -1232,13 +1332,13 @@ def generate_html(participants, is_fun=False):
                     f'<span class="battle-vs">\u26a1 VS \u26a1</span>'
                     f'<span class="battle-team">{esc(b["team2"])} ({esc(b["km2"])} km)</span>'
                     f'<div class="battle-ecart">Seulement {esc(b["ecart"])} km d\'\u00e9cart !</div>'
-                    f'</div>'
+                    f"</div>"
                 )
             battles_html = (
                 f'<div class="battles-section">'
                 f'<h3 class="battles-title">\u2694\ufe0f Les Battles du Moment \u2694\ufe0f</h3>'
                 f'<div class="battles-list">{battle_cards}</div>'
-                f'</div>'
+                f"</div>"
             )
 
     suffix = "-fun" if is_fun else ""
