@@ -262,8 +262,82 @@ def get_fun_badge(km):
         return ("Fusée Humaine 🚀", "La NASA t'a repéré !")
     elif km < 300:
         return ("Tour du Monde Sportif 🌍", "Google Maps te suit en direct !")
-    else:
+    elif km < 400:
         return ("Extra-Terrestre du Sport 👽", "Tu n'es clairement plus humain !")
+    elif km < 500:
+        return ("Dieu du Marathon 🏛️", "L'Olympe t'attend !")
+    elif km < 550:
+        return ("Conquérant des Routes 🛤️", "Les routes tremblent sur ton passage !")
+    elif km < 600:
+        return ("Avaleur de Bornes 🎯", "Les panneaux kilométriques te supplient d'arrêter !")
+    elif km < 650:
+        return ("Tornade sur Pattes 🌪️", "Météo France t'a classé phénomène naturel !")
+    elif km < 700:
+        return ("Nomade Infatigable 🏜️", "Même les chameaux te demandent des conseils !")
+    elif km < 750:
+        return ("Coureur Quantique ⚛️", "Tu existes simultanément sur plusieurs parcours !")
+    elif km < 800:
+        return ("Gladiateur du Macadam ⚔️", "Ave César, les km te saluent !")
+    elif km < 850:
+        return ("Marathonien des Étoiles ☄️", "Tu laisses une traînée de sueur cosmique !")
+    elif km < 900:
+        return ("Broyeur de Distance 🦾", "Le GPS a abandonné, tu vas trop loin !")
+    elif km < 950:
+        return ("Prophète de la Foulée 📜", "Tes km sont cités dans les textes sacrés !")
+    elif km < 1000:
+        return ("Sphinx du Running 🦁", "Personne ne résout l'énigme de ton endurance !")
+    elif km < 1080:
+        return ("Ultra-Trailer Cosmique 🌌", "Tu cours entre les étoiles !")
+    elif km < 1160:
+        return ("Légende Immortelle ⚡", "On parlera de toi dans 1000 ans !")
+    elif km < 1240:
+        return ("Forgeron de l'Endurance 🔨", "Chaque foulée forge ta légende !")
+    elif km < 1320:
+        return ("Titan des Kilomètres 🗿", "Même les montagnes s'écartent !")
+    elif km < 1400:
+        return ("Dompteur d'Horizons 🌅", "L'horizon recule devant toi !")
+    elif km < 1480:
+        return ("Phénix de l'Asphalte 🔥", "Tu renais à chaque kilomètre !")
+    elif km < 1560:
+        return ("Demi-Dieu de l'Asphalte 👑", "Zeus lui-même est jaloux !")
+    elif km < 1640:
+        return ("Arpenteur des Galaxies 🪐", "Même Pluton te trouve extrême !")
+    elif km < 1720:
+        return ("Mangeur de Bitume 🦈", "La route disparaît sous tes pieds !")
+    elif km < 1800:
+        return ("Architecte de l'Impossible 🏗️", "Tu construis l'impossible un km à la fois !")
+    elif km < 1880:
+        return ("Seigneur des Foulées 🐉", "Les dragons courent derrière toi !")
+    elif km < 1960:
+        return ("Voyageur Interstellaire 🛸", "Houston, on l'a perdu… il est trop loin !")
+    elif km < 2000:
+        return ("Maître de l'Univers 🔮", "L'espace-temps se plie à ta foulée !")
+    else:
+        return ("Chuck Norris du Running 🥋", "Chuck Norris court derrière TOI !")
+
+
+# Badge thresholds for progress bar computation
+BADGE_THRESHOLDS = [2, 5, 10, 20, 35, 50, 75, 100, 150, 200, 300, 400, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1080, 1160, 1240, 1320, 1400, 1480, 1560, 1640, 1720, 1800, 1880, 1960, 2000]
+
+
+def get_badge_progress(km):
+    """Retourne (percent, km_restants, prochain_badge_label) ou None si au max."""
+    if km >= BADGE_THRESHOLDS[-1]:
+        return None
+    current_threshold = 0
+    next_threshold = BADGE_THRESHOLDS[0]
+    for t in BADGE_THRESHOLDS:
+        if km >= t:
+            current_threshold = t
+        else:
+            next_threshold = t
+            break
+    range_km = next_threshold - current_threshold
+    progress_km = km - current_threshold
+    percent = min(100, max(0, (progress_km / range_km) * 100)) if range_km > 0 else 0
+    km_restants = next_threshold - km
+    next_badge_label, _ = get_fun_badge(next_threshold)
+    return (percent, km_restants, next_badge_label)
 
 
 def build_teams(participants_sorted):
@@ -294,6 +368,80 @@ def build_teams(participants_sorted):
         )
     teams.sort(key=lambda t: float(t["km"].replace(",", ".")), reverse=True)
     return teams, equipe_members
+
+
+def compute_awards(participants, teams):
+    """Calcule les trophées spéciaux (records individuels et équipe)."""
+    awards = []
+    hommes = [p for p in participants if p.get("sexe") == "M"]
+    femmes = [p for p in participants if p.get("sexe") == "F"]
+
+    # Roi/Reine du Kilomètre
+    if hommes:
+        best_h = max(hommes, key=km_float)
+        awards.append({"emoji": "\U0001f3c3", "title": "Roi du Kilom\u00e8tre", "winner": best_h["nom"], "value": f'{best_h["km"]} km', "detail": ""})
+    if femmes:
+        best_f = max(femmes, key=km_float)
+        awards.append({"emoji": "\U0001f3c3\u200d\u2640\ufe0f", "title": "Reine du Kilom\u00e8tre", "winner": best_f["nom"], "value": f'{best_f["km"]} km', "detail": ""})
+
+    # Le Plus Régulier / La Plus Régulière
+    def seances_int(p):
+        try:
+            return int(p.get("nb_seances", "0"))
+        except ValueError:
+            return 0
+
+    if hommes:
+        best_h = max(hommes, key=seances_int)
+        awards.append({"emoji": "\U0001f504", "title": "Le Plus R\u00e9gulier", "winner": best_h["nom"], "value": f'{best_h["nb_seances"]} s\u00e9ances', "detail": ""})
+    if femmes:
+        best_f = max(femmes, key=seances_int)
+        awards.append({"emoji": "\U0001f504", "title": "La Plus R\u00e9guli\u00e8re", "winner": best_f["nom"], "value": f'{best_f["nb_seances"]} s\u00e9ances', "detail": ""})
+
+    # Le Grimpeur / La Grimpeuse
+    def denivele_int(p):
+        try:
+            return int(p.get("denivele", "0") or "0")
+        except ValueError:
+            return 0
+
+    hommes_d = [p for p in hommes if denivele_int(p) > 0]
+    femmes_d = [p for p in femmes if denivele_int(p) > 0]
+    if hommes_d:
+        best_h = max(hommes_d, key=denivele_int)
+        awards.append({"emoji": "\u26f0\ufe0f", "title": "Le Grimpeur Fou", "winner": best_h["nom"], "value": f'{best_h.get("denivele", "0")} m D+', "detail": ""})
+    if femmes_d:
+        best_f = max(femmes_d, key=denivele_int)
+        awards.append({"emoji": "\u26f0\ufe0f", "title": "La Grimpeuse Folle", "winner": best_f["nom"], "value": f'{best_f.get("denivele", "0")} m D+', "detail": ""})
+
+    # L'Équipe de Choc (meilleure moyenne km/membre, min 3 membres)
+    eligible = [t for t in teams if t["nb_equipier"] >= 3]
+    if eligible:
+        best_team = max(eligible, key=lambda t: float(t["km"].replace(",", ".")) / t["nb_equipier"])
+        avg = float(best_team["km"].replace(",", ".")) / best_team["nb_equipier"]
+        awards.append({"emoji": "\U0001f465", "title": "L'\u00c9quipe de Choc", "winner": best_team["equipe"], "value": f'{avg:.1f} km/membre', "detail": f'{best_team["nb_equipier"]} \u00e9quipiers'})
+
+    return awards
+
+
+def compute_battles(teams, max_battles=3):
+    """Trouve les duels les plus serrés entre équipes consécutives au classement."""
+    if len(teams) < 2:
+        return []
+    pairs = []
+    for i in range(len(teams) - 1):
+        km1 = float(teams[i]["km"].replace(",", "."))
+        km2 = float(teams[i + 1]["km"].replace(",", "."))
+        ecart = km1 - km2
+        pairs.append({
+            "team1": teams[i]["equipe"],
+            "team2": teams[i + 1]["equipe"],
+            "km1": teams[i]["km"],
+            "km2": teams[i + 1]["km"],
+            "ecart": f"{ecart:.1f}".replace(".", ","),
+        })
+    pairs.sort(key=lambda x: float(x["ecart"].replace(",", ".")))
+    return pairs[:max_battles]
 
 
 # Milestones partagés entre generate_html et generate_team_page
@@ -429,10 +577,21 @@ def generate_team_page(team, rank, members, is_fun=False):
         badge_html = ""
         if is_fun:
             badge_label, badge_motiv = get_fun_badge(km_float(p))
+            progress = get_badge_progress(km_float(p))
+            progress_html = ""
+            if progress:
+                pct, km_rest, next_badge = progress
+                progress_html = (
+                    f'<div class="progress-bar-container">'
+                    f'<div class="progress-bar" style="width: {pct:.0f}%"></div>'
+                    f'</div>'
+                    f'<small class="progress-label">Encore {km_rest:.1f} km pour atteindre le niveau {next_badge}</small>'
+                )
             badge_html = (
                 f'<div class="member-badge">'
                 f'<span class="fun-badge">🏅 {badge_label}</span>'
                 f'<small class="fun-motivation">{badge_motiv}</small>'
+                f"{progress_html}"
                 f"</div>"
             )
         border_color = (
@@ -600,6 +759,32 @@ body {
 }
 .fun-toast.show {
   right: 20px;
+}
+/* Progress bar toward next badge */
+.progress-bar-container {
+  background: #e0e0e0;
+  border-radius: 8px;
+  height: 8px;
+  margin-top: 4px;
+  overflow: hidden;
+}
+[data-theme="dark"] .progress-bar-container {
+  background: #374151;
+}
+.progress-bar {
+  background: linear-gradient(90deg, #4CAF50, #8BC34A);
+  height: 100%;
+  border-radius: 8px;
+  transition: width 0.3s;
+}
+.progress-label {
+  font-size: 0.7rem;
+  color: #6b7280;
+  display: block;
+  margin-top: 2px;
+}
+[data-theme="dark"] .progress-label {
+  color: #9ca3af;
 }
 /* Rotating quotes banner */
 .fun-quotes-banner {
@@ -961,9 +1146,20 @@ def generate_html(participants, is_fun=False):
             )
             if is_fun:
                 badge_label, badge_motiv = get_fun_badge(km_float(p))
+                progress = get_badge_progress(km_float(p))
+                progress_html = ""
+                if progress:
+                    pct, km_rest, next_badge = progress
+                    progress_html = (
+                        f'<div class="progress-bar-container">'
+                        f'<div class="progress-bar" style="width: {pct:.0f}%"></div>'
+                        f'</div>'
+                        f'<small class="progress-label">Encore {km_rest:.1f} km pour atteindre le niveau {next_badge}</small>'
+                    )
                 lines.append(
                     f'<td data-label="Badge"><span class="tag is-warning is-light fun-badge">{badge_label}</span>'
-                    f'<br><small class="fun-motivation">{badge_motiv}</small></td>'
+                    f'<br><small class="fun-motivation">{badge_motiv}</small>'
+                    f'{progress_html}</td>'
                 )
             lines.append("</tr>")
         lines.append("</tbody></table>")
@@ -1000,6 +1196,50 @@ def generate_html(participants, is_fun=False):
             f'<div class="team-podium-entries">{team_entries}</div>'
             f"</div>"
         )
+
+    # Awards and Battles for fun mode
+    awards_html = ""
+    battles_html = ""
+    if is_fun:
+        awards = compute_awards(participants_sorted, teams)
+        if awards:
+            award_cards = ""
+            for a in awards:
+                detail_line = f'<div class="award-detail">{esc(a["detail"])}</div>' if a["detail"] else ""
+                award_cards += (
+                    f'<div class="award-card">'
+                    f'<div class="award-emoji">{a["emoji"]}</div>'
+                    f'<div class="award-title">{esc(a["title"])}</div>'
+                    f'<div class="award-winner">{esc(a["winner"])}</div>'
+                    f'<div class="award-value">{esc(a["value"])}</div>'
+                    f'{detail_line}'
+                    f'</div>'
+                )
+            awards_html = (
+                f'<div class="awards-section">'
+                f'<h3 class="awards-title">\U0001f3c6 Tableau d\'Honneur \U0001f3c6</h3>'
+                f'<div class="awards-grid">{award_cards}</div>'
+                f'</div>'
+            )
+
+        battles = compute_battles(teams)
+        if battles:
+            battle_cards = ""
+            for b in battles:
+                battle_cards += (
+                    f'<div class="battle-card">'
+                    f'<span class="battle-team">{esc(b["team1"])} ({esc(b["km1"])} km)</span>'
+                    f'<span class="battle-vs">\u26a1 VS \u26a1</span>'
+                    f'<span class="battle-team">{esc(b["team2"])} ({esc(b["km2"])} km)</span>'
+                    f'<div class="battle-ecart">Seulement {esc(b["ecart"])} km d\'\u00e9cart !</div>'
+                    f'</div>'
+                )
+            battles_html = (
+                f'<div class="battles-section">'
+                f'<h3 class="battles-title">\u2694\ufe0f Les Battles du Moment \u2694\ufe0f</h3>'
+                f'<div class="battles-list">{battle_cards}</div>'
+                f'</div>'
+            )
 
     suffix = "-fun" if is_fun else ""
     tab_equipe_parts = []
@@ -1672,6 +1912,184 @@ body {
 }
 .fun-toast.show {
   right: 20px;
+}
+/* Progress bar toward next badge */
+.progress-bar-container {
+  background: #e0e0e0;
+  border-radius: 8px;
+  height: 8px;
+  margin-top: 4px;
+  overflow: hidden;
+}
+[data-theme="dark"] .progress-bar-container {
+  background: #374151;
+}
+.progress-bar {
+  background: linear-gradient(90deg, #4CAF50, #8BC34A);
+  height: 100%;
+  border-radius: 8px;
+  transition: width 0.3s;
+}
+.progress-label {
+  font-size: 0.7rem;
+  color: #6b7280;
+  display: block;
+  margin-top: 2px;
+}
+[data-theme="dark"] .progress-label {
+  color: #9ca3af;
+}
+/* Awards section */
+.awards-section {
+  max-width: 900px;
+  margin: 1.5rem auto;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 16px;
+  border: 2px solid #ffd700;
+  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.2);
+}
+[data-theme="light"] .awards-section {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+.awards-title {
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #ffd700;
+  margin-bottom: 1rem;
+}
+[data-theme="light"] .awards-title {
+  color: #b45309;
+}
+.awards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+.award-card {
+  background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.05));
+  border: 1px solid rgba(255,215,0,0.3);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  transition: transform 0.2s;
+}
+.award-card:hover {
+  transform: translateY(-4px);
+}
+[data-theme="light"] .award-card {
+  background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,215,0,0.05));
+  border-color: #fbbf24;
+}
+.award-emoji {
+  font-size: 2em;
+  margin-bottom: 0.3rem;
+}
+.award-title {
+  font-weight: bold;
+  font-size: 0.85rem;
+  color: #fbbf24;
+  margin-bottom: 0.3rem;
+}
+[data-theme="light"] .award-title {
+  color: #b45309;
+}
+.award-winner {
+  font-weight: bold;
+  font-size: 1rem;
+  color: #fff;
+  margin-bottom: 0.2rem;
+}
+[data-theme="light"] .award-winner {
+  color: #1e293b;
+}
+.award-value {
+  font-size: 0.85rem;
+  color: #a0aec0;
+}
+[data-theme="light"] .award-value {
+  color: #64748b;
+}
+.award-detail {
+  font-size: 0.75rem;
+  color: #718096;
+  margin-top: 0.2rem;
+}
+/* Battles section */
+.battles-section {
+  max-width: 900px;
+  margin: 1.5rem auto;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #1a1a2e 0%, #2d1b3d 100%);
+  border-radius: 16px;
+  border: 2px solid #e74c3c;
+  box-shadow: 0 4px 20px rgba(231, 76, 60, 0.2);
+}
+[data-theme="light"] .battles-section {
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe0e0 100%);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  border-color: #f87171;
+}
+.battles-title {
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #e74c3c;
+  margin-bottom: 1rem;
+}
+[data-theme="light"] .battles-title {
+  color: #dc2626;
+}
+.battles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.battle-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  background: linear-gradient(135deg, rgba(231,76,60,0.1), rgba(243,156,18,0.1));
+  border: 1px solid rgba(231,76,60,0.3);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+}
+[data-theme="light"] .battle-card {
+  background: linear-gradient(135deg, rgba(248,113,113,0.1), rgba(251,191,36,0.1));
+  border-color: #fca5a5;
+}
+.battle-team {
+  font-weight: bold;
+  font-size: 1rem;
+  color: #fff;
+}
+[data-theme="light"] .battle-team {
+  color: #1e293b;
+}
+.battle-vs {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #f39c12;
+  animation: battle-pulse 1s infinite alternate;
+}
+@keyframes battle-pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.2); opacity: 1; }
+}
+.battle-ecart {
+  width: 100%;
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: #e74c3c;
+  margin-top: 0.3rem;
+}
+[data-theme="light"] .battle-ecart {
+  color: #dc2626;
 }
 </style>
 """
@@ -2708,6 +3126,8 @@ th[data-sort]:hover {{
 
 <div class="main-content">
   {fun_stats}
+  {awards_html}
+  {battles_html}
 
   <div class="search-wrapper">
     <div class="control has-icons-left">
