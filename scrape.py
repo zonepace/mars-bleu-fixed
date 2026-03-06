@@ -363,6 +363,31 @@ def generate_html(participants, is_fun=False):
     teams.sort(key=lambda t: float(t["km"].replace(",", ".")), reverse=True)
     nb_equipes = len(teams)
 
+    # Team podium for fun mode (top 5 teams, show 3 at a time with rotation)
+    team_podium_html = ""
+    if is_fun and len(teams) >= 3:
+        top_n = min(len(teams), 5)
+        medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"]
+        podium_colors = ["#FFD700", "#C0C0C0", "#CD7F32", "#48dbfb", "#ff9ff3"]
+        team_entries = ""
+        for i in range(top_n):
+            t = teams[i]
+            display = "flex" if i < 3 else "none"
+            team_entries += (
+                f'<div class="team-podium-entry team-podium-{i+1}" data-index="{i}" style="display:{display}">'
+                f'<span class="podium-medal">{medals[i]}</span>'
+                f'<span class="podium-name" style="color: {podium_colors[i]}">{esc(t["equipe"])}</span>'
+                f'<span class="podium-km">{esc(t["km"])} km</span>'
+                f'<span class="podium-count">{t["nb_equipier"]} équipiers</span>'
+                f'</div>'
+            )
+        team_podium_html = (
+            f'<div class="fun-team-podium" id="fun-team-podium">'
+            f'<h3 class="fun-podium-title">🏆 Le Podium des Meutes 🏆</h3>'
+            f'<div class="team-podium-entries">{team_entries}</div>'
+            f'</div>'
+        )
+
     tab_equipe_parts = []
     for idx, t in enumerate(teams, 1):
         team_slug = slugify(t["equipe"])
@@ -460,9 +485,67 @@ def generate_html(participants, is_fun=False):
     fun_stats = ""
     if is_fun:
         baguettes = int(total_km * 1538)
-        mars_distance = 225_000_000
-        mars_pct = (total_km / mars_distance) * 100
-        mars_remaining = mars_distance - total_km
+        # Journey milestones (from Nice)
+        milestones = [
+            (200, "🇮🇹", "Rome (depuis Nice)", "Andiamo ! Pasta e basta ! 🍝"),
+            (800, "🇬🇷", "Athènes", "Berceau des JO ! On court comme les anciens ! 🏛️"),
+            (1_600, "🇪🇸", "Madrid", "Olé ! On traverse les Pyrénées ! 💃"),
+            (3_000, "🇬🇧", "Londres", "Keep calm and keep running ! ☕"),
+            (4_000, "🌍", "Hors d'Europe", "On quitte le continent, adios ! ✈️"),
+            (5_500, "🇪🇬", "Le Caire", "Les pyramides en vue ! Pas le temps de visiter ! 🐪"),
+            (7_000, "🌍", "L'Afrique (cap vers le sud)", "Jambo ! Le soleil tape mais on lâche rien ! ☀️"),
+            (9_500, "🇧🇷", "Rio de Janeiro", "Samba et sueur ! Carnaval des mollets ! 🎭"),
+            (12_000, "🇺🇸", "Les Amériques (cap vers l'ouest)", "Traversée de l'Atlantique ! Bonjour New York ! 🗽"),
+            (16_000, "🇲🇽", "Mexico", "Arriba arriba ! Tacos rechargement ! 🌮"),
+            (20_000, "🕌", "L'Inde (cap vers l'est)", "Namaste ! Curry power activated ! 🍛"),
+            (24_000, "🇹🇭", "Bangkok", "Pad thaï et massages pour les mollets ! 🍜"),
+            (28_000, "🏯", "L'Asie (Japon)", "Konnichiwa ! On est à l'autre bout du monde ! 🐉"),
+            (32_000, "🇦🇺", "Sydney", "G'day mate ! Les kangourous nous encouragent ! 🦘"),
+            (40_075, "🌐", "Tour de la Terre", "Un tour complet du globe ! 🤯"),
+            (80_000, "🌐🌐", "2x le tour de la Terre", "On repart pour un tour ?! Vous êtes malades ! 🤪"),
+            (384_400, "🌙", "La Lune", "Houston, on a un problème... de motivation ! 🧑‍🚀"),
+            (225_000_000, "🔴", "Mars", "Mars... Bleu, la planète, vous avez compris le jeu de mots ? 😏"),
+        ]
+
+        # Build journey milestones HTML
+        journey_steps = []
+        current_milestone_msg = ""
+        for dist, icon, name, msg in milestones:
+            reached = total_km >= dist
+            if reached:
+                pct = 100
+                current_milestone_msg = msg
+            else:
+                # progress toward this milestone from previous one
+                prev_dist = 0
+                for pd, _, _, _ in milestones:
+                    if pd < dist:
+                        prev_dist = pd
+                pct = max(0, min(100, ((total_km - prev_dist) / (dist - prev_dist)) * 100)) if total_km > prev_dist else 0
+            status_cls = "reached" if reached else ("in-progress" if pct > 0 else "locked")
+            check = "✅" if reached else ("🏃" if pct > 0 else "🔒")
+            dist_fmt = f"{dist:,}".replace(",", " ")
+            journey_steps.append(
+                f'<div class="journey-step {status_cls}">'
+                f'<div class="journey-step-header">'
+                f'<span class="journey-icon">{icon}</span>'
+                f'<span class="journey-name">{name}</span>'
+                f'<span class="journey-check">{check}</span>'
+                f'</div>'
+                f'<div class="journey-dist">{dist_fmt} km</div>'
+                f'<div class="journey-bar"><div class="journey-bar-fill" style="width:{pct:.1f}%"></div></div>'
+                f'<div class="journey-msg">{msg}</div>'
+                f'</div>'
+            )
+        if not current_milestone_msg:
+            current_milestone_msg = "C'est parti de Nice ! On lace les baskets ! 👟"
+        journey_html = (
+            f'<div class="journey-container">'
+            f'<h3 class="journey-title">🗺️ Le Voyage depuis Nice — {total_km:,.1f} km parcourus</h3>'
+            f'<div class="journey-current-msg">{current_milestone_msg}</div>'
+            f'<div class="journey-milestones">{"".join(journey_steps)}</div>'
+            f'</div>'
+        ).replace(",", " ")
 
         # Top 3 for podium
         top3 = participants_sorted[:3] if len(participants_sorted) >= 3 else participants_sorted
@@ -486,17 +569,8 @@ def generate_html(participants, is_fun=False):
   <span id="fun-quote-text"></span>
 </div>
 
-<!-- Mars progress bar -->
-<div class="mars-progress-container">
-  <div class="mars-progress-label">🌍 Distance vers Mars : {total_km:,.1f} / {mars_distance:,} km ({mars_pct:.6f}%)</div>
-  <div class="mars-progress-bar">
-    <div class="mars-progress-fill" style="width: {mars_pct}%">
-      <span class="mars-rocket">🚀</span>
-    </div>
-    <span class="mars-target">🔴</span>
-  </div>
-  <div class="mars-progress-comment">Plus que {mars_remaining:,.0f} km... On y est presque ! (ou pas 😅)</div>
-</div>
+<!-- Journey milestones from Nice -->
+{journey_html}
 
 <!-- Animated podium -->
 <div class="fun-podium">
@@ -524,6 +598,80 @@ body {
 [data-theme="dark"] body {
   --fun-bg: #0f172a;
   --fun-dot: #1e293b;
+}
+/* Light mode fun fixes */
+[data-theme="light"] .journey-container {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  border: 2px solid #e0e7ff;
+}
+[data-theme="light"] .journey-title {
+  color: #5b21b6;
+  text-shadow: none;
+}
+[data-theme="light"] .journey-current-msg {
+  color: #7c3aed;
+}
+[data-theme="light"] .journey-name {
+  color: #1e293b;
+}
+[data-theme="light"] .journey-dist {
+  color: #64748b;
+}
+[data-theme="light"] .journey-msg {
+  color: #059669;
+}
+[data-theme="light"] .journey-step {
+  background: rgba(0,0,0,0.03);
+}
+[data-theme="light"] .journey-step.reached {
+  background: rgba(16, 185, 129, 0.1);
+  border-left-color: #10b981;
+}
+[data-theme="light"] .journey-step.in-progress {
+  background: rgba(245, 158, 11, 0.1);
+  border-left-color: #f59e0b;
+}
+[data-theme="light"] .journey-step.locked {
+  background: rgba(0,0,0,0.02);
+  border-left-color: #cbd5e1;
+}
+[data-theme="light"] .journey-step.locked .journey-msg {
+  color: #94a3b8;
+}
+[data-theme="light"] .journey-bar {
+  background: #e2e8f0;
+}
+[data-theme="light"] .fun-podium {
+  background: linear-gradient(135deg, #ffffff 0%, #fef3c7 100%);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  border: 2px solid #fde68a;
+}
+[data-theme="light"] .fun-podium-title {
+  color: #b45309;
+  text-shadow: none;
+}
+[data-theme="light"] .podium-entry {
+  background: rgba(0,0,0,0.03);
+}
+[data-theme="light"] .podium-km {
+  color: #475569;
+}
+[data-theme="light"] .participant-row:hover {
+  color: #1a1a2e !important;
+}
+[data-theme="light"] .fun-quotes-banner {
+  color: #1a1a2e;
+}
+[data-theme="light"] .notification.is-info.is-light {
+  background-color: #dbf4ff !important;
+  color: #1a1a2e !important;
+}
+[data-theme="light"] .fun-toast {
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  color: #1e293b;
+  border-left-color: #f59e0b;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 .site-footer {
   background: linear-gradient(135deg, var(--hero-from) 0%, var(--hero-via) 40%, var(--hero-to) 100%) !important;
@@ -602,60 +750,110 @@ body {
 #fun-quote-text {
   transition: opacity 0.5s ease;
 }
-/* Mars progress bar */
-.mars-progress-container {
+/* Journey milestones */
+.journey-container {
   max-width: 800px;
   margin: 0 auto 2rem;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+.journey-title {
   text-align: center;
-}
-.mars-progress-label {
-  font-weight: bold;
+  font-size: 1.4rem;
+  color: #feca57;
   margin-bottom: 0.5rem;
-  font-size: 1rem;
+  text-shadow: 0 0 10px rgba(254, 202, 87, 0.5);
 }
-.mars-progress-bar {
-  position: relative;
-  height: 36px;
-  background: #2d3436;
-  border-radius: 18px;
-  overflow: visible;
-  border: 3px solid #636e72;
+.journey-current-msg {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #48dbfb;
+  margin-bottom: 1.2rem;
+  font-style: italic;
 }
-.mars-progress-fill {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  min-width: 40px;
-  background: linear-gradient(90deg, #00b894, #00cec9, #0984e3, #6c5ce7);
-  border-radius: 18px 0 0 18px;
+.journey-milestones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.journey-step {
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  transition: transform 0.2s;
+}
+.journey-step.reached {
+  background: rgba(0, 184, 148, 0.15);
+  border-left: 4px solid #00b894;
+}
+.journey-step.in-progress {
+  background: rgba(253, 203, 110, 0.15);
+  border-left: 4px solid #fdcb6e;
+  animation: step-pulse 2s infinite alternate;
+}
+.journey-step.locked {
+  opacity: 0.5;
+  border-left: 4px solid #636e72;
+}
+@keyframes step-pulse {
+  0% { box-shadow: 0 0 5px rgba(253, 203, 110, 0.2); }
+  100% { box-shadow: 0 0 15px rgba(253, 203, 110, 0.4); }
+}
+.journey-step-header {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  transition: width 2s ease;
+  gap: 0.6rem;
+  margin-bottom: 0.3rem;
 }
-.mars-rocket {
+.journey-icon {
   font-size: 1.5rem;
-  animation: rocket-bounce 0.6s infinite alternate;
-  position: relative;
-  right: -10px;
 }
-@keyframes rocket-bounce {
-  0% { transform: translateY(-2px) rotate(-10deg); }
-  100% { transform: translateY(2px) rotate(10deg); }
+.journey-name {
+  font-weight: bold;
+  color: #dfe6e9;
+  font-size: 1.05rem;
+  flex: 1;
 }
-.mars-target {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.3rem;
+.journey-check {
+  font-size: 1.2rem;
 }
-.mars-progress-comment {
-  margin-top: 0.5rem;
+.journey-dist {
+  color: #b2bec3;
+  font-size: 0.85rem;
+  margin-bottom: 0.4rem;
+}
+.journey-bar {
+  height: 10px;
+  background: #2d3436;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 0.3rem;
+}
+.journey-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00b894, #00cec9, #0984e3);
+  border-radius: 5px;
+  transition: width 1.5s ease;
+}
+.journey-step.reached .journey-bar-fill {
+  background: #00b894;
+}
+.journey-step.in-progress .journey-bar-fill {
+  background: linear-gradient(90deg, #fdcb6e, #e17055);
+}
+.journey-msg {
+  color: #81ecec;
+  font-size: 0.85rem;
   font-style: italic;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
+}
+.journey-step.locked .journey-msg {
+  color: #636e72;
+}
+@media (max-width: 600px) {
+  .journey-container { padding: 1rem; }
+  .journey-step { padding: 0.6rem; }
 }
 /* Fun podium */
 .fun-podium {
@@ -789,7 +987,8 @@ body {
       "T'as pas fait tout \\u00e7a pour abandonner maintenant ! \\ud83d\\udcaa",
       "M\\u00eame un escargot finit par arriver \\ud83d\\udc0c",
       "Ton corps te d\\u00e9teste l\\u00e0, mais il t'aimera demain \\u2764\\ufe0f",
-      "Si t'arrives \\u00e0 lire \\u00e7a en courant, ralentis pas ! \\ud83c\\udfc3"
+      "Si t'arrives \\u00e0 lire \\u00e7a en courant, ralentis pas ! \\ud83c\\udfc3",
+      "Cours plus vite que ta digestion \\ud83d\\udca9"
     ];
     var quoteEl = document.getElementById('fun-quote-text');
     if (quoteEl) {
@@ -806,11 +1005,25 @@ body {
     }
 
     // Achievement toast notifications
-    var toasts = [
+    var allToasts = [
       "\\ud83c\\udfc6 Achievement: Tu as ouvert la page ! +10 points motivation",
       "\\ud83c\\udfc6 Achievement: Stalker de classement d\\u00e9tect\\u00e9 !",
-      "\\ud83c\\udfc6 Achievement: Mode Fun activ\\u00e9 ! Tu g\\u00e8res !"
+      "\\ud83c\\udfc6 Achievement: Mode Fun activ\\u00e9 ! Tu g\\u00e8res !",
+      "\\ud83d\\udc40 Achievement: Espionnage de concurrents en cours...",
+      "\\ud83e\\uddb6 Achievement: Tes mollets ont senti ta pr\\u00e9sence",
+      "\\ud83c\\udf55 Achievement: Calories brul\\u00e9es = 1 pizza gratuite",
+      "\\ud83d\\udca9 Achievement: Tu scrolles au lieu de courir !",
+      "\\ud83e\\udd21 Achievement: Fan n\\u00b01 du Mode Fun",
+      "\\ud83d\\ude34 Achievement: Le canap\\u00e9 pleure ton absence",
+      "\\ud83e\\uddd0 Achievement: Analyse tactique du classement"
     ];
+    // Pick 3 random toasts
+    var toasts = [];
+    var indices = [];
+    while (toasts.length < 3 && indices.length < allToasts.length) {
+      var ri = Math.floor(Math.random() * allToasts.length);
+      if (indices.indexOf(ri) === -1) { indices.push(ri); toasts.push(allToasts[ri]); }
+    }
     function showToast(msg, delay, topOffset) {
       setTimeout(function() {
         var t = document.createElement('div');
@@ -1766,6 +1979,7 @@ th[data-sort]:hover {{
   </div>
 
   <div id="tab-equipe" class="tab-content is-active">
+    {team_podium_html}
     {tab_equipe}
   </div>
   <div id="tab-general" class="tab-content">
