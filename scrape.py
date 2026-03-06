@@ -240,16 +240,30 @@ def km_float(p):
 
 def get_fun_badge(km):
     """Retourne un badge humoristique + motivation en fonction des kilomètres parcourus."""
-    if km < 5:
+    if km < 2:
+        return ("Roi du Canapé 🛋️", "Le plus dur c'est de se lever !")
+    elif km < 5:
         return ("Échauffement du fessier 🐌", "Tu as commencé, c'est déjà énorme !")
-    elif km < 20:
+    elif km < 10:
         return ("Trotteur du dimanche 🚶", "Les jambes chauffent !")
-    elif km < 50:
+    elif km < 20:
+        return ("Joggeur Motivé 🏃", "Ça commence à sentir l'athlète !")
+    elif km < 35:
         return ("Mollets en Titane 🦵", "Machine de guerre en formation !")
-    elif km < 100:
+    elif km < 50:
+        return ("Athlète du Bitume 💪", "Tu fais peur aux trottoirs !")
+    elif km < 75:
         return ("Forrest Gump 🏃💨", "INARRÊTABLE !")
-    else:
+    elif km < 100:
+        return ("Machine Infernale 🔥", "Même le vent te demande de ralentir !")
+    elif km < 150:
         return ("Cyborg aux Fesses d'Acier 🦾🍑", "LÉGENDE VIVANTE !")
+    elif km < 200:
+        return ("Fusée Humaine 🚀", "La NASA t'a repéré !")
+    elif km < 300:
+        return ("Tour du Monde Sportif 🌍", "Google Maps te suit en direct !")
+    else:
+        return ("Extra-Terrestre du Sport 👽", "Tu n'es clairement plus humain !")
 
 
 def build_teams(participants_sorted):
