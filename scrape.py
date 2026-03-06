@@ -262,6 +262,7 @@ def generate_html(participants):
                 f'data-nom="{esc(p["nom"].lower())}" '
                 f'data-km="{km_float(p)}" '
                 f'data-seances="{esc(p["nb_seances"])}" '
+                f'data-denivele="{esc(p.get("denivele", "0"))}" '
                 f'data-dossard="{esc(p.get("dossard", ""))}" '
                 f'data-denivele="{esc(p.get("denivele", ""))}" '
                 f'data-temps="{esc(p.get("temps", ""))}" '
@@ -1135,6 +1136,9 @@ document.querySelectorAll('th[data-sort]').forEach(function(th) {{
       }} else if (key === 'seances') {{
         va = parseInt(a.dataset.seances) || 0;
         vb = parseInt(b.dataset.seances) || 0;
+      }} else if (key === 'denivele') {{
+        va = parseInt(a.dataset.denivele) || 0;
+        vb = parseInt(b.dataset.denivele) || 0;
       }} else {{
         va = a.dataset.nom || '';
         vb = b.dataset.nom || '';
