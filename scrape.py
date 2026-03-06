@@ -317,21 +317,8 @@ def generate_team_page(team, rank, members, is_fun=False):
 
     esc = html_mod.escape
 
-    # Build member table
-    table_lines = [
-        '<table class="table is-hoverable is-fullwidth results-table">',
-        "<thead><tr>",
-        '<th class="is-narrow">#</th>',
-        "<th>Nom</th>",
-        "<th>Km</th>",
-        "<th>Séances</th>",
-        "<th>Dénivelé</th>",
-        "<th>Sexe</th>",
-        "<th>Catégorie</th>",
-        '<th>Badge 🏅</th>' if is_fun else '',
-        "</tr></thead>",
-        "<tbody>",
-    ]
+    # Build member cards
+    card_lines = ['<div class="member-cards">']
     for idx, p in enumerate(sorted(members, key=km_float, reverse=True), 1):
         sexe_tag = (
             f'<span class="tag tag-sexe-m">{esc(p["sexe"])}</span>'
@@ -340,25 +327,34 @@ def generate_team_page(team, rank, members, is_fun=False):
         )
         cat_tag = f'<span class="tag tag-cat">{esc(cat_fr(p["categorie"]))}</span>'
         denivele_val = p.get("denivele", "")
-        table_lines.append(f'<tr class="participant-row">')
-        table_lines.append(f'<td data-label="#">{idx}</td>')
-        table_lines.append(f'<td data-label="Nom"><strong>{esc(p["nom"])}</strong></td>')
-        table_lines.append(f'<td data-label="Km"><strong>{esc(p["km"])}</strong></td>')
-        table_lines.append(f'<td data-label="Séances">{esc(p["nb_seances"])}</td>')
-        table_lines.append(
-            f'<td data-label="Dénivelé">{esc(denivele_val)}{" m" if denivele_val else ""}</td>'
-        )
-        table_lines.append(f'<td data-label="Sexe">{sexe_tag}</td>')
-        table_lines.append(f'<td data-label="Catégorie">{cat_tag}</td>')
+        denivele_str = f'{esc(denivele_val)} m dénivelé' if denivele_val else ""
+        details_parts = [f'{esc(p["nb_seances"])} séances']
+        if denivele_str:
+            details_parts.append(denivele_str)
+        badge_html = ""
         if is_fun:
             badge_label, badge_motiv = get_fun_badge(km_float(p))
-            table_lines.append(
-                f'<td data-label="Badge"><span class="tag is-warning is-light fun-badge">{badge_label}</span>'
-                f'<br><small class="fun-motivation">{badge_motiv}</small></td>'
+            badge_html = (
+                f'<div class="member-badge">'
+                f'<span class="fun-badge">🏅 {badge_label}</span>'
+                f'<small class="fun-motivation">{badge_motiv}</small>'
+                f'</div>'
             )
-        table_lines.append("</tr>")
-    table_lines.append("</tbody></table>")
-    member_table = "\n".join(table_lines)
+        border_color = "var(--accent)" if idx > 3 else ["#ffd700", "#c0c0c0", "#cd7f32"][idx - 1]
+        card_lines.append(
+            f'<div class="member-card" style="border-left: 4px solid {border_color};">'
+            f'<div class="member-header">'
+            f'<span class="member-rank">#{idx}</span>'
+            f'<span class="member-name">{esc(p["nom"])}</span>'
+            f'<span class="member-km">{esc(p["km"])} km</span>'
+            f'</div>'
+            f'<div class="member-details">{" · ".join(details_parts)}</div>'
+            f'<div class="member-tags">{sexe_tag} {cat_tag}</div>'
+            f'{badge_html}'
+            f'</div>'
+        )
+    card_lines.append('</div>')
+    member_table = "\n".join(card_lines)
 
     # Journey milestones (fun only, filtered)
     journey_html = ""
@@ -456,9 +452,9 @@ body {
 }
 [data-theme="dark"] body { --fun-bg: #0f172a; --fun-dot: #1e293b; }
 .fun-motivation { color: #e91e63; font-style: italic; font-size: 0.8rem; font-weight: bold; }
-.fun-badge { font-size: 0.85rem !important; }
-.participant-row:hover, tr:hover {
-  transform: scale(1.02) rotate(-1deg); transition: transform 0.1s;
+.fun-badge { font-size: 0.85rem !important; display: inline-block; padding: 0.3rem 0.8rem; border-radius: 6px; background: rgba(251, 191, 36, 0.15) !important; color: #fbbf24 !important; font-weight: 600; }
+.member-card:hover {
+  transform: scale(1.02) rotate(-1deg) !important; transition: transform 0.1s;
 }
 [data-theme="light"] .journey-container {
   background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
@@ -526,17 +522,22 @@ body {{ background: var(--bg); color: var(--text); font-family: var(--font-body)
 }}
 .hero-title {{ font-family: var(--font-heading); font-size: 2rem; font-weight: 900; color: #ffffff; margin: 0 0 0.5rem; }}
 .hero-subtitle {{ color: rgba(255,255,255,0.7); font-size: 1rem; }}
+.depistage-msg {{ color: #fbbf24; font-family: var(--font-heading); font-size: 1.3rem; font-weight: 700; margin-top: 0.7rem; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }}
 .stats-grid {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: -1.5rem auto 0.5rem; max-width: 700px; padding: 0 1.5rem; position: relative; z-index: 2; }}
 .stat-card {{ background: var(--bg-card); border-radius: var(--radius); padding: 0.8rem; text-align: center; box-shadow: var(--shadow-md); border-top: 3px solid var(--accent); }}
 .stat-card .stat-value {{ font-family: var(--font-heading); font-size: 2rem; font-weight: 700; color: var(--accent); }}
 .stat-card .stat-label {{ font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-top: 0.3rem; font-weight: 500; }}
 .main-content {{ max-width: 1000px; margin: 0 auto; padding: 1rem 1.5rem; }}
-.results-table {{ background: var(--bg-card); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); border: 1px solid var(--border); }}
-.results-table thead th {{ background: transparent !important; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; border-bottom: 2px solid var(--accent) !important; padding: 0.75rem 1rem; white-space: nowrap; }}
-.results-table tbody td {{ padding: 0.7rem 1rem; border-bottom: 1px solid var(--border-light) !important; vertical-align: middle; font-size: 0.9rem; }}
-.results-table tbody tr:nth-child(even) {{ background: rgba(0,0,0,0.015); }}
-[data-theme="dark"] .results-table tbody tr:nth-child(even) {{ background: rgba(255,255,255,0.02); }}
-.results-table, .results-table thead, .results-table tbody, .results-table tr, .results-table td, .results-table th {{ border-color: var(--border-light) !important; }}
+.member-cards {{ display: flex; flex-direction: column; gap: 1rem; }}
+.member-card {{ background: var(--bg-card); border-radius: var(--radius); padding: 1rem 1.2rem; box-shadow: var(--shadow-sm); border: 1px solid var(--border); transition: transform 0.15s, box-shadow 0.15s; }}
+.member-card:hover {{ transform: translateY(-2px); box-shadow: var(--shadow-md); }}
+.member-header {{ display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.4rem; flex-wrap: wrap; }}
+.member-rank {{ font-family: var(--font-heading); font-weight: 700; font-size: 1.1rem; color: var(--text-muted); min-width: 2rem; }}
+.member-name {{ font-weight: 700; font-size: 1rem; color: var(--text); flex: 1; }}
+.member-km {{ font-weight: 700; font-size: 1.05rem; color: var(--accent); white-space: nowrap; }}
+.member-details {{ font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem; }}
+.member-tags {{ display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.4rem; }}
+.member-badge {{ margin-top: 0.3rem; display: flex; flex-direction: column; gap: 0.2rem; }}
 .tag-sexe-m {{ background: var(--tag-m-bg) !important; color: var(--tag-m-text) !important; font-weight: 600; font-size: 0.75rem !important; border-radius: 6px; }}
 .tag-sexe-f {{ background: var(--tag-f-bg) !important; color: var(--tag-f-text) !important; font-weight: 600; font-size: 0.75rem !important; border-radius: 6px; }}
 .tag-cat {{ background: var(--tag-cat-bg) !important; color: var(--tag-cat-text) !important; font-weight: 500; font-size: 0.75rem !important; border-radius: 6px; }}
@@ -574,33 +575,6 @@ body {{ background: var(--bg); color: var(--text); font-family: var(--font-body)
 @media (max-width: 768px) {{
   .stats-grid {{ grid-template-columns: 1fr; }}
   .hero-title {{ font-size: 1.5rem; }}
-  .results-table thead {{ display: none; }}
-  .results-table tbody tr.participant-row {{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.2rem;
-    padding: 0.75rem;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 0.5rem;
-    border-radius: var(--radius);
-  }}
-  .results-table tbody td {{
-    border: none !important;
-    padding: 0.2rem 0 !important;
-    font-size: 0.85rem;
-  }}
-  .results-table tbody td::before {{
-    content: attr(data-label);
-    font-size: 0.6rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--text-muted);
-    display: block;
-    font-weight: 500;
-  }}
-  .results-table tbody td:nth-child(2) {{
-    grid-column: 1 / -1;
-  }}
 }}
 </style>
 {fun_css_block}
@@ -616,6 +590,7 @@ body {{ background: var(--bg); color: var(--text); font-family: var(--font-body)
 <div class="hero-section">
   <h1 class="hero-title">{hero_title}</h1>
   <p class="hero-subtitle">Équipe classée #{rank} &mdash; Mise à jour : {now}</p>
+  <p class="depistage-msg">À partir de 50 ans, je me fais dépister !</p>
 </div>
 
 <div class="stats-grid">
@@ -1760,6 +1735,15 @@ body::after {{
   position: relative;
   font-family: var(--font-body);
 }}
+.depistage-msg {{
+  color: #fbbf24;
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-top: 0.7rem;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  position: relative;
+}}
 
 /* ── Stats cards ── */
 .stats-grid {{
@@ -2439,6 +2423,7 @@ th[data-sort]:hover {{
   <h1 class="hero-title">{hero_title_html}</h1>
   <div class="hero-divider"></div>
   <p class="hero-subtitle">{hero_subtitle}</p>
+  <p class="depistage-msg">À partir de 50 ans, je me fais dépister !</p>
   {switch_link}
 </div>
 
