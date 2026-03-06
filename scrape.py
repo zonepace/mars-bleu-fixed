@@ -101,7 +101,7 @@ def parse_page(page_html):
     col_map = {}
     for idx, th in enumerate(header_cells):
         text = th.get_text(" ", strip=True).lower()
-        if "seance" in text:
+        if "séance" in text or "seance" in text:
             col_map["nb_seances"] = idx
         elif "km" in text:
             col_map["km"] = idx
@@ -264,20 +264,19 @@ def generate_html(participants):
                 f'data-seances="{esc(p["nb_seances"])}" '
                 f'data-denivele="{esc(p.get("denivele", "0"))}" '
                 f'data-dossard="{esc(p.get("dossard", ""))}" '
-                f'data-denivele="{esc(p.get("denivele", ""))}" '
                 f'data-temps="{esc(p.get("temps", ""))}" '
                 f'data-place="{esc(p.get("place", ""))}" '
                 f'data-place-cat="{esc(p.get("place_cat", ""))}">'
             )
-            lines.append(f'<td class="has-text-grey">{idx}</td>')
-            lines.append(f'<td><strong>{esc(p["nom"])}</strong></td>')
-            lines.append(f'<td class="has-text-weight-semibold">{esc(p["km"])}</td>')
-            lines.append(f'<td>{esc(p["nb_seances"])}</td>')
             denivele_val = p.get("denivele", "")
-            lines.append(f'<td>{esc(denivele_val)}{" m" if denivele_val else ""}</td>')
-            lines.append(f"<td>{sexe_tag}</td>")
-            lines.append(f"<td>{cat_tag}</td>")
-            lines.append(f'<td class="has-text-grey">{esc(p.get("entreprise", ""))}</td>')
+            lines.append(f'<td data-label="#">{idx}</td>')
+            lines.append(f'<td data-label="Nom"><strong>{esc(p["nom"])}</strong></td>')
+            lines.append(f'<td data-label="Km"><strong>{esc(p["km"])}</strong></td>')
+            lines.append(f'<td data-label="Séances">{esc(p["nb_seances"])}</td>')
+            lines.append(f'<td data-label="Dénivelé">{esc(denivele_val)}{" m" if denivele_val else ""}</td>')
+            lines.append(f'<td data-label="Sexe">{sexe_tag}</td>')
+            lines.append(f'<td data-label="Catégorie">{cat_tag}</td>')
+            lines.append(f'<td data-label="Entreprise">{esc(p.get("entreprise", ""))}</td>')
             lines.append("</tr>")
         lines.append("</tbody></table>")
         return "\n".join(lines)
@@ -323,7 +322,7 @@ def generate_html(participants):
             f'<i class="fas fa-chevron-right equipe-chevron"></i>'
             f'</div>'
         )
-        tab_equipe_parts.append(f'<div class="equipe-detail" style="display:none">')
+        tab_equipe_parts.append('<div class="equipe-detail">')
         if members:
             tab_equipe_parts.append(render_table(members))
         else:
@@ -340,7 +339,6 @@ def generate_html(participants):
         s_label = SEXE_FR.get(s_code, s_code)
         s_km = sum(km_float(p) for p in members)
         icon = "fa-venus" if s_code == "F" else "fa-mars"
-        color = "is-danger" if s_code == "F" else "is-info"
         tab_sexe_parts.append(
             f'<div class="section-box" id="sexe-{s_code.lower()}">'
             f'<div class="section-box-title" onclick="toggleSection(this)" style="cursor:pointer">'
@@ -349,7 +347,7 @@ def generate_html(participants):
             f'<span class="tag tag-count">{len(members)} participante{"s" if len(members) > 1 else ""}</span>'
             f'<i class="fas fa-chevron-right equipe-chevron" style="margin-left:auto"></i>'
             f"</div>"
-            f'<div class="section-detail" style="display:none">'
+            f'<div class="section-detail">'
         )
         tab_sexe_parts.append(render_table(members))
         tab_sexe_parts.append("</div></div>")
@@ -380,29 +378,31 @@ def generate_html(participants):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Défi Mars Bleu Connecté 2026 - Résultats</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔵</text></svg>">
 <style>
-/* ── CSS Custom Properties for theming ── */
 :root {{
-  --bg: #f0f4f8;
+  --font-heading: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --bg: #faf8f5;
   --bg-card: #ffffff;
-  --bg-card-hover: #f7f9fc;
-  --text: #1a1a2e;
-  --text-secondary: #5a6778;
+  --bg-card-hover: #f7f5f0;
+  --text: #0a1628;
+  --text-secondary: #4a5568;
   --text-muted: #8e99a9;
-  --border: #e2e8f0;
-  --border-light: #edf2f7;
-  --accent: #2563eb;
-  --accent-light: #dbeafe;
-  --accent-dark: #1d4ed8;
-  --hero-from: #0f172a;
-  --hero-via: #1e3a5f;
-  --hero-to: #1e40af;
-  --stat-gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --stat-gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  --stat-gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --border: #e5e1d8;
+  --border-light: #f0ece4;
+  --accent: #1a56db;
+  --accent-light: rgba(26,86,219,0.08);
+  --accent-dark: #1648b8;
+  --gold: #d4a853;
+  --hero-from: #0a1628;
+  --hero-via: #112240;
+  --hero-to: #1a56db;
   --tag-m-bg: #dbeafe;
   --tag-m-text: #1e40af;
   --tag-f-bg: #fce7f3;
@@ -413,42 +413,36 @@ def generate_html(participants):
   --tag-km-text: #065f46;
   --tag-count-bg: #e0e7ff;
   --tag-count-text: #3730a3;
-  --table-head-bg: #f8fafc;
-  --table-row-hover: #f1f5f9;
-  --table-border: #e2e8f0;
-  --equipe-hover: #f8fafc;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-  --shadow-md: 0 4px 14px rgba(0,0,0,0.08);
-  --shadow-lg: 0 10px 30px rgba(0,0,0,0.1);
+  --table-row-hover: rgba(26,86,219,0.04);
+  --equipe-hover: #f9f7f3;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 14px rgba(0,0,0,0.07);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
   --radius: 12px;
   --radius-sm: 8px;
-  --footer-bg: #f8fafc;
+  --footer-bg: #faf8f5;
   --footer-text: #64748b;
   --input-bg: #ffffff;
-  --input-border: #cbd5e1;
-  --tab-bg: transparent;
-  --tab-active-bg: var(--bg-card);
-  --tab-active-border: var(--accent);
-  --tab-text: var(--text-secondary);
-  --tab-active-text: var(--accent);
+  --input-border: #d5d0c8;
 }}
 
 @media (prefers-color-scheme: dark) {{
   :root {{
-    --bg: #0f172a;
-    --bg-card: #1e293b;
-    --bg-card-hover: #263348;
-    --text: #e2e8f0;
+    --bg: #0a1628;
+    --bg-card: #111d32;
+    --bg-card-hover: #162541;
+    --text: #e8edf5;
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
-    --border: #334155;
-    --border-light: #1e293b;
-    --accent: #60a5fa;
-    --accent-light: #1e3a5f;
-    --accent-dark: #93bbfc;
-    --hero-from: #020617;
-    --hero-via: #0f172a;
-    --hero-to: #1e3a5f;
+    --border: #1e3150;
+    --border-light: #162541;
+    --accent: #3b82f6;
+    --accent-light: rgba(59,130,246,0.12);
+    --accent-dark: #60a5fa;
+    --gold: #e5b863;
+    --hero-from: #020b1a;
+    --hero-via: #0a1628;
+    --hero-to: #1e3a6e;
     --tag-m-bg: #1e3a5f;
     --tag-m-text: #93c5fd;
     --tag-f-bg: #4a1942;
@@ -459,20 +453,16 @@ def generate_html(participants):
     --tag-km-text: #6ee7b7;
     --tag-count-bg: #312e81;
     --tag-count-text: #a5b4fc;
-    --table-head-bg: #1a2536;
-    --table-row-hover: #263348;
-    --table-border: #334155;
-    --equipe-hover: #263348;
+    --table-row-hover: rgba(59,130,246,0.08);
+    --equipe-hover: #162541;
     --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
     --shadow-md: 0 4px 14px rgba(0,0,0,0.3);
     --shadow-lg: 0 10px 30px rgba(0,0,0,0.4);
-    --footer-bg: #1e293b;
+    --footer-bg: #0a1628;
     --footer-text: #94a3b8;
-    --input-bg: #1e293b;
-    --input-border: #475569;
-    --tab-active-bg: var(--bg-card);
+    --input-bg: #111d32;
+    --input-border: #1e3150;
 
-    /* Bulma 1.0 variable overrides */
     --bulma-text-strong: var(--text);
     --bulma-text: var(--text-secondary);
     --bulma-scheme-main: var(--bg);
@@ -502,27 +492,40 @@ def generate_html(participants):
 body {{
   background: var(--bg);
   color: var(--text);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-body);
   transition: background 0.3s, color 0.3s;
+}}
+body::after {{
+  content: '';
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
 }}
 
 /* ── Hero ── */
 .hero-section {{
   background: linear-gradient(135deg, var(--hero-from) 0%, var(--hero-via) 40%, var(--hero-to) 100%);
-  padding: 3rem 1.5rem 2.5rem;
+  background-size: 200% 200%;
+  animation: heroGradient 8s ease infinite;
+  padding: 3.5rem 1.5rem 3rem;
   text-align: center;
   position: relative;
   overflow: hidden;
 }}
+@keyframes heroGradient {{
+  0%, 100% {{ background-position: 0% 50%; }}
+  50% {{ background-position: 100% 50%; }}
+}}
 .hero-section::before {{
   content: '';
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(ellipse at 30% 50%, rgba(96,165,250,0.15) 0%, transparent 60%),
-              radial-gradient(ellipse at 70% 80%, rgba(139,92,246,0.1) 0%, transparent 50%);
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(ellipse at 30% 50%, rgba(96,165,250,0.12) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 80%, rgba(212,168,83,0.08) 0%, transparent 50%);
   pointer-events: none;
 }}
 .hero-logo {{
@@ -534,11 +537,34 @@ body {{
   position: relative;
 }}
 .hero-title {{
-  font-size: 2.2rem;
-  font-weight: 800;
+  font-family: var(--font-heading);
+  font-size: 2.4rem;
+  font-weight: 900;
   color: #ffffff;
   margin: 0 0 0.5rem;
   letter-spacing: -0.5px;
+  position: relative;
+}}
+.hero-highlight {{
+  position: relative;
+  display: inline-block;
+}}
+.hero-highlight::after {{
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--gold);
+  border-radius: 2px;
+}}
+.hero-divider {{
+  width: 60px;
+  height: 3px;
+  background: var(--gold);
+  margin: 1rem auto 0.75rem;
+  border-radius: 2px;
   position: relative;
 }}
 .hero-subtitle {{
@@ -546,12 +572,13 @@ body {{
   font-size: 1rem;
   font-weight: 400;
   position: relative;
+  font-family: var(--font-body);
 }}
 
 /* ── Stats cards ── */
 .stats-grid {{
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.25rem;
   margin: -2rem auto 2rem;
   max-width: 900px;
@@ -560,32 +587,49 @@ body {{
   z-index: 2;
 }}
 .stat-card {{
+  background: var(--bg-card);
   border-radius: var(--radius);
   padding: 1.5rem;
   text-align: center;
-  color: #fff;
-  box-shadow: var(--shadow-lg);
-  transition: transform 0.2s ease;
+  box-shadow: var(--shadow-md);
+  border-top: 3px solid var(--accent);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  opacity: 0;
+  animation: fadeInUp 0.6s ease forwards;
 }}
+.stat-card:nth-child(1) {{ animation-delay: 0s; }}
+.stat-card:nth-child(2) {{ animation-delay: 0.1s; }}
+.stat-card:nth-child(3) {{ animation-delay: 0.2s; }}
 .stat-card:hover {{
   transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}}
+.stat-card .stat-icon {{
+  font-size: 1.2rem;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
 }}
 .stat-card .stat-value {{
+  font-family: var(--font-heading);
   font-size: 2.4rem;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.1;
   letter-spacing: -1px;
+  color: var(--accent);
 }}
 .stat-card .stat-label {{
-  font-size: 0.8rem;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  opacity: 0.85;
-  margin-top: 0.3rem;
+  color: var(--text-muted);
+  margin-top: 0.4rem;
+  font-weight: 500;
 }}
-.stat-1 {{ background: var(--stat-gradient-1); }}
-.stat-2 {{ background: var(--stat-gradient-2); }}
-.stat-3 {{ background: var(--stat-gradient-3); }}
+@keyframes fadeInUp {{
+  from {{ opacity: 0; transform: translateY(20px); }}
+  to {{ opacity: 1; transform: translateY(0); }}
+}}
 
 /* ── Main content ── */
 .main-content {{
@@ -602,67 +646,63 @@ body {{
 .search-wrapper .input {{
   background: var(--input-bg);
   border: 1px solid var(--input-border);
-  border-radius: var(--radius-sm);
+  border-radius: 50px;
   color: var(--text);
   box-shadow: var(--shadow-sm);
-  padding-left: 2.5rem;
+  padding-left: 2.75rem;
   height: 2.75rem;
+  font-family: var(--font-body);
   transition: border-color 0.2s, box-shadow 0.2s;
 }}
-.search-wrapper .input::placeholder {{
-  color: var(--text-muted);
-}}
+.search-wrapper .input::placeholder {{ color: var(--text-muted); }}
 .search-wrapper .input:focus {{
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-light);
 }}
-.search-wrapper .icon {{
-  color: var(--text-muted);
-}}
+.search-wrapper .icon {{ color: var(--text-muted); }}
 
 /* ── Tabs ── */
-.tabs-container {{
-  margin-bottom: 1.5rem;
-}}
+.tabs-container {{ margin-bottom: 1.5rem; }}
 .tabs-container .tabs {{
-  border-bottom: 2px solid var(--border);
+  border-bottom: none;
 }}
 .tabs-container .tabs ul {{
   border-bottom: none;
+  gap: 0.5rem;
 }}
 .tabs-container .tabs li a {{
-  color: var(--tab-text);
-  border: none;
-  border-bottom: 3px solid transparent;
-  padding: 0.75rem 1.25rem;
-  margin-bottom: -2px;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border);
+  border-radius: 50px;
+  padding: 0.5rem 1.25rem;
   font-weight: 500;
-  transition: color 0.2s, border-color 0.2s;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
   background: transparent;
+  margin-bottom: 0;
 }}
 .tabs-container .tabs li a:hover {{
   color: var(--accent);
-  border-bottom-color: var(--accent-light);
-  background: transparent;
+  border-color: var(--accent);
+  background: var(--accent-light);
 }}
 .tabs-container .tabs li.is-active a {{
-  color: var(--tab-active-text);
-  border-bottom-color: var(--tab-active-border);
+  color: #ffffff;
+  background: var(--accent);
+  border-color: var(--accent);
   font-weight: 600;
-  background: transparent;
 }}
 
 /* ── Tab content ── */
 .tab-content {{
   display: none;
-  animation: fadeIn 0.25s ease;
+  animation: fadeInTab 0.3s ease;
 }}
-.tab-content.is-active {{
-  display: block;
-}}
-@keyframes fadeIn {{
-  from {{ opacity: 0; transform: translateY(6px); }}
-  to {{ opacity: 1; transform: translateY(0); }}
+.tab-content.is-active {{ display: block; }}
+@keyframes fadeInTab {{
+  from {{ opacity: 0; }}
+  to {{ opacity: 1; }}
 }}
 
 /* ── Tables ── */
@@ -674,14 +714,15 @@ body {{
   border: 1px solid var(--border);
 }}
 .results-table thead th {{
-  background: var(--table-head-bg) !important;
-  color: var(--text-secondary);
-  font-size: 0.78rem;
+  background: transparent !important;
+  color: var(--text-muted);
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
-  font-weight: 600;
-  border-bottom: 2px solid var(--border) !important;
-  padding: 0.9rem 1rem;
+  letter-spacing: 1px;
+  font-weight: 500;
+  font-family: var(--font-body);
+  border-bottom: 2px solid var(--accent) !important;
+  padding: 0.75rem 1rem;
   white-space: nowrap;
 }}
 .results-table,
@@ -693,13 +734,21 @@ body {{
   border-color: var(--border-light) !important;
 }}
 .results-table tbody td {{
-  padding: 0.75rem 1rem;
+  padding: 0.7rem 1rem;
   border-bottom: 1px solid var(--border-light) !important;
   vertical-align: middle;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
 }}
 .results-table tbody tr {{
   transition: background 0.15s;
+}}
+.results-table tbody tr:nth-child(even) {{
+  background: rgba(0,0,0,0.015);
+}}
+@media (prefers-color-scheme: dark) {{
+  .results-table tbody tr:nth-child(even) {{
+    background: rgba(255,255,255,0.02);
+  }}
 }}
 .results-table tbody tr:hover {{
   background: var(--table-row-hover) !important;
@@ -715,9 +764,9 @@ th[data-sort]:hover {{
   color: var(--accent) !important;
 }}
 .sort-icon {{
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   margin-left: 0.3rem;
-  opacity: 0.5;
+  opacity: 0.4;
 }}
 
 /* ── Tags ── */
@@ -768,7 +817,8 @@ th[data-sort]:hover {{
   box-shadow: var(--shadow-sm);
 }}
 .section-box-title {{
-  font-size: 1.15rem;
+  font-family: var(--font-body);
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--text);
   margin-bottom: 1rem;
@@ -776,6 +826,8 @@ th[data-sort]:hover {{
   align-items: center;
   gap: 0.6rem;
   flex-wrap: wrap;
+  padding-left: 0.75rem;
+  border-left: 3px solid var(--accent);
 }}
 .section-box-title i {{
   font-size: 1.1rem;
@@ -790,6 +842,16 @@ th[data-sort]:hover {{
   transform: rotate(90deg);
   color: var(--accent);
 }}
+.section-detail {{
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+}}
+.section-box.is-open .section-detail {{
+  max-height: 50000px;
+  opacity: 1;
+}}
 
 /* ── Équipe blocks ── */
 .equipe-block {{
@@ -801,7 +863,7 @@ th[data-sort]:hover {{
   border-radius: var(--radius-sm);
   padding: 1rem 1.25rem;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.2s, transform 0.2s;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -810,12 +872,14 @@ th[data-sort]:hover {{
 .equipe-summary:hover {{
   background: var(--equipe-hover);
   border-color: var(--accent);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }}
 .equipe-rank {{
   color: var(--text-muted);
+  font-family: var(--font-heading);
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.1rem;
   min-width: 2rem;
   text-align: center;
 }}
@@ -847,11 +911,23 @@ th[data-sort]:hover {{
   background: var(--equipe-hover);
 }}
 .equipe-detail {{
-  border: 1px solid var(--accent);
+  border: 1px solid var(--border);
   border-top: none;
   border-radius: 0 0 var(--radius-sm) var(--radius-sm);
   padding: 0.75rem;
   background: var(--bg-card);
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.4s ease, opacity 0.3s ease, padding 0.3s ease;
+  padding-top: 0;
+  padding-bottom: 0;
+}}
+.equipe-block.is-open .equipe-detail {{
+  max-height: 50000px;
+  opacity: 1;
+  padding: 0.75rem;
+  border-color: var(--accent);
 }}
 
 /* ── Participant detail row ── */
@@ -892,22 +968,156 @@ th[data-sort]:hover {{
   font-size: 0.88rem;
   margin-top: 3rem;
 }}
+.site-footer .footer-brand {{
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+}}
 .site-footer a {{
   color: var(--accent);
   text-decoration: none;
 }}
-.site-footer a:hover {{
-  text-decoration: underline;
+.site-footer a:hover {{ text-decoration: underline; }}
+.footer-vibed {{
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+}}
+.footer-vibed .rainbow {{
+  background: linear-gradient(90deg, #ff0000, #ff7700, #ffdd00, #00ff00, #0000ff, #8b00ff, #ff0000);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: rainbowFlow 3s linear infinite;
+  font-weight: 700;
+}}
+@keyframes rainbowFlow {{
+  0% {{ background-position: 0% 50%; }}
+  100% {{ background-position: 200% 50%; }}
 }}
 
-/* ── Responsive ── */
+/* ── Mobile responsive ── */
 @media (max-width: 768px) {{
-  .hero-title {{ font-size: 1.5rem; }}
-  .hero-logo {{ width: 200px; }}
-  .stat-card .stat-value {{ font-size: 1.8rem; }}
-  .tabs-container .tabs li a {{ padding: 0.5rem 0.75rem; font-size: 0.85rem; }}
-  .equipe-tags {{ display: none; }}
-  .results-table {{ font-size: 0.85rem; }}
+  /* Hero */
+  .hero-section {{ padding: 2rem 1rem 2rem; }}
+  .hero-title {{ font-size: 1.6rem; }}
+  .hero-logo {{ width: 180px; }}
+
+  /* Stats: single column, horizontal layout */
+  .stats-grid {{
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    max-width: 400px;
+  }}
+  .stat-card {{
+    display: flex;
+    align-items: center;
+    text-align: left;
+    padding: 1rem 1.25rem;
+    gap: 1rem;
+  }}
+  .stat-card .stat-icon {{
+    font-size: 1.4rem;
+    margin-bottom: 0;
+  }}
+  .stat-card .stat-value {{
+    font-size: 1.6rem;
+  }}
+  .stat-card .stat-label {{
+    margin-top: 0;
+  }}
+
+  /* Tabs: horizontal scroll pills */
+  .tabs-container .tabs ul {{
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 0.25rem;
+  }}
+  .tabs-container .tabs li {{
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }}
+  .tabs-container .tabs li a {{
+    padding: 0.4rem 0.9rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }}
+
+  /* Search: full width */
+  .search-wrapper {{
+    max-width: 100%;
+  }}
+
+  /* Tables: card-style rows */
+  .results-table thead {{ display: none; }}
+  .results-table tbody tr.participant-row {{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.2rem;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0.5rem;
+    border-radius: var(--radius-sm);
+  }}
+  .results-table tbody td {{
+    border: none !important;
+    padding: 0.2rem 0 !important;
+    font-size: 0.85rem;
+  }}
+  .results-table tbody td::before {{
+    content: attr(data-label);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    display: block;
+    font-weight: 500;
+  }}
+  /* Name spans full width */
+  .results-table tbody td:nth-child(2) {{
+    grid-column: 1 / -1;
+  }}
+  .results-table tbody tr.participant-detail-row {{
+    display: block;
+    padding: 0.5rem 0.75rem;
+  }}
+  .results-table tbody tr.participant-detail-row td {{
+    padding: 0.5rem !important;
+  }}
+  .results-table tbody tr.participant-detail-row td::before {{
+    display: none;
+  }}
+
+  /* Team blocks: keep tags visible */
+  .equipe-tags {{
+    display: flex;
+    gap: 0.35rem;
+  }}
+  .equipe-tags .tag {{
+    font-size: 0.7rem !important;
+    padding: 0.2em 0.5em;
+  }}
+  .equipe-summary {{
+    padding: 0.75rem 1rem;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }}
+  .equipe-name {{
+    min-width: 0;
+    flex-basis: calc(100% - 3rem);
+  }}
+  .equipe-tags {{
+    flex-basis: 100%;
+    padding-left: 2rem;
+  }}
+
+  /* Section boxes */
+  .section-box {{
+    padding: 1rem;
+  }}
 }}
 </style>
 </head>
@@ -915,22 +1125,32 @@ th[data-sort]:hover {{
 
 <div class="hero-section">
   <img src="{logo_url}" alt="Mars Bleu" class="hero-logo">
-  <h1 class="hero-title">Défi Mars Bleu Connecté 2026</h1>
+  <h1 class="hero-title">Défi <span class="hero-highlight">Mars Bleu</span> Connecté 2026</h1>
+  <div class="hero-divider"></div>
   <p class="hero-subtitle">Résultats en direct &mdash; Mise à jour : {now}</p>
 </div>
 
 <div class="stats-grid">
-  <div class="stat-card stat-1">
-    <div class="stat-value">{total_participants}</div>
-    <div class="stat-label">Participants</div>
+  <div class="stat-card">
+    <div class="stat-icon"><i class="fas fa-users"></i></div>
+    <div>
+      <div class="stat-value">{total_participants}</div>
+      <div class="stat-label">Participants</div>
+    </div>
   </div>
-  <div class="stat-card stat-2">
-    <div class="stat-value">{total_km:,.1f}</div>
-    <div class="stat-label">Kilomètres</div>
+  <div class="stat-card">
+    <div class="stat-icon"><i class="fas fa-road"></i></div>
+    <div>
+      <div class="stat-value">{total_km:,.1f}</div>
+      <div class="stat-label">Kilomètres</div>
+    </div>
   </div>
-  <div class="stat-card stat-3">
-    <div class="stat-value">{nb_equipes}</div>
-    <div class="stat-label">Équipes</div>
+  <div class="stat-card">
+    <div class="stat-icon"><i class="fas fa-people-group"></i></div>
+    <div>
+      <div class="stat-value">{nb_equipes}</div>
+      <div class="stat-label">Équipes</div>
+    </div>
   </div>
 </div>
 
@@ -938,7 +1158,7 @@ th[data-sort]:hover {{
 
   <div class="search-wrapper">
     <div class="control has-icons-left">
-      <input class="input" type="text" id="search" placeholder="Rechercher un participant...">
+      <input class="input" type="text" id="search" placeholder="Rechercher un participant ou une équipe...">
       <span class="icon is-left"><i class="fas fa-search"></i></span>
     </div>
   </div>
@@ -971,13 +1191,16 @@ th[data-sort]:hover {{
 
 <footer class="site-footer">
   <p>
-    <strong>Défi Mars Bleu Connecté 2026</strong> &mdash;
+    <span class="footer-brand">Défi Mars Bleu Connecté 2026</span> &mdash;
     Données issues de <a href="https://www.zapsports.com" target="_blank">ZapSports</a>.
     Mise à jour : {now}.
   </p>
   <p style="margin-top:0.5rem">
-    <i class="fas fa-ribbon" style="color: var(--accent);"></i>
-    Mars Bleu &mdash; Sensibilisation au cancer colorectal
+    <i class="fas fa-ribbon" style="color: var(--gold);"></i>
+    <span style="font-family: var(--font-heading); font-weight: 700;">Mars Bleu</span> &mdash; Sensibilisation au cancer colorectal
+  </p>
+  <p class="footer-vibed">
+    <span class="rainbow">Vibed with love</span> by <a href="https://www.instagram.com/samchmou/" target="_blank">SamChmou</a> - <a href="https://www.instagram.com/nicerunners06/" target="_blank">Nice Runners</a>
   </p>
 </footer>
 
@@ -1003,20 +1226,16 @@ document.querySelectorAll('#main-tabs li').forEach(function(tab) {{
   }});
 }});
 
-// Toggle équipe expand/collapse
+// Toggle équipe expand/collapse with max-height animation
 function toggleEquipe(summary) {{
   var block = summary.closest('.equipe-block');
-  var detail = block.querySelector('.equipe-detail');
   block.classList.toggle('is-open');
-  detail.style.display = block.classList.contains('is-open') ? 'block' : 'none';
 }}
 
-// Toggle section-box (sexe, categorie) expand/collapse
+// Toggle section-box (sexe) expand/collapse with max-height animation
 function toggleSection(title) {{
   var box = title.closest('.section-box');
-  var detail = box.querySelector('.section-detail');
   box.classList.toggle('is-open');
-  detail.style.display = box.classList.contains('is-open') ? 'block' : 'none';
 }}
 
 // Hash routing on load
@@ -1032,7 +1251,6 @@ function handleHash() {{
   if (el && el.classList.contains('equipe-block')) {{
     activateTab('equipe');
     el.classList.add('is-open');
-    el.querySelector('.equipe-detail').style.display = 'block';
     setTimeout(function() {{ el.scrollIntoView({{ behavior: 'smooth', block: 'start' }}); }}, 100);
   }}
 }}
@@ -1060,13 +1278,9 @@ function applySearch(q) {{
     var visibleBlocks = Array.from(equipeBlocks).filter(function(b) {{ return b.style.display !== 'none'; }});
     if (visibleBlocks.length === 1) {{
       visibleBlocks[0].classList.add('is-open');
-      var detail = visibleBlocks[0].querySelector('.equipe-detail');
-      if (detail) detail.style.display = 'block';
     }} else {{
       equipeBlocks.forEach(function(block) {{
         block.classList.remove('is-open');
-        var detail = block.querySelector('.equipe-detail');
-        if (detail) detail.style.display = 'none';
       }});
     }}
   }} else {{
