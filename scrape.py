@@ -251,6 +251,395 @@ def get_fun_badge(km):
         return ("Cyborg aux Fesses d'Acier 🦾🍑", "LÉGENDE VIVANTE !")
 
 
+def build_teams(participants_sorted):
+    """Agrège les participants par équipe et retourne (teams, equipe_members).
+
+    teams: liste de dicts triée par km décroissant
+    equipe_members: dict {key_lower: [participants]}
+    """
+    equipe_members = {}
+    equipe_original_name = {}
+    for p in participants_sorted:
+        eq = p["equipe"]
+        if eq:
+            key = eq.lower()
+            equipe_members.setdefault(key, []).append(p)
+            if key not in equipe_original_name:
+                equipe_original_name[key] = eq
+
+    teams = []
+    for key, members in equipe_members.items():
+        team_km = sum(km_float(p) for p in members)
+        teams.append(
+            {
+                "equipe": equipe_original_name[key],
+                "km": f"{team_km:.1f}".replace(".", ","),
+                "nb_equipier": len(members),
+            }
+        )
+    teams.sort(key=lambda t: float(t["km"].replace(",", ".")), reverse=True)
+    return teams, equipe_members
+
+
+# Milestones partagés entre generate_html et generate_team_page
+JOURNEY_MILESTONES = [
+    (200, "\U0001f1ee\U0001f1f9", "Rome (depuis Nice)", "Andiamo ! Pasta e basta ! \U0001f35d"),
+    (800, "\U0001f1ec\U0001f1f7", "Ath\u00e8nes", "Berceau des JO ! On court comme les anciens ! \U0001f3db\ufe0f"),
+    (1_600, "\U0001f1ea\U0001f1f8", "Madrid", "Ol\u00e9 ! On traverse les Pyr\u00e9n\u00e9es ! \U0001f483"),
+    (3_000, "\U0001f1ec\U0001f1e7", "Londres", "Keep calm and keep running ! \u2615"),
+    (4_000, "\U0001f30d", "Hors d'Europe", "On quitte le continent, adios ! \u2708\ufe0f"),
+    (5_500, "\U0001f1ea\U0001f1ec", "Le Caire", "Les pyramides en vue ! Pas le temps de visiter ! \U0001f42a"),
+    (7_000, "\U0001f30d", "L'Afrique (cap vers le sud)", "Jambo ! Le soleil tape mais on l\u00e2che rien ! \u2600\ufe0f"),
+    (9_500, "\U0001f1e7\U0001f1f7", "Rio de Janeiro", "Samba et sueur ! Carnaval des mollets ! \U0001f3ad"),
+    (12_000, "\U0001f1fa\U0001f1f8", "Les Am\u00e9riques (cap vers l'ouest)", "Travers\u00e9e de l'Atlantique ! Bonjour New York ! \U0001f5fd"),
+    (16_000, "\U0001f1f2\U0001f1fd", "Mexico", "Arriba arriba ! Tacos rechargement ! \U0001f32e"),
+    (20_000, "\U0001f54c", "L'Inde (cap vers l'est)", "Namaste ! Curry power activated ! \U0001f35b"),
+    (24_000, "\U0001f1f9\U0001f1ed", "Bangkok", "Pad tha\u00ef et massages pour les mollets ! \U0001f35c"),
+    (28_000, "\U0001f3ef", "L'Asie (Japon)", "Konnichiwa ! On est \u00e0 l'autre bout du monde ! \U0001f409"),
+    (32_000, "\U0001f1e6\U0001f1fa", "Sydney", "G'day mate ! Les kangourous nous encouragent ! \U0001f998"),
+    (40_075, "\U0001f310", "Tour de la Terre", "Un tour complet du globe ! \U0001f92f"),
+    (80_000, "\U0001f310\U0001f310", "2x le tour de la Terre", "On repart pour un tour ?! Vous \u00eates malades ! \U0001f92a"),
+    (384_400, "\U0001f319", "La Lune", "Houston, on a un probl\u00e8me... de motivation ! \U0001f9d1\u200d\U0001f680"),
+    (225_000_000, "\U0001f534", "Mars", "Mars... Bleu, la plan\u00e8te, vous avez compris le jeu de mots ? \U0001f60f"),
+]
+
+
+def generate_team_page(team, rank, members, is_fun=False):
+    """Génère une page HTML autonome pour une équipe du top 5."""
+    now = get_paris_time()
+    team_name = team["equipe"]
+    team_km_str = team["km"]
+    team_km = float(team_km_str.replace(",", "."))
+    nb_members = team["nb_equipier"]
+    slug = slugify(team_name)
+    medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"]
+    medal = medals[rank - 1] if rank <= 5 else ""
+
+    esc = html_mod.escape
+
+    # Build member table
+    table_lines = [
+        '<table class="table is-hoverable is-fullwidth results-table">',
+        "<thead><tr>",
+        '<th class="is-narrow">#</th>',
+        "<th>Nom</th>",
+        "<th>Km</th>",
+        "<th>Séances</th>",
+        "<th>Dénivelé</th>",
+        "<th>Sexe</th>",
+        "<th>Catégorie</th>",
+        '<th>Badge 🏅</th>' if is_fun else '',
+        "</tr></thead>",
+        "<tbody>",
+    ]
+    for idx, p in enumerate(sorted(members, key=km_float, reverse=True), 1):
+        sexe_tag = (
+            f'<span class="tag tag-sexe-m">{esc(p["sexe"])}</span>'
+            if p["sexe"] == "M"
+            else f'<span class="tag tag-sexe-f">{esc(p["sexe"])}</span>'
+        )
+        cat_tag = f'<span class="tag tag-cat">{esc(cat_fr(p["categorie"]))}</span>'
+        denivele_val = p.get("denivele", "")
+        table_lines.append(f"<tr>")
+        table_lines.append(f'<td>{idx}</td>')
+        table_lines.append(f'<td><strong>{esc(p["nom"])}</strong></td>')
+        table_lines.append(f'<td><strong>{esc(p["km"])}</strong></td>')
+        table_lines.append(f'<td>{esc(p["nb_seances"])}</td>')
+        table_lines.append(
+            f'<td>{esc(denivele_val)}{" m" if denivele_val else ""}</td>'
+        )
+        table_lines.append(f'<td>{sexe_tag}</td>')
+        table_lines.append(f'<td>{cat_tag}</td>')
+        if is_fun:
+            badge_label, badge_motiv = get_fun_badge(km_float(p))
+            table_lines.append(
+                f'<td><span class="tag is-warning is-light fun-badge">{badge_label}</span>'
+                f'<br><small class="fun-motivation">{badge_motiv}</small></td>'
+            )
+        table_lines.append("</tr>")
+    table_lines.append("</tbody></table>")
+    member_table = "\n".join(table_lines)
+
+    # Journey milestones (fun only, filtered)
+    journey_html = ""
+    if is_fun:
+        # Determine which milestones to show:
+        # - last reached (as reference)
+        # - current in-progress
+        # - next 2-3 locked
+        last_reached_idx = -1
+        for i, (dist, _, _, _) in enumerate(JOURNEY_MILESTONES):
+            if team_km >= dist:
+                last_reached_idx = i
+
+        passed_steps = []
+        filtered = []
+        for i, (dist, icon, name, msg) in enumerate(JOURNEY_MILESTONES):
+            reached = team_km >= dist
+            if reached and i < last_reached_idx:
+                # collect passed milestones for collapsible section
+                dist_fmt = f"{dist:,}".replace(",", " ")
+                passed_steps.append(
+                    f'<div class="journey-step reached">'
+                    f'<div class="journey-step-header">'
+                    f'<span class="journey-icon">{icon}</span>'
+                    f'<span class="journey-name">{name}</span>'
+                    f'<span class="journey-check">✅</span>'
+                    f'</div>'
+                    f'<div class="journey-dist">{dist_fmt} km</div>'
+                    f'<div class="journey-bar"><div class="journey-bar-fill" style="width:100%"></div></div>'
+                    f'<div class="journey-msg">{msg}</div>'
+                    f'</div>'
+                )
+                continue
+            if not reached and i > last_reached_idx + 4:
+                break  # only show 2-3 locked after in-progress
+            if reached:
+                pct = 100
+            else:
+                prev_dist = JOURNEY_MILESTONES[i - 1][0] if i > 0 else 0
+                pct = max(0, min(100, ((team_km - prev_dist) / (dist - prev_dist)) * 100)) if team_km > prev_dist else 0
+            status_cls = "reached" if reached else ("in-progress" if pct > 0 else "locked")
+            check = "✅" if reached else ("🏃" if pct > 0 else "🔒")
+            dist_fmt = f"{dist:,}".replace(",", " ")
+            filtered.append(
+                f'<div class="journey-step {status_cls}">'
+                f'<div class="journey-step-header">'
+                f'<span class="journey-icon">{icon}</span>'
+                f'<span class="journey-name">{name}</span>'
+                f'<span class="journey-check">{check}</span>'
+                f'</div>'
+                f'<div class="journey-dist">{dist_fmt} km</div>'
+                f'<div class="journey-bar"><div class="journey-bar-fill" style="width:{pct:.1f}%"></div></div>'
+                f'<div class="journey-msg">{msg}</div>'
+                f'</div>'
+            )
+        passed_html = ""
+        if passed_steps:
+            n = len(passed_steps)
+            passed_html = (
+                f'<details class="journey-passed">'
+                f'<summary>📜 Étapes précédentes ({n} accomplie{"s" if n > 1 else ""})</summary>'
+                f'<div class="journey-milestones">{"".join(passed_steps)}</div>'
+                f'</details>'
+            )
+        journey_html = (
+            f'<div class="journey-container">'
+            f'<h3 class="journey-title">🗺️ Voyage de l\'équipe — {team_km:,.1f} km parcourus</h3>'
+            f'{passed_html}'
+            f'<div class="journey-milestones">{"".join(filtered)}</div>'
+            f'</div>'
+        ).replace(",", " ")
+
+    # Navigation links
+    back_link = "fun.html" if is_fun else "index.html"
+    back_label = "🤓 Retour au classement" if not is_fun else "🤪 Retour au classement fun"
+    switch_fun_link = f"equipe-{slug}-fun.html" if not is_fun else f"equipe-{slug}.html"
+    switch_fun_label = "🤪 Version Fun" if not is_fun else "🤓 Version Sérieuse"
+
+    page_title = f"{team_name} — Mars Bleu 2026"
+    if is_fun:
+        page_title = f"{medal} {team_name} — Bouge Ton Popotin ! 🍑"
+
+    hero_title = f'{medal} {esc(team_name)}'
+
+    fun_css_block = ""
+    if is_fun:
+        fun_css_block = """<style>
+body {
+  font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif !important;
+  background-color: var(--fun-bg, #e0f2fe) !important;
+  background-image: radial-gradient(var(--fun-dot, #bae6fd) 20%, transparent 20%),
+                    radial-gradient(var(--fun-dot, #bae6fd) 20%, transparent 20%) !important;
+  background-position: 0 0, 25px 25px !important;
+  background-size: 50px 50px !important;
+}
+[data-theme="dark"] body { --fun-bg: #0f172a; --fun-dot: #1e293b; }
+.fun-motivation { color: #e91e63; font-style: italic; font-size: 0.8rem; font-weight: bold; }
+.fun-badge { font-size: 0.85rem !important; }
+.participant-row:hover, tr:hover {
+  transform: scale(1.02) rotate(-1deg); transition: transform 0.1s;
+  background-color: #ffff00 !important; color: #000 !important; font-weight: bold;
+}
+[data-theme="light"] .journey-container {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 2px solid #e0e7ff;
+}
+[data-theme="light"] .journey-title { color: #5b21b6; text-shadow: none; }
+[data-theme="light"] .journey-name { color: #1e293b; }
+[data-theme="light"] .journey-dist { color: #64748b; }
+[data-theme="light"] .journey-msg { color: #059669; }
+[data-theme="light"] .journey-step { background: rgba(0,0,0,0.03); }
+[data-theme="light"] .journey-step.reached { background: rgba(16, 185, 129, 0.1); border-left-color: #10b981; }
+[data-theme="light"] .journey-step.in-progress { background: rgba(245, 158, 11, 0.1); border-left-color: #f59e0b; }
+[data-theme="light"] .journey-step.locked { background: rgba(0,0,0,0.02); border-left-color: #cbd5e1; }
+[data-theme="light"] .journey-bar { background: #e2e8f0; }
+[data-theme="light"] .journey-passed summary { color: #5b21b6; }
+</style>"""
+
+    return f"""<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{page_title}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌼</text></svg>">
+<style>
+:root {{
+  --font-heading: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --bg: #faf8f5; --bg-card: #ffffff; --text: #0a1628; --text-secondary: #4a5568;
+  --text-muted: #8e99a9; --border: #e5e1d8; --border-light: #f0ece4;
+  --accent: #1a56db; --accent-light: rgba(26,86,219,0.08);
+  --hero-from: #0a1628; --hero-via: #112240; --hero-to: #1a56db;
+  --tag-m-bg: #dbeafe; --tag-m-text: #1e40af; --tag-f-bg: #fce7f3; --tag-f-text: #be185d;
+  --tag-cat-bg: #fef3c7; --tag-cat-text: #92400e; --tag-km-bg: #d1fae5; --tag-km-text: #065f46;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06); --shadow-md: 0 4px 14px rgba(0,0,0,0.07);
+  --radius: 12px; --input-bg: #ffffff; --input-border: #d5d0c8;
+  --footer-bg: #faf8f5; --footer-text: #64748b;
+}}
+[data-theme="dark"] {{
+  --bg: #0a1628; --bg-card: #111d32; --text: #e8edf5; --text-secondary: #94a3b8;
+  --text-muted: #64748b; --border: #1e3150; --border-light: #162541;
+  --accent: #3b82f6; --accent-light: rgba(59,130,246,0.12);
+  --hero-from: #020b1a; --hero-via: #0a1628; --hero-to: #1e3a6e;
+  --tag-m-bg: #1e3a5f; --tag-m-text: #93c5fd; --tag-f-bg: #4a1942; --tag-f-text: #f9a8d4;
+  --tag-cat-bg: #422006; --tag-cat-text: #fcd34d; --tag-km-bg: #064e3b; --tag-km-text: #6ee7b7;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3); --shadow-md: 0 4px 14px rgba(0,0,0,0.3);
+  --input-bg: #111d32; --input-border: #1e3150;
+  --footer-bg: #0a1628; --footer-text: #94a3b8;
+  --bulma-text-strong: var(--text); --bulma-text: var(--text-secondary);
+  --bulma-scheme-main: var(--bg); --bulma-scheme-main-bis: var(--bg-card);
+  --bulma-table-color: var(--text); --bulma-table-background-color: var(--bg-card);
+  --bulma-table-cell-border-color: var(--border);
+  --bulma-body-background-color: var(--bg); --bulma-body-color: var(--text);
+  --bulma-strong-color: var(--text);
+}}
+body {{ background: var(--bg); color: var(--text); font-family: var(--font-body); transition: background 0.3s, color 0.3s; }}
+.hero-section {{
+  background: linear-gradient(135deg, var(--hero-from) 0%, var(--hero-via) 40%, var(--hero-to) 100%);
+  padding: 2rem 1.5rem 1.5rem; text-align: center;
+}}
+.hero-title {{ font-family: var(--font-heading); font-size: 2rem; font-weight: 900; color: #ffffff; margin: 0 0 0.5rem; }}
+.hero-subtitle {{ color: rgba(255,255,255,0.7); font-size: 1rem; }}
+.stats-grid {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: -1.5rem auto 0.5rem; max-width: 700px; padding: 0 1.5rem; position: relative; z-index: 2; }}
+.stat-card {{ background: var(--bg-card); border-radius: var(--radius); padding: 0.8rem; text-align: center; box-shadow: var(--shadow-md); border-top: 3px solid var(--accent); }}
+.stat-card .stat-value {{ font-family: var(--font-heading); font-size: 2rem; font-weight: 700; color: var(--accent); }}
+.stat-card .stat-label {{ font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-top: 0.3rem; font-weight: 500; }}
+.main-content {{ max-width: 1000px; margin: 0 auto; padding: 1rem 1.5rem; }}
+.results-table {{ background: var(--bg-card); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); border: 1px solid var(--border); }}
+.results-table thead th {{ background: transparent !important; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; border-bottom: 2px solid var(--accent) !important; padding: 0.75rem 1rem; white-space: nowrap; }}
+.results-table tbody td {{ padding: 0.7rem 1rem; border-bottom: 1px solid var(--border-light) !important; vertical-align: middle; font-size: 0.9rem; }}
+.results-table tbody tr:nth-child(even) {{ background: rgba(0,0,0,0.015); }}
+[data-theme="dark"] .results-table tbody tr:nth-child(even) {{ background: rgba(255,255,255,0.02); }}
+.results-table, .results-table thead, .results-table tbody, .results-table tr, .results-table td, .results-table th {{ border-color: var(--border-light) !important; }}
+.tag-sexe-m {{ background: var(--tag-m-bg) !important; color: var(--tag-m-text) !important; font-weight: 600; font-size: 0.75rem !important; border-radius: 6px; }}
+.tag-sexe-f {{ background: var(--tag-f-bg) !important; color: var(--tag-f-text) !important; font-weight: 600; font-size: 0.75rem !important; border-radius: 6px; }}
+.tag-cat {{ background: var(--tag-cat-bg) !important; color: var(--tag-cat-text) !important; font-weight: 500; font-size: 0.75rem !important; border-radius: 6px; }}
+.nav-buttons {{ display: flex; gap: 1rem; justify-content: center; margin: 1rem 0; flex-wrap: wrap; }}
+.nav-buttons a {{ border-radius: 50px; font-weight: 600; padding: 0.6rem 1.5rem; text-decoration: none; }}
+.journey-container {{ max-width: 800px; margin: 0 auto 1rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 16px; padding: 1.5rem; box-shadow: 0 8px 25px rgba(0,0,0,0.3); }}
+.journey-title {{ text-align: center; font-size: 1.3rem; color: #feca57; margin-bottom: 1rem; text-shadow: 0 0 10px rgba(254, 202, 87, 0.5); }}
+.journey-milestones {{ display: flex; flex-direction: column; gap: 0.8rem; }}
+.journey-step {{ background: rgba(255,255,255,0.05); border-radius: 12px; padding: 0.8rem 1rem; }}
+.journey-step.reached {{ background: rgba(0, 184, 148, 0.15); border-left: 4px solid #00b894; }}
+.journey-step.in-progress {{ background: rgba(253, 203, 110, 0.15); border-left: 4px solid #fdcb6e; animation: step-pulse 2s infinite alternate; }}
+.journey-step.locked {{ opacity: 0.5; border-left: 4px solid #636e72; }}
+@keyframes step-pulse {{ 0% {{ box-shadow: 0 0 5px rgba(253, 203, 110, 0.2); }} 100% {{ box-shadow: 0 0 15px rgba(253, 203, 110, 0.4); }} }}
+.journey-step-header {{ display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.3rem; }}
+.journey-icon {{ font-size: 1.5rem; }}
+.journey-name {{ font-weight: bold; color: #dfe6e9; font-size: 1.05rem; flex: 1; }}
+.journey-check {{ font-size: 1.2rem; }}
+.journey-dist {{ color: #b2bec3; font-size: 0.85rem; margin-bottom: 0.4rem; }}
+.journey-bar {{ height: 10px; background: #2d3436; border-radius: 5px; overflow: hidden; margin-bottom: 0.3rem; }}
+.journey-bar-fill {{ height: 100%; background: linear-gradient(90deg, #00b894, #00cec9, #0984e3); border-radius: 5px; transition: width 1.5s ease; }}
+.journey-step.reached .journey-bar-fill {{ background: #00b894; }}
+.journey-step.in-progress .journey-bar-fill {{ background: linear-gradient(90deg, #fdcb6e, #e17055); }}
+.journey-msg {{ color: #81ecec; font-size: 0.85rem; font-style: italic; }}
+.journey-step.locked .journey-msg {{ color: #636e72; }}
+.journey-passed {{ margin-bottom: 0.8rem; }}
+.journey-passed summary {{ cursor: pointer; color: #feca57; font-weight: 600; font-size: 0.95rem; padding: 0.5rem; list-style: none; }}
+.journey-passed summary::-webkit-details-marker {{ display: none; }}
+.journey-passed summary::before {{ content: "\\25B6  "; font-size: 0.8rem; }}
+.journey-passed[open] summary::before {{ content: "\\25BC  "; font-size: 0.8rem; }}
+.theme-switcher {{ position: fixed; top: 1.5rem; right: 1.5rem; z-index: 1000; }}
+.theme-btn {{ background: linear-gradient(135deg, var(--accent), var(--accent)); border: none; color: white; width: 3rem; height: 3rem; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md); transition: all 0.3s ease; }}
+.theme-btn:hover {{ transform: scale(1.1) rotate(20deg); }}
+.site-footer {{ background: var(--footer-bg); color: var(--footer-text); padding: 2rem; margin-top: 1.5rem; border-top: 2px solid var(--border); font-size: 0.85rem; text-align: center; }}
+.site-footer a {{ color: var(--accent); text-decoration: none; }}
+@media (max-width: 768px) {{
+  .stats-grid {{ grid-template-columns: 1fr; }}
+  .hero-title {{ font-size: 1.5rem; }}
+}}
+</style>
+{fun_css_block}
+</head>
+<body>
+
+<div class="theme-switcher">
+  <button id="theme-toggle" class="theme-btn" title="Toggle dark mode">
+    <i class="fas fa-moon"></i>
+  </button>
+</div>
+
+<div class="hero-section">
+  <h1 class="hero-title">{hero_title}</h1>
+  <p class="hero-subtitle">Équipe classée #{rank} &mdash; Mise à jour : {now}</p>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div><div class="stat-value">{team_km_str}</div><div class="stat-label">Kilomètres</div></div>
+  </div>
+  <div class="stat-card">
+    <div><div class="stat-value">{nb_members}</div><div class="stat-label">Équipiers</div></div>
+  </div>
+  <div class="stat-card">
+    <div><div class="stat-value">#{rank}</div><div class="stat-label">Classement</div></div>
+  </div>
+</div>
+
+<div class="main-content">
+  <div class="nav-buttons">
+    <a href="{back_link}" class="button is-info is-rounded">{back_label}</a>
+    <a href="{switch_fun_link}" class="button is-warning is-rounded">{switch_fun_label}</a>
+  </div>
+
+  {journey_html}
+
+  <h2 style="font-family:var(--font-heading);font-size:1.4rem;margin-bottom:1rem;">Membres de l'équipe</h2>
+  {member_table}
+</div>
+
+<footer class="site-footer">
+  <p>Défi Mars Bleu Connecté 2026 &mdash; Page équipe générée automatiquement</p>
+</footer>
+
+<script>
+var html = document.documentElement;
+var saved = localStorage.getItem('theme');
+if (saved) {{ html.setAttribute('data-theme', saved); }}
+else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {{ html.setAttribute('data-theme', 'dark'); }}
+var themeToggle = document.getElementById('theme-toggle');
+function updateIcon(t) {{ themeToggle.querySelector('i').className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon'; }}
+updateIcon(html.getAttribute('data-theme'));
+themeToggle.addEventListener('click', function() {{
+  var cur = html.getAttribute('data-theme');
+  var nxt = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', nxt);
+  localStorage.setItem('theme', nxt);
+  updateIcon(nxt);
+}});
+</script>
+</body>
+</html>"""
+
+
 def generate_html(participants, is_fun=False):
     """Génère le fichier HTML avec Bulma (mode standard ou fun)."""
     now = get_paris_time()
@@ -340,27 +729,7 @@ def generate_html(participants, is_fun=False):
     tab_general = render_table(participants_sorted, "table-general")
 
     # Onglet Par Équipe — build teams from participant data
-    equipe_members = {}
-    equipe_original_name = {}
-    for p in participants_sorted:
-        eq = p["equipe"]
-        if eq:
-            key = eq.lower()
-            equipe_members.setdefault(key, []).append(p)
-            if key not in equipe_original_name:
-                equipe_original_name[key] = eq
-
-    teams = []
-    for key, members in equipe_members.items():
-        team_km = sum(km_float(p) for p in members)
-        teams.append(
-            {
-                "equipe": equipe_original_name[key],
-                "km": f"{team_km:.1f}".replace(".", ","),
-                "nb_equipier": len(members),
-            }
-        )
-    teams.sort(key=lambda t: float(t["km"].replace(",", ".")), reverse=True)
+    teams, equipe_members = build_teams(participants_sorted)
     nb_equipes = len(teams)
 
     # Team podium for fun mode (top 5 teams, show 3 at a time with rotation)
@@ -388,10 +757,19 @@ def generate_html(participants, is_fun=False):
             f'</div>'
         )
 
+    suffix = "-fun" if is_fun else ""
     tab_equipe_parts = []
     for idx, t in enumerate(teams, 1):
         team_slug = slugify(t["equipe"])
         members = equipe_members.get(t["equipe"].lower(), [])
+        team_page_link = ""
+        if idx <= 5:
+            team_page_link = (
+                f' <a href="equipe-{team_slug}{suffix}.html" class="tag tag-km" '
+                f'style="text-decoration:none;margin-left:0.5rem;" '
+                f'onclick="event.stopPropagation()" title="Page dédiée de l\'équipe">'
+                f'<i class="fas fa-external-link-alt"></i> Voir la page</a>'
+            )
         tab_equipe_parts.append(
             f'<div class="equipe-block" id="equipe-{team_slug}">'
             f'<div class="equipe-summary" onclick="toggleEquipe(this)">'
@@ -400,6 +778,7 @@ def generate_html(participants, is_fun=False):
             f'<span class="equipe-tags">'
             f'<span class="tag tag-km">{esc(t["km"])} km</span>'
             f'<span class="tag tag-count">{t["nb_equipier"]} équipiers</span>'
+            f'{team_page_link}'
             f"</span>"
             f'<i class="fas fa-chevron-right equipe-chevron"></i>'
             f"</div>"
@@ -492,37 +871,24 @@ def generate_html(participants, is_fun=False):
         camemberts = int(total_km * 9091)   # ~11cm
         frites = int(total_km * 14286)      # ~7cm
         # Journey milestones (from Nice)
-        milestones = [
-            (200, "🇮🇹", "Rome (depuis Nice)", "Andiamo ! Pasta e basta ! 🍝"),
-            (800, "🇬🇷", "Athènes", "Berceau des JO ! On court comme les anciens ! 🏛️"),
-            (1_600, "🇪🇸", "Madrid", "Olé ! On traverse les Pyrénées ! 💃"),
-            (3_000, "🇬🇧", "Londres", "Keep calm and keep running ! ☕"),
-            (4_000, "🌍", "Hors d'Europe", "On quitte le continent, adios ! ✈️"),
-            (5_500, "🇪🇬", "Le Caire", "Les pyramides en vue ! Pas le temps de visiter ! 🐪"),
-            (7_000, "🌍", "L'Afrique (cap vers le sud)", "Jambo ! Le soleil tape mais on lâche rien ! ☀️"),
-            (9_500, "🇧🇷", "Rio de Janeiro", "Samba et sueur ! Carnaval des mollets ! 🎭"),
-            (12_000, "🇺🇸", "Les Amériques (cap vers l'ouest)", "Traversée de l'Atlantique ! Bonjour New York ! 🗽"),
-            (16_000, "🇲🇽", "Mexico", "Arriba arriba ! Tacos rechargement ! 🌮"),
-            (20_000, "🕌", "L'Inde (cap vers l'est)", "Namaste ! Curry power activated ! 🍛"),
-            (24_000, "🇹🇭", "Bangkok", "Pad thaï et massages pour les mollets ! 🍜"),
-            (28_000, "🏯", "L'Asie (Japon)", "Konnichiwa ! On est à l'autre bout du monde ! 🐉"),
-            (32_000, "🇦🇺", "Sydney", "G'day mate ! Les kangourous nous encouragent ! 🦘"),
-            (40_075, "🌐", "Tour de la Terre", "Un tour complet du globe ! 🤯"),
-            (80_000, "🌐🌐", "2x le tour de la Terre", "On repart pour un tour ?! Vous êtes malades ! 🤪"),
-            (384_400, "🌙", "La Lune", "Houston, on a un problème... de motivation ! 🧑‍🚀"),
-            (225_000_000, "🔴", "Mars", "Mars... Bleu, la planète, vous avez compris le jeu de mots ? 😏"),
-        ]
+        milestones = JOURNEY_MILESTONES
 
         # Build journey milestones HTML
+        # Find last reached milestone index
+        last_reached_idx = -1
+        for i, (dist, _, _, _) in enumerate(milestones):
+            if total_km >= dist:
+                last_reached_idx = i
+
+        passed_steps = []
         journey_steps = []
         current_milestone_msg = ""
-        for dist, icon, name, msg in milestones:
+        for i, (dist, icon, name, msg) in enumerate(milestones):
             reached = total_km >= dist
             if reached:
                 pct = 100
                 current_milestone_msg = msg
             else:
-                # progress toward this milestone from previous one
                 prev_dist = 0
                 for pd, _, _, _ in milestones:
                     if pd < dist:
@@ -531,7 +897,7 @@ def generate_html(participants, is_fun=False):
             status_cls = "reached" if reached else ("in-progress" if pct > 0 else "locked")
             check = "✅" if reached else ("🏃" if pct > 0 else "🔒")
             dist_fmt = f"{dist:,}".replace(",", " ")
-            journey_steps.append(
+            step_html = (
                 f'<div class="journey-step {status_cls}">'
                 f'<div class="journey-step-header">'
                 f'<span class="journey-icon">{icon}</span>'
@@ -543,12 +909,26 @@ def generate_html(participants, is_fun=False):
                 f'<div class="journey-msg">{msg}</div>'
                 f'</div>'
             )
+            if reached and i < last_reached_idx:
+                passed_steps.append(step_html)
+            else:
+                journey_steps.append(step_html)
         if not current_milestone_msg:
             current_milestone_msg = "C'est parti de Nice ! On lace les baskets ! 👟"
+        passed_html = ""
+        if passed_steps:
+            n = len(passed_steps)
+            passed_html = (
+                f'<details class="journey-passed">'
+                f'<summary>📜 Étapes précédentes ({n} accomplie{"s" if n > 1 else ""})</summary>'
+                f'<div class="journey-milestones">{"".join(passed_steps)}</div>'
+                f'</details>'
+            )
         journey_html = (
             f'<div class="journey-container">'
             f'<h3 class="journey-title">🗺️ Le Voyage depuis Nice — {total_km:,.1f} km parcourus</h3>'
             f'<div class="journey-current-msg">{current_milestone_msg}</div>'
+            f'{passed_html}'
             f'<div class="journey-milestones">{"".join(journey_steps)}</div>'
             f'</div>'
         ).replace(",", " ")
@@ -568,7 +948,7 @@ def generate_html(participants, is_fun=False):
                 f'</div>'
             )
 
-        fun_stats = f'''<div class="notification is-info is-light" id="fun-food-facts" style="max-width: 800px; margin: 0 auto 2rem; text-align: center; border-radius: 12px; font-weight: bold; font-size: 1.1rem;">
+        fun_stats = f'''<div class="notification is-info is-light" id="fun-food-facts" style="max-width: 800px; margin: 0 auto 1rem; text-align: center; border-radius: 12px; font-weight: bold; font-size: 1.1rem;">
   <span id="fun-food-text">🥖 Déjà l'équivalent de {baguettes:,} baguettes mises bout à bout ! 💪</span>
 </div>
 <script>
@@ -676,6 +1056,9 @@ body {
 [data-theme="light"] .journey-bar {
   background: #e2e8f0;
 }
+[data-theme="light"] .journey-passed summary {
+  color: #5b21b6;
+}
 [data-theme="light"] .fun-podium {
   background: linear-gradient(135deg, #ffffff 0%, #fef3c7 100%);
   box-shadow: 0 4px 20px rgba(0,0,0,0.1);
@@ -719,6 +1102,7 @@ body {
   animation: bounce 1s infinite alternate !important;
   border: 4px dashed #ff00ff !important;
   transform-origin: bottom;
+  opacity: 1 !important;
 }
 .stat-card:nth-child(2) { animation-delay: 0.2s !important; border-color: #00ff00 !important; }
 .stat-card:nth-child(3) { animation-delay: 0.4s !important; border-color: #00ffff !important; }
@@ -760,7 +1144,7 @@ body {
 /* Rotating quotes banner */
 .fun-quotes-banner {
   max-width: 800px;
-  margin: 0 auto 2rem;
+  margin: 0 auto 1rem;
   text-align: center;
   padding: 1.2rem 2rem;
   background: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
@@ -787,7 +1171,7 @@ body {
 /* Journey milestones */
 .journey-container {
   max-width: 800px;
-  margin: 0 auto 2rem;
+  margin: 0 auto 1rem;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   border-radius: 16px;
   padding: 1.5rem;
@@ -885,6 +1269,11 @@ body {
 .journey-step.locked .journey-msg {
   color: #636e72;
 }
+.journey-passed { margin-bottom: 0.8rem; }
+.journey-passed summary { cursor: pointer; color: #feca57; font-weight: 600; font-size: 0.95rem; padding: 0.5rem; list-style: none; }
+.journey-passed summary::-webkit-details-marker { display: none; }
+.journey-passed summary::before { content: "\\25B6  "; font-size: 0.8rem; }
+.journey-passed[open] summary::before { content: "\\25BC  "; font-size: 0.8rem; }
 @media (max-width: 600px) {
   .journey-container { padding: 1rem; }
   .journey-step { padding: 0.6rem; }
@@ -892,7 +1281,7 @@ body {
 /* Fun podium */
 .fun-podium {
   max-width: 800px;
-  margin: 0 auto 2rem;
+  margin: 0 auto 1rem;
   text-align: center;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   border-radius: 16px;
@@ -939,7 +1328,7 @@ body {
 /* Team podium carousel */
 .fun-team-podium {
   max-width: 800px;
-  margin: 0 auto 2rem;
+  margin: 0 auto 1rem;
   text-align: center;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   border-radius: 16px;
@@ -1305,7 +1694,7 @@ body::after {{
   background: linear-gradient(135deg, var(--hero-from) 0%, var(--hero-via) 40%, var(--hero-to) 100%);
   background-size: 200% 200%;
   animation: heroGradient 8s ease infinite;
-  padding: 3.5rem 1.5rem 3rem;
+  padding: 2rem 1.5rem 1.5rem;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -1357,7 +1746,7 @@ body::after {{
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.25rem;
-  margin: -2rem auto 2rem;
+  margin: -1.5rem auto 0.5rem;
   max-width: 900px;
   padding: 0 1.5rem;
   position: relative;
@@ -1366,7 +1755,7 @@ body::after {{
 .stat-card {{
   background: var(--bg-card);
   border-radius: var(--radius);
-  padding: 1.5rem;
+  padding: 0.8rem;
   text-align: center;
   box-shadow: var(--shadow-md);
   border-top: 3px solid var(--accent);
@@ -1412,7 +1801,7 @@ body::after {{
 .main-content {{
   max-width: 1100px;
   margin: 0 auto;
-  padding: 1.5rem;
+  padding: 1rem 1.5rem;
 }}
 
 /* ── Search ── */
@@ -1741,7 +2130,7 @@ th[data-sort]:hover {{
   text-align: center;
   color: var(--footer-text);
   font-size: 0.88rem;
-  margin-top: 3rem;
+  margin-top: 1.5rem;
 }}
 .site-footer .footer-brand {{
   font-family: var(--font-heading);
@@ -2335,6 +2724,22 @@ def main():
     with open("fun.html", "w", encoding="utf-8") as f:
         f.write(fun_html_content)
     print("fun.html généré avec succès.")
+
+    # Générer les pages individuelles pour les 5 premières équipes
+    participants_sorted = sorted(participants, key=km_float, reverse=True)
+    teams, equipe_members = build_teams(participants_sorted)
+    print(f"\nGénération des pages équipes (top {min(5, len(teams))})...")
+    for idx, team in enumerate(teams[:5], 1):
+        slug = slugify(team["equipe"])
+        members = equipe_members[team["equipe"].lower()]
+        for is_fun in [False, True]:
+            suffix = "-fun" if is_fun else ""
+            filename = f"equipe-{slug}{suffix}.html"
+            team_html = generate_team_page(team, idx, members, is_fun)
+            with open(filename, "w", encoding="utf-8") as f:
+                f.write(team_html)
+            print(f"  {filename} généré.")
+    print("Pages équipes générées avec succès.")
 
 
 if __name__ == "__main__":
