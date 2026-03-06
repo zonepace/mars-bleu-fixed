@@ -485,6 +485,12 @@ def generate_html(participants, is_fun=False):
     fun_stats = ""
     if is_fun:
         baguettes = int(total_km * 1538)
+        pizzas = int(total_km * 3333)       # ~30cm diameter
+        bieres = int(total_km * 4545)       # ~22cm height
+        croissants = int(total_km * 5882)   # ~17cm
+        saucissons = int(total_km * 4000)   # ~25cm
+        camemberts = int(total_km * 9091)   # ~11cm
+        frites = int(total_km * 14286)      # ~7cm
         # Journey milestones (from Nice)
         milestones = [
             (200, "🇮🇹", "Rome (depuis Nice)", "Andiamo ! Pasta e basta ! 🍝"),
@@ -562,7 +568,35 @@ def generate_html(participants, is_fun=False):
                 f'</div>'
             )
 
-        fun_stats = f'''<div class="notification is-info is-light" style="max-width: 800px; margin: 0 auto 2rem; text-align: center; border-radius: 12px; font-weight: bold; font-size: 1.1rem;">🥖 Déjà l'équivalent de {baguettes:,} baguettes mises bout à bout ! 💪</div>
+        fun_stats = f'''<div class="notification is-info is-light" id="fun-food-facts" style="max-width: 800px; margin: 0 auto 2rem; text-align: center; border-radius: 12px; font-weight: bold; font-size: 1.1rem;">
+  <span id="fun-food-text">🥖 Déjà l'équivalent de {baguettes:,} baguettes mises bout à bout ! 💪</span>
+</div>
+<script>
+(function() {{
+  var foodFacts = [
+    "🥖 Déjà l'équivalent de {baguettes:,} baguettes mises bout à bout ! 💪",
+    "🍕 Soit {pizzas:,} pizzas alignées les unes à côté des autres ! 🤤",
+    "🍺 Ou encore {bieres:,} canettes de bière empilées ! 🍻",
+    "🥐 C'est aussi {croissants:,} croissants mis bout à bout ! 🇫🇷",
+    "🥖 Ça fait {saucissons:,} saucissons en file indienne ! 😋",
+    "🧀 Pas moins de {camemberts:,} camemberts roulés ! 🫠",
+    "🍟 Et même {frites:,} frites alignées ! 🤯"
+  ];
+  var foodEl = document.getElementById('fun-food-text');
+  if (foodEl) {{
+    var fi = 0;
+    setInterval(function() {{
+      foodEl.style.opacity = '0';
+      foodEl.style.transition = 'opacity 0.5s';
+      setTimeout(function() {{
+        fi = (fi + 1) % foodFacts.length;
+        foodEl.textContent = foodFacts[fi];
+        foodEl.style.opacity = '1';
+      }}, 500);
+    }}, 4000);
+  }}
+}})();
+</script>
 
 <!-- Rotating motivational quotes -->
 <div id="fun-quotes" class="fun-quotes-banner">
@@ -902,6 +936,52 @@ body {
   0% { box-shadow: 0 0 5px #CD7F32; }
   100% { box-shadow: 0 0 20px #CD7F32; }
 }
+/* Team podium carousel */
+.fun-team-podium {
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  text-align: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+.team-podium-entries {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.team-podium-entry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  min-width: 150px;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.team-podium-1 { animation: podium-glow-gold 1.5s infinite alternate; }
+.team-podium-2 { animation: podium-glow-silver 1.5s infinite alternate; }
+.team-podium-3 { animation: podium-glow-bronze 1.5s infinite alternate; }
+.podium-count {
+  color: #81ecec;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+[data-theme="light"] .fun-team-podium {
+  background: linear-gradient(135deg, #ffffff 0%, #fef3c7 100%);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  border: 2px solid #fde68a;
+}
+[data-theme="light"] .team-podium-entry {
+  background: rgba(0,0,0,0.03);
+}
+[data-theme="light"] .podium-count {
+  color: #475569;
+}
 .podium-medal {
   font-size: 2.5rem;
   animation: medal-bounce 0.8s infinite alternate;
@@ -1041,6 +1121,26 @@ body {
     showToast(toasts[0], 3500, 20);
     showToast(toasts[1], 5500, 90);
     showToast(toasts[2], 7500, 160);
+
+    // Team podium carousel rotation
+    var teamEntries = document.querySelectorAll('.team-podium-entry');
+    if (teamEntries.length > 3) {
+      var teamOffset = 0;
+      setInterval(function() {
+        teamOffset = (teamOffset + 1) % teamEntries.length;
+        teamEntries.forEach(function(el, i) {
+          var pos = (i - teamOffset + teamEntries.length) % teamEntries.length;
+          if (pos < 3) {
+            el.style.display = 'flex';
+            el.style.opacity = '0';
+            setTimeout(function() { el.style.opacity = '1'; }, 50);
+          } else {
+            el.style.opacity = '0';
+            setTimeout(function() { el.style.display = 'none'; }, 500);
+          }
+        });
+      }, 3000);
+    }
 
     // Konami code Easter egg
     var konamiSeq = [38,38,40,40,37,39,37,39,66,65];
