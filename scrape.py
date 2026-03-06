@@ -238,17 +238,17 @@ def km_float(p):
 
 
 def get_fun_badge(km):
-    """Retourne un badge humoristique en fonction des kilomètres parcourus."""
+    """Retourne un badge humoristique + motivation en fonction des kilomètres parcourus."""
     if km < 5:
-        return "Échauffement du fessier 🐌"
+        return ("Échauffement du fessier 🐌", "Tu as commencé, c'est déjà énorme !")
     elif km < 20:
-        return "Trotteur du dimanche 🚶"
+        return ("Trotteur du dimanche 🚶", "Les jambes chauffent !")
     elif km < 50:
-        return "Mollets en Titane 🦵"
+        return ("Mollets en Titane 🦵", "Machine de guerre en formation !")
     elif km < 100:
-        return "Forrest Gump 🏃💨"
+        return ("Forrest Gump 🏃💨", "INARRÊTABLE !")
     else:
-        return "Cyborg aux Fesses d'Acier 🦾🍑"
+        return ("Cyborg aux Fesses d'Acier 🦾🍑", "LÉGENDE VIVANTE !")
 
 
 def generate_html(participants, is_fun=False):
@@ -327,9 +327,10 @@ def generate_html(participants, is_fun=False):
                 f'<td data-label="Entreprise">{esc(p.get("entreprise", ""))}</td>'
             )
             if is_fun:
-                badge = get_fun_badge(km_float(p))
+                badge_label, badge_motiv = get_fun_badge(km_float(p))
                 lines.append(
-                    f'<td data-label="Badge"><span class="tag is-warning is-light">{badge}</span></td>'
+                    f'<td data-label="Badge"><span class="tag is-warning is-light fun-badge">{badge_label}</span>'
+                    f'<br><small class="fun-motivation">{badge_motiv}</small></td>'
                 )
             lines.append("</tr>")
         lines.append("</tbody></table>")
@@ -443,7 +444,7 @@ def generate_html(participants, is_fun=False):
     hero_subtitle = (
         f"Résultats en direct &mdash; Mise à jour : {now}"
         if not is_fun
-        else f"On se bouge contre le cancer ! &mdash; Maj: {now}"
+        else f"On se bouge pour se faire dépister ! &mdash; Maj: {now}"
     )
 
     total_participants_label = "Participants" if not is_fun else "Fessiers en action 🍑"
@@ -459,9 +460,53 @@ def generate_html(participants, is_fun=False):
     fun_stats = ""
     if is_fun:
         baguettes = int(total_km * 1538)
-        fun_stats = f'<div class="notification is-info is-light" style="max-width: 800px; margin: 0 auto 2rem; text-align: center; border-radius: 12px; font-weight: bold; font-size: 1.1rem;">🥖 Déjà l\'équivalent de {baguettes:,} baguettes mises bout à bout ! Plus que {225000000 - total_km:,.0f} km avant d\'atteindre Mars. On ne lâche rien ! 💪</div>'.replace(
-            ",", " "
-        )
+        mars_distance = 225_000_000
+        mars_pct = (total_km / mars_distance) * 100
+        mars_remaining = mars_distance - total_km
+
+        # Top 3 for podium
+        top3 = participants_sorted[:3] if len(participants_sorted) >= 3 else participants_sorted
+        podium_html = ""
+        medals = ["🥇", "🥈", "🥉"]
+        podium_colors = ["#FFD700", "#C0C0C0", "#CD7F32"]
+        for i, p in enumerate(top3):
+            podium_html += (
+                f'<div class="podium-entry podium-{i+1}">'
+                f'<span class="podium-medal">{medals[i]}</span>'
+                f'<span class="podium-name" style="color: {podium_colors[i]}">{esc(p["nom"])}</span>'
+                f'<span class="podium-km">{esc(p["km"])} km</span>'
+                f'<span class="podium-clap">👏👏👏</span>'
+                f'</div>'
+            )
+
+        fun_stats = f'''<div class="notification is-info is-light" style="max-width: 800px; margin: 0 auto 2rem; text-align: center; border-radius: 12px; font-weight: bold; font-size: 1.1rem;">🥖 Déjà l'équivalent de {baguettes:,} baguettes mises bout à bout ! 💪</div>
+
+<!-- Rotating motivational quotes -->
+<div id="fun-quotes" class="fun-quotes-banner">
+  <span id="fun-quote-text"></span>
+</div>
+
+<!-- Mars progress bar -->
+<div class="mars-progress-container">
+  <div class="mars-progress-label">🌍 Distance vers Mars : {total_km:,.1f} / {mars_distance:,} km ({mars_pct:.6f}%)</div>
+  <div class="mars-progress-bar">
+    <div class="mars-progress-fill" style="width: {mars_pct}%">
+      <span class="mars-rocket">🚀</span>
+    </div>
+    <span class="mars-target">🔴</span>
+  </div>
+  <div class="mars-progress-comment">Plus que {mars_remaining:,.0f} km... On y est presque ! (ou pas 😅)</div>
+</div>
+
+<!-- Animated podium -->
+<div class="fun-podium">
+  <h3 class="fun-podium-title">🏆 Le Podium des Machines 🏆</h3>
+  <div class="podium-entries">
+    {podium_html}
+  </div>
+  <div class="standing-ovation" id="standing-ovation">👏🎉👏🎉👏🎉👏</div>
+</div>
+'''.replace(",", " ")  # noqa: E501
 
     fun_css = ""
     if is_fun:
@@ -520,6 +565,197 @@ body {
   border-radius: 20px;
   box-shadow: 0 0 30px rgba(0,0,0,0.3);
 }
+/* Badge motivation text */
+.fun-motivation {
+  color: #e91e63;
+  font-style: italic;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+.fun-badge {
+  font-size: 0.85rem !important;
+}
+/* Rotating quotes banner */
+.fun-quotes-banner {
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  text-align: center;
+  padding: 1.2rem 2rem;
+  background: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+  background-size: 300% 300%;
+  animation: gradient-shift 4s ease infinite;
+  border-radius: 16px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #1a1a2e;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  min-height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+#fun-quote-text {
+  transition: opacity 0.5s ease;
+}
+/* Mars progress bar */
+.mars-progress-container {
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  text-align: center;
+}
+.mars-progress-label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+.mars-progress-bar {
+  position: relative;
+  height: 36px;
+  background: #2d3436;
+  border-radius: 18px;
+  overflow: visible;
+  border: 3px solid #636e72;
+}
+.mars-progress-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  min-width: 40px;
+  background: linear-gradient(90deg, #00b894, #00cec9, #0984e3, #6c5ce7);
+  border-radius: 18px 0 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  transition: width 2s ease;
+}
+.mars-rocket {
+  font-size: 1.5rem;
+  animation: rocket-bounce 0.6s infinite alternate;
+  position: relative;
+  right: -10px;
+}
+@keyframes rocket-bounce {
+  0% { transform: translateY(-2px) rotate(-10deg); }
+  100% { transform: translateY(2px) rotate(10deg); }
+}
+.mars-target {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.3rem;
+}
+.mars-progress-comment {
+  margin-top: 0.5rem;
+  font-style: italic;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+/* Fun podium */
+.fun-podium {
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  text-align: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+.fun-podium-title {
+  font-size: 1.5rem;
+  color: #feca57;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px rgba(254, 202, 87, 0.5);
+}
+.podium-entries {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.podium-entry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  min-width: 150px;
+}
+.podium-1 { animation: podium-glow-gold 1.5s infinite alternate; }
+.podium-2 { animation: podium-glow-silver 1.5s infinite alternate; }
+.podium-3 { animation: podium-glow-bronze 1.5s infinite alternate; }
+@keyframes podium-glow-gold {
+  0% { box-shadow: 0 0 5px #FFD700; }
+  100% { box-shadow: 0 0 25px #FFD700, 0 0 50px rgba(255,215,0,0.3); }
+}
+@keyframes podium-glow-silver {
+  0% { box-shadow: 0 0 5px #C0C0C0; }
+  100% { box-shadow: 0 0 20px #C0C0C0; }
+}
+@keyframes podium-glow-bronze {
+  0% { box-shadow: 0 0 5px #CD7F32; }
+  100% { box-shadow: 0 0 20px #CD7F32; }
+}
+.podium-medal {
+  font-size: 2.5rem;
+  animation: medal-bounce 0.8s infinite alternate;
+}
+@keyframes medal-bounce {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-8px) scale(1.1); }
+}
+.podium-name {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+.podium-km {
+  color: #dfe6e9;
+  font-size: 0.95rem;
+}
+.podium-clap {
+  animation: clap-wave 0.6s infinite alternate;
+}
+@keyframes clap-wave {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.2); }
+}
+.standing-ovation {
+  margin-top: 1rem;
+  font-size: 1.5rem;
+  letter-spacing: 0.5rem;
+  animation: ovation-pulse 1s infinite alternate;
+}
+@keyframes ovation-pulse {
+  0% { opacity: 0.5; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1.05); }
+}
+/* Achievement toast notifications */
+.fun-toast {
+  position: fixed;
+  right: -400px;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #2d3436, #636e72);
+  color: white;
+  border-radius: 12px;
+  border-left: 5px solid #feca57;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+  z-index: 9999;
+  font-weight: bold;
+  font-size: 0.95rem;
+  max-width: 350px;
+  transition: right 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+.fun-toast.show {
+  right: 20px;
+}
 </style>
 """
 
@@ -529,6 +765,7 @@ body {
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
   window.addEventListener('load', function() {
+    // Confetti on load
     var duration = 3 * 1000;
     var animationEnd = Date.now() + duration;
     var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
@@ -540,6 +777,81 @@ body {
       confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
       confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
     }, 250);
+
+    // Rotating motivational quotes
+    var quotes = [
+      "La sueur, c'est juste tes bourrelets qui pleurent \\ud83d\\ude2d",
+      "Cours comme si le dernier pain au chocolat t'attendait \\ud83e\\udd50",
+      "Tes fesses te remercieront... un jour \\ud83c\\udf51",
+      "On n'est pas l\\u00e0 pour souffrir... ah si en fait \\ud83d\\ude05",
+      "Chaque kilom\\u00e8tre te rapproche de Mars ! \\ud83d\\ude80",
+      "Le canap\\u00e9 est ton ennemi. Le bitume est ton ami. \\ud83d\\udeb6",
+      "T'as pas fait tout \\u00e7a pour abandonner maintenant ! \\ud83d\\udcaa",
+      "M\\u00eame un escargot finit par arriver \\ud83d\\udc0c",
+      "Ton corps te d\\u00e9teste l\\u00e0, mais il t'aimera demain \\u2764\\ufe0f",
+      "Si t'arrives \\u00e0 lire \\u00e7a en courant, ralentis pas ! \\ud83c\\udfc3"
+    ];
+    var quoteEl = document.getElementById('fun-quote-text');
+    if (quoteEl) {
+      var qi = 0;
+      quoteEl.textContent = quotes[0];
+      setInterval(function() {
+        quoteEl.style.opacity = '0';
+        setTimeout(function() {
+          qi = (qi + 1) % quotes.length;
+          quoteEl.textContent = quotes[qi];
+          quoteEl.style.opacity = '1';
+        }, 500);
+      }, 4000);
+    }
+
+    // Achievement toast notifications
+    var toasts = [
+      "\\ud83c\\udfc6 Achievement: Tu as ouvert la page ! +10 points motivation",
+      "\\ud83c\\udfc6 Achievement: Stalker de classement d\\u00e9tect\\u00e9 !",
+      "\\ud83c\\udfc6 Achievement: Mode Fun activ\\u00e9 ! Tu g\\u00e8res !"
+    ];
+    function showToast(msg, delay, topOffset) {
+      setTimeout(function() {
+        var t = document.createElement('div');
+        t.className = 'fun-toast';
+        t.textContent = msg;
+        t.style.top = topOffset + 'px';
+        document.body.appendChild(t);
+        setTimeout(function() { t.classList.add('show'); }, 50);
+        setTimeout(function() {
+          t.classList.remove('show');
+          setTimeout(function() { t.remove(); }, 600);
+        }, 4000);
+      }, delay);
+    }
+    showToast(toasts[0], 3500, 20);
+    showToast(toasts[1], 5500, 90);
+    showToast(toasts[2], 7500, 160);
+
+    // Konami code Easter egg
+    var konamiSeq = [38,38,40,40,37,39,37,39,66,65];
+    var konamiPos = 0;
+    document.addEventListener('keydown', function(e) {
+      if (e.keyCode === konamiSeq[konamiPos]) {
+        konamiPos++;
+        if (konamiPos === konamiSeq.length) {
+          konamiPos = 0;
+          // Mega confetti burst
+          var end = Date.now() + 5000;
+          var iv = setInterval(function() {
+            if (Date.now() > end) return clearInterval(iv);
+            confetti({ particleCount: 100, spread: 160, origin: { x: Math.random(), y: Math.random() * 0.6 } });
+          }, 100);
+          // Fun alert
+          setTimeout(function() {
+            alert("\\ud83c\\udf89 KONAMI CODE ACTIV\\u00c9 ! \\ud83c\\udf89\\n\\nTu es officiellement un NINJA du classement !\\nBonus : +1000 km imaginaires \\ud83e\\uddb8");
+          }, 500);
+        }
+      } else {
+        konamiPos = e.keyCode === konamiSeq[0] ? 1 : 0;
+      }
+    });
   });
 </script>
 """
