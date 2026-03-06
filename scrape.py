@@ -8,7 +8,7 @@ import sys
 import time
 import unicodedata
 import urllib.request
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 
 from bs4 import BeautifulSoup
 
@@ -1300,7 +1300,7 @@ th[data-sort]:hover {{
 
   <div class="search-wrapper">
     <div class="control has-icons-left">
-      <input class="input" type="text" id="search" placeholder="Rechercher un participant ou une équipe...">
+      <input class="input" type="text" id="search" placeholder="Rechercher un participant(e) ou une équipe...">
       <span class="icon is-left"><i class="fas fa-search"></i></span>
     </div>
   </div>
