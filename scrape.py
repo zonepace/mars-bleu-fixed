@@ -11,7 +11,6 @@ import urllib.request
 from datetime import datetime, timezone
 
 BASE_URL = "https://www.zapsports.com/ext/app_page_web/su-res-detail-503-{offset}-100.htm"
-TEAM_URL = "https://www.zapsports.com/ext/app_page_web/su-res-equipe-503.htm"
 OFFSETS = [0, 100, 200, 300, 400]
 
 CATEGORIES_FR = {
@@ -112,28 +111,6 @@ def parse_page(page_html):
     return participants
 
 
-def scrape_teams():
-    """Récupère les résultats par équipe depuis la page dédiée."""
-    url = TEAM_URL
-    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        page_html = resp.read().decode("latin-1")
-    teams = []
-    table_match = re.search(r"<table[^>]*>(.*?)</table>", page_html, re.DOTALL)
-    if not table_match:
-        return teams
-    table = table_match.group(1)
-    rows = re.findall(r"<tr[^>]*>(.*?)</tr>", table, re.DOTALL)
-    for row in rows[1:]:  # skip header
-        cells = re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL)
-        if len(cells) >= 3:
-            teams.append({
-                "km": clean(cells[0]),
-                "equipe": clean(cells[1]),
-                "nb_equipier": int(clean(cells[2]) or "0"),
-            })
-    return teams
-
 
 def scrape_all():
     """Récupère tous les participants depuis les 5 pages."""
@@ -166,7 +143,7 @@ def km_float(p):
         return 0.0
 
 
-def generate_html(participants, teams):
+def generate_html(participants):
     """Génère le fichier index.html avec Bulma."""
     now = datetime.now(timezone.utc).strftime("%d/%m/%Y à %H:%M UTC")
     participants_sorted = sorted(participants, key=km_float, reverse=True)
@@ -188,8 +165,6 @@ def generate_html(participants, teams):
         key=lambda x: sum(km_float(p) for p in x[1]),
         reverse=True,
     )
-
-    nb_equipes = len(teams)
 
     def esc(s):
         return html_mod.escape(str(s))
@@ -234,13 +209,27 @@ def generate_html(participants, teams):
     # Onglet Général
     tab_general = render_table(participants_sorted, "table-general")
 
-    # Onglet Par Équipe (clickable expand/collapse with participant details)
-    # Group participants by equipe (case-insensitive matching)
+    # Onglet Par Équipe — build teams from participant data
     equipe_members = {}
+    equipe_original_name = {}
     for p in participants_sorted:
         eq = p["equipe"]
         if eq:
-            equipe_members.setdefault(eq.lower(), []).append(p)
+            key = eq.lower()
+            equipe_members.setdefault(key, []).append(p)
+            if key not in equipe_original_name:
+                equipe_original_name[key] = eq
+
+    teams = []
+    for key, members in equipe_members.items():
+        total_km = sum(km_float(p) for p in members)
+        teams.append({
+            "equipe": equipe_original_name[key],
+            "km": f"{total_km:.1f}".replace(".", ","),
+            "nb_equipier": len(members),
+        })
+    teams.sort(key=lambda t: float(t["km"].replace(",", ".")), reverse=True)
+    nb_equipes = len(teams)
 
     tab_equipe_parts = []
     for idx, t in enumerate(teams, 1):
@@ -404,6 +393,30 @@ def generate_html(participants, teams):
     --input-bg: #1e293b;
     --input-border: #475569;
     --tab-active-bg: var(--bg-card);
+
+    /* Bulma 1.0 variable overrides */
+    --bulma-text-strong: var(--text);
+    --bulma-text: var(--text-secondary);
+    --bulma-scheme-main: var(--bg);
+    --bulma-scheme-main-bis: var(--bg-card);
+    --bulma-scheme-main-ter: var(--bg-card-hover);
+    --bulma-border: var(--border);
+    --bulma-border-weak: var(--border-light);
+    --bulma-table-color: var(--text);
+    --bulma-table-cell-heading-color: var(--text-secondary);
+    --bulma-table-head-cell-color: var(--text-secondary);
+    --bulma-table-background-color: var(--bg-card);
+    --bulma-table-cell-border-color: var(--border);
+    --bulma-table-row-hover-background-color: var(--table-row-hover);
+    --bulma-body-background-color: var(--bg);
+    --bulma-body-color: var(--text);
+    --bulma-strong-color: var(--text);
+    --bulma-box-background-color: var(--bg-card);
+    --bulma-footer-background-color: var(--footer-bg);
+    --bulma-footer-color: var(--footer-text);
+    --bulma-input-background-color: var(--input-bg);
+    --bulma-input-border-color: var(--input-border);
+    --bulma-input-color: var(--text);
   }}
 }}
 
@@ -599,8 +612,6 @@ body {{
 .results-table tr,
 .results-table td,
 .results-table th {{
-  background-color: transparent !important;
-  color: var(--text) !important;
   border-color: var(--border-light) !important;
 }}
 .results-table tbody td {{
@@ -608,12 +619,6 @@ body {{
   border-bottom: 1px solid var(--border-light) !important;
   vertical-align: middle;
   font-size: 0.92rem;
-}}
-.results-table tbody td strong {{
-  color: var(--text) !important;
-}}
-.results-table thead th {{
-  color: var(--text-secondary) !important;
 }}
 .results-table tbody tr {{
   transition: background 0.15s;
@@ -697,20 +702,6 @@ th[data-sort]:hover {{
 .section-box-title i {{
   font-size: 1.1rem;
   color: var(--accent);
-}}
-.section-box .title,
-.section-box strong,
-.section-box-title {{
-  color: var(--text) !important;
-}}
-
-/* Override Bulma .table root background */
-.results-table.table {{
-  background-color: var(--bg-card) !important;
-}}
-/* Override Bulma strong color globally */
-.main-content strong {{
-  color: var(--text) !important;
 }}
 
 /* ── Équipe blocks ── */
@@ -986,12 +977,8 @@ def main():
     participants = scrape_all()
     print(f"\nTotal : {len(participants)} participants")
 
-    print("Scraping des équipes...")
-    teams = scrape_teams()
-    print(f"Total : {len(teams)} équipes")
-
     print("Génération du HTML...")
-    html_content = generate_html(participants, teams)
+    html_content = generate_html(participants)
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(html_content)
     print("index.html généré avec succès.")
