@@ -436,8 +436,7 @@ def generate_html(participants):
   --input-border: #d5d0c8;
 }}
 
-@media (prefers-color-scheme: dark) {{
-  :root {{
+[data-theme="dark"] {{
     --bg: #0a1628;
     --bg-card: #111d32;
     --bg-card-hover: #162541;
@@ -495,7 +494,6 @@ def generate_html(participants):
     --bulma-input-background-color: var(--input-bg);
     --bulma-input-border-color: var(--input-border);
     --bulma-input-color: var(--text);
-  }}
 }}
 
 /* ── Global ── */
@@ -558,24 +556,6 @@ body::after {{
 .hero-highlight {{
   position: relative;
   display: inline-block;
-}}
-.hero-highlight::after {{
-  content: '';
-  position: absolute;
-  bottom: 2px;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background: var(--gold);
-  border-radius: 2px;
-}}
-.hero-divider {{
-  width: 60px;
-  height: 3px;
-  background: var(--gold);
-  margin: 1rem auto 0.75rem;
-  border-radius: 2px;
-  position: relative;
 }}
 .hero-subtitle {{
   color: rgba(255,255,255,0.7);
@@ -755,10 +735,8 @@ body::after {{
 .results-table tbody tr:nth-child(even) {{
   background: rgba(0,0,0,0.015);
 }}
-@media (prefers-color-scheme: dark) {{
-  .results-table tbody tr:nth-child(even) {{
-    background: rgba(255,255,255,0.02);
-  }}
+[data-theme="dark"] .results-table tbody tr:nth-child(even) {{
+  background: rgba(255,255,255,0.02);
 }}
 .results-table tbody tr:hover {{
   background: var(--table-row-hover) !important;
