@@ -12,7 +12,9 @@ from datetime import datetime, timezone
 
 from bs4 import BeautifulSoup
 
-BASE_URL = "https://www.zapsports.com/ext/app_page_web/su-res-detail-503-{offset}-100.htm"
+BASE_URL = (
+    "https://www.zapsports.com/ext/app_page_web/su-res-detail-503-{offset}-100.htm"
+)
 OFFSETS = [0, 100, 200, 300, 400]
 
 CATEGORIES_FR = {
@@ -44,7 +46,6 @@ def slugify(text):
     return text.strip("-")
 
 
-
 def fetch_page(offset, retries=2):
     """Récupère une page de résultats depuis ZapSports (avec retry)."""
     url = BASE_URL.format(offset=offset)
@@ -59,7 +60,9 @@ def fetch_page(offset, retries=2):
                     return raw.decode("latin-1")
         except Exception as e:
             if attempt < retries:
-                print(f"    Erreur (tentative {attempt + 1}/{retries + 1}): {e}. Retry...")
+                print(
+                    f"    Erreur (tentative {attempt + 1}/{retries + 1}): {e}. Retry..."
+                )
                 time.sleep(5)
             else:
                 raise
@@ -151,7 +154,6 @@ def parse_page(page_html):
                 participants.append(p)
         i += 1
     return participants
-
 
 
 def _detect_offsets(first_page_html):
@@ -273,10 +275,14 @@ def generate_html(participants):
             lines.append(f'<td data-label="Nom"><strong>{esc(p["nom"])}</strong></td>')
             lines.append(f'<td data-label="Km"><strong>{esc(p["km"])}</strong></td>')
             lines.append(f'<td data-label="Séances">{esc(p["nb_seances"])}</td>')
-            lines.append(f'<td data-label="Dénivelé">{esc(denivele_val)}{" m" if denivele_val else ""}</td>')
+            lines.append(
+                f'<td data-label="Dénivelé">{esc(denivele_val)}{" m" if denivele_val else ""}</td>'
+            )
             lines.append(f'<td data-label="Sexe">{sexe_tag}</td>')
             lines.append(f'<td data-label="Catégorie">{cat_tag}</td>')
-            lines.append(f'<td data-label="Entreprise">{esc(p.get("entreprise", ""))}</td>')
+            lines.append(
+                f'<td data-label="Entreprise">{esc(p.get("entreprise", ""))}</td>'
+            )
             lines.append("</tr>")
         lines.append("</tbody></table>")
         return "\n".join(lines)
@@ -298,11 +304,13 @@ def generate_html(participants):
     teams = []
     for key, members in equipe_members.items():
         team_km = sum(km_float(p) for p in members)
-        teams.append({
-            "equipe": equipe_original_name[key],
-            "km": f"{team_km:.1f}".replace(".", ","),
-            "nb_equipier": len(members),
-        })
+        teams.append(
+            {
+                "equipe": equipe_original_name[key],
+                "km": f"{team_km:.1f}".replace(".", ","),
+                "nb_equipier": len(members),
+            }
+        )
     teams.sort(key=lambda t: float(t["km"].replace(",", ".")), reverse=True)
     nb_equipes = len(teams)
 
@@ -318,16 +326,18 @@ def generate_html(participants):
             f'<span class="equipe-tags">'
             f'<span class="tag tag-km">{esc(t["km"])} km</span>'
             f'<span class="tag tag-count">{t["nb_equipier"]} équipiers</span>'
-            f'</span>'
+            f"</span>"
             f'<i class="fas fa-chevron-right equipe-chevron"></i>'
-            f'</div>'
+            f"</div>"
         )
         tab_equipe_parts.append('<div class="equipe-detail">')
         if members:
             tab_equipe_parts.append(render_table(members))
         else:
-            tab_equipe_parts.append('<p class="has-text-grey-light ml-4">Aucun détail disponible</p>')
-        tab_equipe_parts.append('</div></div>')
+            tab_equipe_parts.append(
+                '<p class="has-text-grey-light ml-4">Aucun détail disponible</p>'
+            )
+        tab_equipe_parts.append("</div></div>")
     tab_equipe = "\n".join(tab_equipe_parts)
 
     # Onglet Par Sexe
@@ -383,7 +393,7 @@ def generate_html(participants):
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔵</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌼</text></svg>">
 <style>
 :root {{
   --font-heading: 'Playfair Display', Georgia, 'Times New Roman', serif;
@@ -1119,12 +1129,138 @@ th[data-sort]:hover {{
     padding: 1rem;
   }}
 }}
+
+/* Hero Logo Link */
+.hero-section a {{
+  display: inline-block;
+  transition: transform 0.3s ease;
+}}
+
+.hero-section a:hover img {{
+  transform: scale(1.05);
+}}
+
+/* Theme Switcher */
+.theme-switcher {{
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 1000;
+}}
+
+.theme-btn {{
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  border: none;
+  color: white;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}}
+
+.theme-btn:hover {{
+  transform: scale(1.1) rotate(20deg);
+  box-shadow: var(--shadow-lg);
+}}
+
+.theme-btn:active {{
+  transform: scale(0.95);
+}}
+
+.theme-btn i {{
+  transition: transform 0.3s ease;
+}}
+
+.theme-btn i.fa-sun {{
+  color: #fbbf24;
+}}
+
+.theme-btn i.fa-moon {{
+  color: #60a5fa;
+}}
+
+/* Improved Footer */
+.site-footer {{
+  background: var(--footer-bg);
+  color: var(--footer-text);
+  padding: 3rem 2rem 2rem;
+  margin-top: 4rem;
+  border-top: 2px solid var(--border);
+  font-size: 0.9rem;
+}}
+
+.site-footer p {{
+  margin: 0.75rem 0;
+  line-height: 1.6;
+}}
+
+.site-footer a {{
+  color: var(--accent);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}}
+
+.site-footer a:hover {{
+  text-decoration: underline;
+  opacity: 0.8;
+}}
+
+.footer-brand {{
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 1.1rem;
+}}
+
+.footer-vibed {{
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 1.5rem !important;
+}}
+
+.rainbow {{
+  background: linear-gradient(90deg, #ff6b6b, #ffa500, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-style: italic;
+  font-weight: 600;
+}}
+
+@media (max-width: 768px) {{
+  .theme-switcher {{
+    top: 1rem;
+    right: 1rem;
+  }}
+
+  .theme-btn {{
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1rem;
+  }}
+}}
 </style>
 </head>
 <body>
 
+<div class="theme-switcher">
+  <button id="theme-toggle" class="theme-btn" title="Toggle dark mode">
+    <i class="fas fa-moon"></i>
+  </button>
+</div>
+
 <div class="hero-section">
-  <img src="{logo_url}" alt="Mars Bleu" class="hero-logo">
+  <a href="https://www.marsbleuconnecte.fr/#top" target="_blank" title="Aller au site Mars Bleu Connecté">
+    <img src="{logo_url}" alt="Mars Bleu" class="hero-logo">
+  </a>
   <h1 class="hero-title">Défi <span class="hero-highlight">Mars Bleu</span> Connecté 2026</h1>
   <div class="hero-divider"></div>
   <p class="hero-subtitle">Résultats en direct &mdash; Mise à jour : {now}</p>
@@ -1367,6 +1503,34 @@ document.querySelectorAll('th[data-sort]').forEach(function(th) {{
     }});
   }});
 }});
+
+// Theme Toggle
+document.addEventListener('DOMContentLoaded', function() {{
+  const themeToggle = document.getElementById('theme-toggle');
+  const html = document.documentElement;
+
+  // Load saved theme preference or detect system preference
+  const savedTheme = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+
+  html.setAttribute('data-theme', initialTheme);
+  updateThemeIcon(initialTheme);
+
+  // Toggle theme on button click
+  themeToggle.addEventListener('click', function() {{
+    const currentTheme = html.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+  }});
+
+  function updateThemeIcon(theme) {{
+    const icon = themeToggle.querySelector('i');
+    icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+  }}
+}});
 </script>
 
 </body>
@@ -1382,7 +1546,9 @@ def main():
         if participants:
             print("\nExemples :")
             for p in participants[:5]:
-                print(f"  {p['nom']} - {p['km']} km - {p['equipe']} ({p['sexe']}, {p['categorie']})")
+                print(
+                    f"  {p['nom']} - {p['km']} km - {p['equipe']} ({p['sexe']}, {p['categorie']})"
+                )
         return
 
     print("Scraping des résultats Mars Bleu...")
