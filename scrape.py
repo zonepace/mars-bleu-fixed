@@ -8,7 +8,7 @@ import sys
 import time
 import unicodedata
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from bs4 import BeautifulSoup
 
@@ -44,6 +44,34 @@ def slugify(text):
     text = text.lower()
     text = re.sub(r"[^a-z0-9]+", "-", text)
     return text.strip("-")
+
+
+def get_paris_time():
+    """Retourne l'heure actuelle en heure de Paris (CET/CEST)."""
+    utc_now = datetime.now(timezone.utc)
+    # Déterminer si on est en heure d'été (CEST) ou d'hiver (CET)
+    # Transition : dernier dimanche de mars à 2h UTC et dernier dimanche d'octobre à 3h UTC
+    year = utc_now.year
+
+    # Dernier dimanche de mars (transition vers CEST)
+    march_last = datetime(year, 3, 31, tzinfo=timezone.utc)
+    while march_last.weekday() != 6:  # 6 = dimanche
+        march_last -= timedelta(days=1)
+
+    # Dernier dimanche d'octobre (transition vers CET)
+    october_last = datetime(year, 10, 31, tzinfo=timezone.utc)
+    while october_last.weekday() != 6:  # 6 = dimanche
+        october_last -= timedelta(days=1)
+
+    # CEST : UTC+2, CET : UTC+1
+    if march_last <= utc_now < october_last:
+        offset = timedelta(hours=2)
+    else:
+        offset = timedelta(hours=1)
+
+    paris_tz = timezone(offset)
+    paris_now = utc_now.astimezone(paris_tz)
+    return paris_now.strftime("%d/%m/%Y à %H:%M")
 
 
 def fetch_page(offset, retries=2):
@@ -211,7 +239,7 @@ def km_float(p):
 
 def generate_html(participants):
     """Génère le fichier index.html avec Bulma."""
-    now = datetime.now(timezone.utc).strftime("%d/%m/%Y à %H:%M UTC")
+    now = get_paris_time()
     participants_sorted = sorted(participants, key=km_float, reverse=True)
     total_km = sum(km_float(p) for p in participants)
     total_participants = len(participants)
