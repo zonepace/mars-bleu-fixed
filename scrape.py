@@ -13,6 +13,7 @@ from datetime import datetime, timedelta, timezone
 from bs4 import BeautifulSoup
 
 LOGO_URL = "https://www.iledefrance.ars.sante.fr/system/files/styles/ars_detail_page_content/private/2023-03/vignette_MARSBLEU_0.jpg.webp?itok=1fl-F36g"
+SUBSCRIBE_VIDEO_URL = "video-comment-faire.mp4"
 BASE_URL = (
     "https://www.zapsports.com/ext/app_page_web/su-res-detail-503-{offset}-100.htm"
 )
@@ -1251,9 +1252,20 @@ body {{ background: var(--bg); color: var(--text); font-family: var(--font-body)
 .journey-passed summary::-webkit-details-marker {{ display: none; }}
 .journey-passed summary::before {{ content: "\\25B6  "; font-size: 0.8rem; }}
 .journey-passed[open] summary::before {{ content: "\\25BC  "; font-size: 0.8rem; }}
-.theme-switcher {{ position: fixed; top: 1.5rem; right: 1.5rem; z-index: 1000; }}
-.theme-btn {{ background: linear-gradient(135deg, var(--accent), var(--accent)); border: none; color: white; width: 3rem; height: 3rem; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md); transition: all 0.3s ease; }}
-.theme-btn:hover {{ transform: scale(1.1) rotate(20deg); }}
+.fab-menu {{ position: fixed; top: 1.5rem; right: 1.5rem; z-index: 1000; display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; }}
+.fab-btn {{ background: linear-gradient(135deg, var(--accent), var(--accent-dark, var(--accent))); border: none; color: white; width: 3rem; height: 3rem; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md); transition: all 0.3s ease; }}
+.fab-btn:hover {{ transform: scale(1.1); box-shadow: var(--shadow-lg); }}
+.fab-dropdown {{ display: none; flex-direction: column; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden; min-width: 140px; }}
+.fab-dropdown.open {{ display: flex; }}
+.fab-item {{ background: none; border: none; color: var(--text); padding: 0.65rem 1rem; cursor: pointer; display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; transition: background 0.15s; white-space: nowrap; text-align: left; width: 100%; }}
+.fab-item:hover {{ background: var(--bg-hover, rgba(0,0,0,0.06)); }}
+.fab-item i {{ width: 1.2rem; text-align: center; color: var(--accent); }}
+.video-modal {{ display: none; position: fixed; inset: 0; z-index: 2000; align-items: center; justify-content: center; }}
+.video-modal.open {{ display: flex; }}
+.video-modal-backdrop {{ position: absolute; inset: 0; background: rgba(0,0,0,0.75); }}
+.video-modal-content {{ position: relative; z-index: 1; width: min(360px, 92vw); aspect-ratio: 9 / 16; background: #000; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.5); }}
+.video-modal-close {{ position: absolute; top: 0.5rem; right: 0.5rem; z-index: 2; background: rgba(0,0,0,0.5); border: none; color: white; width: 2rem; height: 2rem; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }}
+.modal-video {{ width: 100%; height: 100%; object-fit: contain; display: block; }}
 .site-footer {{ background: var(--footer-bg); color: var(--footer-text); padding: 2rem; margin-top: 1.5rem; border-top: 2px solid var(--border); font-size: 0.85rem; text-align: center; }}
 .site-footer a {{ color: var(--accent); text-decoration: none; }}
 @media (max-width: 768px) {{
@@ -1265,10 +1277,28 @@ body {{ background: var(--bg); color: var(--text); font-family: var(--font-body)
 </head>
 <body>
 
-<div class="theme-switcher">
-  <button id="theme-toggle" class="theme-btn" title="Toggle dark mode">
-    <i class="fas fa-moon"></i>
+<div class="fab-menu" id="fab-menu">
+  <button class="fab-btn" id="fab-toggle" aria-expanded="false" title="Menu">
+    <i class="fas fa-bars"></i>
   </button>
+  <div class="fab-dropdown" id="fab-dropdown">
+    <button class="fab-item" id="theme-toggle">
+      <i class="fas fa-moon"></i><span>Thème</span>
+    </button>
+    <button class="fab-item" id="help-btn">
+      <i class="fas fa-question-circle"></i><span>Aide</span>
+    </button>
+  </div>
+</div>
+
+<div class="video-modal" id="video-modal">
+  <div class="video-modal-backdrop" id="video-modal-backdrop"></div>
+  <div class="video-modal-content">
+    <button class="video-modal-close" id="video-modal-close">&times;</button>
+    <video controls preload="none" class="modal-video" id="modal-video">
+      <source src="{SUBSCRIBE_VIDEO_URL}" type="video/mp4">
+    </video>
+  </div>
 </div>
 
 <div class="hero-section">
@@ -1323,20 +1353,63 @@ body {{ background: var(--bg); color: var(--text); font-family: var(--font-body)
 </footer>
 
 <script>
-var html = document.documentElement;
-var saved = localStorage.getItem('theme');
-if (saved) {{ html.setAttribute('data-theme', saved); }}
-else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {{ html.setAttribute('data-theme', 'dark'); }}
-var themeToggle = document.getElementById('theme-toggle');
-function updateIcon(t) {{ themeToggle.querySelector('i').className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon'; }}
-updateIcon(html.getAttribute('data-theme'));
-themeToggle.addEventListener('click', function() {{
-  var cur = html.getAttribute('data-theme');
-  var nxt = cur === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', nxt);
-  localStorage.setItem('theme', nxt);
-  updateIcon(nxt);
-}});
+// FAB menu
+(function() {{
+  var html = document.documentElement;
+  var fabToggle = document.getElementById('fab-toggle');
+  var fabDropdown = document.getElementById('fab-dropdown');
+  var themeToggle = document.getElementById('theme-toggle');
+  var helpBtn = document.getElementById('help-btn');
+  var videoModal = document.getElementById('video-modal');
+  var videoModalClose = document.getElementById('video-modal-close');
+  var videoModalBackdrop = document.getElementById('video-modal-backdrop');
+  var modalVideo = document.getElementById('modal-video');
+
+  // Theme init
+  var saved = localStorage.getItem('theme');
+  var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  html.setAttribute('data-theme', theme);
+  updateThemeIcon(theme);
+
+  function updateThemeIcon(t) {{
+    var icon = themeToggle.querySelector('i');
+    icon.className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+  }}
+
+  // FAB open/close
+  fabToggle.addEventListener('click', function(e) {{
+    e.stopPropagation();
+    var open = fabDropdown.classList.toggle('open');
+    fabToggle.setAttribute('aria-expanded', open);
+  }});
+  document.addEventListener('click', function() {{
+    fabDropdown.classList.remove('open');
+    fabToggle.setAttribute('aria-expanded', false);
+  }});
+
+  // Theme toggle
+  themeToggle.addEventListener('click', function() {{
+    var cur = html.getAttribute('data-theme');
+    var nxt = cur === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', nxt);
+    localStorage.setItem('theme', nxt);
+    updateThemeIcon(nxt);
+    fabDropdown.classList.remove('open');
+  }});
+
+  // Help → open video modal
+  helpBtn.addEventListener('click', function() {{
+    videoModal.classList.add('open');
+    fabDropdown.classList.remove('open');
+  }});
+
+  function closeModal() {{
+    videoModal.classList.remove('open');
+    modalVideo.pause();
+  }}
+  videoModalClose.addEventListener('click', closeModal);
+  videoModalBackdrop.addEventListener('click', closeModal);
+}})();
 </script>
 {fun_script}
 </body>
@@ -2714,6 +2787,7 @@ body::after {{
   position: relative;
 }}
 
+
 /* ── Stats cards ── */
 .stats-grid {{
   display: grid;
@@ -3295,16 +3369,19 @@ th[data-sort]:hover {{
   transform: scale(1.05);
 }}
 
-/* Theme Switcher */
-.theme-switcher {{
+/* ── FAB menu ── */
+.fab-menu {{
   position: fixed;
   top: 1.5rem;
   right: 1.5rem;
   z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
 }}
-
-.theme-btn {{
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+.fab-btn {{
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark, var(--accent)));
   border: none;
   color: white;
   width: 3rem;
@@ -3317,30 +3394,76 @@ th[data-sort]:hover {{
   justify-content: center;
   box-shadow: var(--shadow-md);
   transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
 }}
-
-.theme-btn:hover {{
-  transform: scale(1.1) rotate(20deg);
+.fab-btn:hover {{ transform: scale(1.1); box-shadow: var(--shadow-lg); }}
+.fab-dropdown {{
+  display: none;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
   box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  min-width: 140px;
 }}
-
-.theme-btn:active {{
-  transform: scale(0.95);
+.fab-dropdown.open {{ display: flex; }}
+.fab-item {{
+  background: none;
+  border: none;
+  color: var(--text);
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+  white-space: nowrap;
+  text-align: left;
+  width: 100%;
 }}
-
-.theme-btn i {{
-  transition: transform 0.3s ease;
+.fab-item:hover {{ background: var(--bg-hover, rgba(0,0,0,0.06)); }}
+.fab-item i {{ width: 1.2rem; text-align: center; color: var(--accent); }}
+/* ── Video modal ── */
+.video-modal {{
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
 }}
-
-.theme-btn i.fa-sun {{
-  color: #fbbf24;
+.video-modal.open {{ display: flex; }}
+.video-modal-backdrop {{ position: absolute; inset: 0; background: rgba(0,0,0,0.75); }}
+.video-modal-content {{
+  position: relative;
+  z-index: 1;
+  width: min(360px, 92vw);
+  aspect-ratio: 9 / 16;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
 }}
-
-.theme-btn i.fa-moon {{
-  color: #60a5fa;
+.video-modal-close {{
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 2;
+  background: rgba(0,0,0,0.5);
+  border: none;
+  color: white;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }}
+.modal-video {{ width: 100%; height: 100%; object-fit: contain; display: block; }}
 
 /* Improved Footer */
 .site-footer {{
@@ -3390,27 +3513,34 @@ th[data-sort]:hover {{
   font-weight: 600;
 }}
 
-@media (max-width: 768px) {{
-  .theme-switcher {{
-    top: 1rem;
-    right: 1rem;
-  }}
 
-  .theme-btn {{
-    width: 2.5rem;
-    height: 2.5rem;
-    font-size: 1rem;
-  }}
-}}
 </style>
 {fun_css}
 </head>
 <body>
 
-<div class="theme-switcher">
-  <button id="theme-toggle" class="theme-btn" title="Toggle dark mode">
-    <i class="fas fa-moon"></i>
+<div class="fab-menu" id="fab-menu">
+  <button class="fab-btn" id="fab-toggle" aria-expanded="false" title="Menu">
+    <i class="fas fa-bars"></i>
   </button>
+  <div class="fab-dropdown" id="fab-dropdown">
+    <button class="fab-item" id="theme-toggle">
+      <i class="fas fa-moon"></i><span>Thème</span>
+    </button>
+    <button class="fab-item" id="help-btn">
+      <i class="fas fa-question-circle"></i><span>Aide</span>
+    </button>
+  </div>
+</div>
+
+<div class="video-modal" id="video-modal">
+  <div class="video-modal-backdrop" id="video-modal-backdrop"></div>
+  <div class="video-modal-content">
+    <button class="video-modal-close" id="video-modal-close">&times;</button>
+    <video controls preload="none" class="modal-video" id="modal-video">
+      <source src="{SUBSCRIBE_VIDEO_URL}" type="video/mp4">
+    </video>
+  </div>
 </div>
 
 <div class="hero-section">
@@ -3674,33 +3804,63 @@ document.querySelectorAll('th[data-sort]').forEach(function(th) {{
   }});
 }});
 
-// Theme Toggle
-document.addEventListener('DOMContentLoaded', function() {{
-  const themeToggle = document.getElementById('theme-toggle');
-  const html = document.documentElement;
+// FAB menu
+(function() {{
+  var html = document.documentElement;
+  var fabToggle = document.getElementById('fab-toggle');
+  var fabDropdown = document.getElementById('fab-dropdown');
+  var themeToggle = document.getElementById('theme-toggle');
+  var helpBtn = document.getElementById('help-btn');
+  var videoModal = document.getElementById('video-modal');
+  var videoModalClose = document.getElementById('video-modal-close');
+  var videoModalBackdrop = document.getElementById('video-modal-backdrop');
+  var modalVideo = document.getElementById('modal-video');
 
-  // Load saved theme preference or detect system preference
-  const savedTheme = localStorage.getItem('theme');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+  // Theme init
+  var saved = localStorage.getItem('theme');
+  var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  html.setAttribute('data-theme', theme);
+  updateThemeIcon(theme);
 
-  html.setAttribute('data-theme', initialTheme);
-  updateThemeIcon(initialTheme);
+  function updateThemeIcon(t) {{
+    var icon = themeToggle.querySelector('i');
+    icon.className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+  }}
 
-  // Toggle theme on button click
-  themeToggle.addEventListener('click', function() {{
-    const currentTheme = html.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    html.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-    updateThemeIcon(newTheme);
+  // FAB open/close
+  fabToggle.addEventListener('click', function(e) {{
+    e.stopPropagation();
+    var open = fabDropdown.classList.toggle('open');
+    fabToggle.setAttribute('aria-expanded', open);
+  }});
+  document.addEventListener('click', function() {{
+    fabDropdown.classList.remove('open');
+    fabToggle.setAttribute('aria-expanded', false);
   }});
 
-  function updateThemeIcon(theme) {{
-    const icon = themeToggle.querySelector('i');
-    icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+  // Theme toggle
+  themeToggle.addEventListener('click', function() {{
+    var cur = html.getAttribute('data-theme');
+    var nxt = cur === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', nxt);
+    localStorage.setItem('theme', nxt);
+    updateThemeIcon(nxt);
+    fabDropdown.classList.remove('open');
+  }});
+
+  // Help → open video modal
+  helpBtn.addEventListener('click', function() {{
+    videoModal.classList.add('open');
+    fabDropdown.classList.remove('open');
+  }});
+
+  function closeModal() {{
+    videoModal.classList.remove('open');
+    modalVideo.pause();
   }}
-}});
+  videoModalClose.addEventListener('click', closeModal);
+  videoModalBackdrop.addEventListener('click', closeModal);
+}})();
 </script>
 {confetti_script}
 </body>
