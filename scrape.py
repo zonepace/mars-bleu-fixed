@@ -1307,7 +1307,19 @@ body {{ background: var(--bg); color: var(--text); font-family: var(--font-body)
 </div>
 
 <footer class="site-footer">
-  <p>Défi Mars Bleu Connecté 2026 &mdash; Page équipe générée automatiquement</p>
+  <p>
+    <span class="footer-brand">Défi Mars Bleu Connecté 2026</span> &mdash;
+    Page équipe générée automatiquement
+  </p>
+  <div class="footer-refresh">
+    <span class="footer-refresh-text">
+      <i class="fas fa-sync footer-refresh-icon"></i>
+      Données mises à jour automatiquement toutes les 10 minutes
+    </span>
+    <span class="footer-refresh-timestamp">
+      Dernière mise à jour : {now}
+    </span>
+  </div>
 </footer>
 
 <script>
@@ -3104,6 +3116,34 @@ th[data-sort]:hover {{
   text-decoration: none;
 }}
 .site-footer a:hover {{ text-decoration: underline; }}
+.footer-refresh {{
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.85rem;
+  color: var(--footer-text);
+}}
+.footer-refresh-icon {{
+  display: inline-block;
+  margin-right: 0.4rem;
+  animation: syncPulse 2s ease-in-out infinite;
+  color: var(--accent);
+}}
+@keyframes syncPulse {{
+  0%, 100% {{ opacity: 0.7; transform: scale(1); }}
+  50% {{ opacity: 1; transform: scale(1.1); }}
+}}
+.footer-refresh-text {{
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}}
+.footer-refresh-timestamp {{
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.8;
+  margin-top: 0.25rem;
+}}
 .footer-vibed {{
   margin-top: 0.75rem;
   font-size: 0.8rem;
@@ -3451,12 +3491,20 @@ th[data-sort]:hover {{
   <p>
     <span class="footer-brand">Défi Mars Bleu Connecté 2026</span> &mdash;
     Données issues de <a href="https://www.zapsports.com" target="_blank">ZapSports</a>.
-    Mise à jour : {now}.
   </p>
   <p style="margin-top:0.5rem">
     <i class="fas fa-ribbon" style="color: var(--gold);"></i>
     <span style="font-family: var(--font-heading); font-weight: 700;">Mars Bleu</span> &mdash; Sensibilisation au cancer colorectal
   </p>
+  <div class="footer-refresh">
+    <span class="footer-refresh-text">
+      <i class="fas fa-sync footer-refresh-icon"></i>
+      Données mises à jour automatiquement toutes les 10 minutes
+    </span>
+    <span class="footer-refresh-timestamp">
+      Dernière mise à jour : {now}
+    </span>
+  </div>
   <p class="footer-vibed">
     <span class="rainbow">Vibed with love</span> by <a href="https://www.instagram.com/samchmou/" target="_blank">SamChmou</a> - <a href="https://www.instagram.com/nicerunners06/" target="_blank">Nice Runners</a>
   </p>
