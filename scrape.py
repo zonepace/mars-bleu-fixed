@@ -1272,8 +1272,9 @@ body {{ background: var(--bg); color: var(--text); font-family: var(--font-body)
 .about-modal {{ display: none; position: fixed; inset: 0; z-index: 2000; align-items: center; justify-content: center; padding: 1rem; }}
 .about-modal.open {{ display: flex; }}
 .about-modal-backdrop {{ position: absolute; inset: 0; background: rgba(0,0,0,0.7); }}
-.about-modal-content {{ position: relative; background: var(--card-bg, #fff); border-radius: 1rem; padding: 2rem; max-width: 520px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.3); color: var(--text-color, #363636); }}
-.about-modal-close {{ position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-color, #363636); line-height: 1; }}
+.about-modal-content {{ position: relative; background: var(--bg-card, #fff); border-radius: 1rem; padding: 2rem; max-width: 520px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.3); color: var(--text, #363636); }}
+.about-modal-content strong {{ color: var(--text, #363636); }}
+.about-modal-close {{ position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text, #363636); line-height: 1; }}
 .about-header {{ display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #3273dc22; }}
 .about-emoji {{ font-size: 2rem; }}
 .about-header h2 {{ font-size: 1.25rem; font-weight: 700; color: #3273dc; margin: 0; }}
@@ -1354,6 +1355,21 @@ body {{ background: var(--bg); color: var(--text); font-family: var(--font-body)
         Demandez votre kit à votre médecin traitant et rejoignez le camp
         des gens qui prennent soin d'eux. Votre famille vous en remerciera.
         Votre côlon aussi, même s'il est pudique.</p>
+    </div>
+    <div class="about-section">
+      <h3><i class="fas fa-rotate"></i> Comment ça marche ?</h3>
+      <p>Ce site est généré automatiquement depuis les données <strong>ZapSport</strong>
+        et se rafraîchit toutes les <strong>10 minutes</strong>.<br><br>
+        Pour que vos kilomètres apparaissent ici, pensez à
+        <strong>télécharger vos parcours sur ZapSport</strong> — sans ça, on ne peut
+        pas les comptabiliser. Votre GPS mérite d'être entendu !</p>
+    </div>
+    <div class="about-section">
+      <h3><i class="fas fa-heart"></i> Réalisé par</h3>
+      <p>Ce site a été concocté par <strong>@samchmou</strong> des
+        <strong>@nicerunners</strong> pour aider à la motivation des équipes —
+        parce qu'un tableau de bord bien visible, ça donne des ailes
+        (ou au moins des jambes).</p>
     </div>
     <div class="about-footer">
       <a href="https://www.marsbleuconnecte.fr/#top" target="_blank" rel="noopener" class="about-link">
@@ -3545,8 +3561,9 @@ th[data-sort]:hover {{
 .about-modal {{ display: none; position: fixed; inset: 0; z-index: 2000; align-items: center; justify-content: center; padding: 1rem; }}
 .about-modal.open {{ display: flex; }}
 .about-modal-backdrop {{ position: absolute; inset: 0; background: rgba(0,0,0,0.7); }}
-.about-modal-content {{ position: relative; background: var(--card-bg, #fff); border-radius: 1rem; padding: 2rem; max-width: 520px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.3); color: var(--text-color, #363636); }}
-.about-modal-close {{ position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-color, #363636); line-height: 1; }}
+.about-modal-content {{ position: relative; background: var(--bg-card, #fff); border-radius: 1rem; padding: 2rem; max-width: 520px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.3); color: var(--text, #363636); }}
+.about-modal-content strong {{ color: var(--text, #363636); }}
+.about-modal-close {{ position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text, #363636); line-height: 1; }}
 .about-header {{ display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #3273dc22; }}
 .about-emoji {{ font-size: 2rem; }}
 .about-header h2 {{ font-size: 1.25rem; font-weight: 700; color: #3273dc; margin: 0; }}
@@ -3672,6 +3689,21 @@ th[data-sort]:hover {{
         des gens qui prennent soin d'eux. Votre famille vous en remerciera.
         Votre côlon aussi, même s'il est pudique.</p>
     </div>
+    <div class="about-section">
+      <h3><i class="fas fa-rotate"></i> Comment ça marche ?</h3>
+      <p>Ce site est généré automatiquement depuis les données <strong>ZapSport</strong>
+        et se rafraîchit toutes les <strong>10 minutes</strong>.<br><br>
+        Pour que vos kilomètres apparaissent ici, pensez à
+        <strong>télécharger vos parcours sur ZapSport</strong> — sans ça, on ne peut
+        pas les comptabiliser. Votre GPS mérite d'être entendu !</p>
+    </div>
+    <div class="about-section">
+      <h3><i class="fas fa-heart"></i> Réalisé par</h3>
+      <p>Ce site a été concocté par <strong>@samchmou</strong> des
+        <strong>@nicerunners</strong> pour aider à la motivation des équipes —
+        parce qu'un tableau de bord bien visible, ça donne des ailes
+        (ou au moins des jambes).</p>
+    </div>
     <div class="about-footer">
       <a href="https://www.marsbleuconnecte.fr/#top" target="_blank" rel="noopener" class="about-link">
         <i class="fas fa-arrow-up-right-from-square"></i>
@@ -3774,7 +3806,13 @@ th[data-sort]:hover {{
     </span>
   </div>
   <p class="footer-vibed">
-    <span class="rainbow">Vibed with love</span> by <a href="https://www.instagram.com/samchmou/" target="_blank">SamChmou</a> - <a href="https://www.instagram.com/nicerunners06/" target="_blank">Nice Runners</a>
+    <span class="rainbow">Vibed with love</span> by <a href="https://www.instagram.com/samchmou/" target="_blank">SamChmou</a>
+    &mdash;
+    🏃 <a href="https://www.instagram.com/nicerunners06/" target="_blank">Nice Runners</a>
+    &middot;
+    🚴 <a href="https://www.instagram.com/nicecyclists/" target="_blank">Nice Cyclists</a>
+    &middot;
+    🏊 <a href="https://www.instagram.com/niceswimmers/" target="_blank">Nice Swimmers</a>
   </p>
 </footer>
 
