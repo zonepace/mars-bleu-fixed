@@ -11,6 +11,6 @@ install:
 	uv sync
 
 serve:
-	@python3 -mhttp.server 6302
+	@python3 -mhttp.server 6302 --directory html
 
 .PHONY: gen install serve push

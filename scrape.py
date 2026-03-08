@@ -3,6 +3,7 @@
 et génère un site HTML statique avec Bulma."""
 
 import html as html_mod
+import os
 import re
 import sys
 import time
@@ -18,6 +19,7 @@ BASE_URL = (
     "https://www.zapsports.com/ext/app_page_web/su-res-detail-503-{offset}-100.htm"
 )
 OFFSETS = [0, 100, 200, 300, 400]
+OUTPUT_DIR = "html"
 
 CATEGORIES_FR = {
     "MI": "Minime",
@@ -1266,6 +1268,22 @@ body {{ background: var(--bg); color: var(--text); font-family: var(--font-body)
 .video-modal-content {{ position: relative; z-index: 1; width: min(360px, 92vw); aspect-ratio: 9 / 16; background: #000; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.5); }}
 .video-modal-close {{ position: absolute; top: 0.5rem; right: 0.5rem; z-index: 2; background: rgba(0,0,0,0.5); border: none; color: white; width: 2rem; height: 2rem; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }}
 .modal-video {{ width: 100%; height: 100%; object-fit: contain; display: block; }}
+/* About Modal */
+.about-modal {{ display: none; position: fixed; inset: 0; z-index: 2000; align-items: center; justify-content: center; padding: 1rem; }}
+.about-modal.open {{ display: flex; }}
+.about-modal-backdrop {{ position: absolute; inset: 0; background: rgba(0,0,0,0.7); }}
+.about-modal-content {{ position: relative; background: var(--card-bg, #fff); border-radius: 1rem; padding: 2rem; max-width: 520px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.3); color: var(--text-color, #363636); }}
+.about-modal-close {{ position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-color, #363636); line-height: 1; }}
+.about-header {{ display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #3273dc22; }}
+.about-emoji {{ font-size: 2rem; }}
+.about-header h2 {{ font-size: 1.25rem; font-weight: 700; color: #3273dc; margin: 0; }}
+.about-section {{ margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(128,128,128,0.15); }}
+.about-section:last-of-type {{ border-bottom: none; }}
+.about-section h3 {{ font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #3273dc; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }}
+.about-section p {{ font-size: 0.92rem; line-height: 1.6; margin: 0; }}
+.about-footer {{ margin-top: 1.5rem; text-align: center; }}
+.about-link {{ display: inline-flex; align-items: center; gap: 0.5rem; background: #3273dc; color: #fff; padding: 0.6rem 1.2rem; border-radius: 2rem; text-decoration: none; font-size: 0.88rem; font-weight: 600; transition: background 0.2s; }}
+.about-link:hover {{ background: #2366d1; color: #fff; }}
 .site-footer {{ background: var(--footer-bg); color: var(--footer-text); padding: 2rem; margin-top: 1.5rem; border-top: 2px solid var(--border); font-size: 0.85rem; text-align: center; }}
 .site-footer a {{ color: var(--accent); text-decoration: none; }}
 @media (max-width: 768px) {{
@@ -1288,6 +1306,10 @@ body {{ background: var(--bg); color: var(--text); font-family: var(--font-body)
     <button class="fab-item" id="help-btn">
       <i class="fas fa-question-circle"></i><span>Aide</span>
     </button>
+    <button class="fab-item" id="about-btn" aria-label="À propos">
+      <i class="fas fa-circle-info"></i>
+      <span>À propos</span>
+    </button>
   </div>
 </div>
 
@@ -1298,6 +1320,47 @@ body {{ background: var(--bg); color: var(--text); font-family: var(--font-body)
     <video controls preload="none" class="modal-video" id="modal-video">
       <source src="{SUBSCRIBE_VIDEO_URL}" type="video/mp4">
     </video>
+  </div>
+</div>
+
+<div class="about-modal" id="about-modal">
+  <div class="about-modal-backdrop" id="about-modal-backdrop"></div>
+  <div class="about-modal-content">
+    <button class="about-modal-close" id="about-modal-close">&times;</button>
+    <div class="about-header">
+      <span class="about-emoji">🩵</span>
+      <h2>À propos du Défi Mars Bleu</h2>
+    </div>
+    <div class="about-section">
+      <h3><i class="fas fa-person-running"></i> Le Défi</h3>
+      <p>Durant tout le mois de mars, des milliers de courageux chaussent leurs baskets —
+        ou enfilent leurs chaussons — pour accumuler des kilomètres ensemble.
+        Marche, course, vélo, natation : tout compte !<br><br>
+        L'objectif ? Bouger, se connecter, et prouver qu'on peut sauver des vies
+        en sueur et en bonne humeur. Parce que rester assis sur son canapé n'a
+        jamais guéri personne (médicalement parlant).</p>
+    </div>
+    <div class="about-section">
+      <h3><i class="fas fa-ribbon"></i> Le Cancer Colorectal : Les Chiffres qui Piquent</h3>
+      <p>2ème cancer le plus fréquent en France. 1 personne sur 17 sera concernée
+        un jour dans sa vie. Chaque année, plus de 43 000 nouveaux cas diagnostiqués.<br><br>
+        La bonne nouvelle ? Dépisté tôt, il se guérit dans <strong>9 cas sur 10</strong>.
+        Oui, vous avez bien lu. Neuf sur dix. Votre côlon mérite qu'on s'y intéresse.</p>
+    </div>
+    <div class="about-section">
+      <h3><i class="fas fa-circle-check"></i> Pourquoi Se Dépister ?</h3>
+      <p>À partir de 50 ans (et jusqu'à 74 ans), le test de dépistage est
+        <strong>gratuit, discret et réalisable chez soi</strong>. Pas d'excuse !<br><br>
+        Demandez votre kit à votre médecin traitant et rejoignez le camp
+        des gens qui prennent soin d'eux. Votre famille vous en remerciera.
+        Votre côlon aussi, même s'il est pudique.</p>
+    </div>
+    <div class="about-footer">
+      <a href="https://www.marsbleuconnecte.fr/#top" target="_blank" rel="noopener" class="about-link">
+        <i class="fas fa-arrow-up-right-from-square"></i>
+        En savoir plus sur marsbleuconnecte.fr
+      </a>
+    </div>
   </div>
 </div>
 
@@ -1364,6 +1427,10 @@ body {{ background: var(--bg); color: var(--text); font-family: var(--font-body)
   var videoModalClose = document.getElementById('video-modal-close');
   var videoModalBackdrop = document.getElementById('video-modal-backdrop');
   var modalVideo = document.getElementById('modal-video');
+  var aboutBtn = document.getElementById('about-btn');
+  var aboutModal = document.getElementById('about-modal');
+  var aboutModalClose = document.getElementById('about-modal-close');
+  var aboutModalBackdrop = document.getElementById('about-modal-backdrop');
 
   // Theme init
   var saved = localStorage.getItem('theme');
@@ -1401,6 +1468,16 @@ body {{ background: var(--bg); color: var(--text); font-family: var(--font-body)
   helpBtn.addEventListener('click', function() {{
     videoModal.classList.add('open');
     fabDropdown.classList.remove('open');
+  }});
+
+  // About modal
+  aboutBtn.addEventListener('click', function() {{
+    aboutModal.classList.add('open');
+    fabDropdown.classList.remove('open');
+    fabToggle.setAttribute('aria-expanded', 'false');
+  }});
+  [aboutModalClose, aboutModalBackdrop].forEach(function(el) {{
+    el.addEventListener('click', function() {{ aboutModal.classList.remove('open'); }});
   }});
 
   function closeModal() {{
@@ -3464,6 +3541,22 @@ th[data-sort]:hover {{
   line-height: 1;
 }}
 .modal-video {{ width: 100%; height: 100%; object-fit: contain; display: block; }}
+/* About Modal */
+.about-modal {{ display: none; position: fixed; inset: 0; z-index: 2000; align-items: center; justify-content: center; padding: 1rem; }}
+.about-modal.open {{ display: flex; }}
+.about-modal-backdrop {{ position: absolute; inset: 0; background: rgba(0,0,0,0.7); }}
+.about-modal-content {{ position: relative; background: var(--card-bg, #fff); border-radius: 1rem; padding: 2rem; max-width: 520px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.3); color: var(--text-color, #363636); }}
+.about-modal-close {{ position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-color, #363636); line-height: 1; }}
+.about-header {{ display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #3273dc22; }}
+.about-emoji {{ font-size: 2rem; }}
+.about-header h2 {{ font-size: 1.25rem; font-weight: 700; color: #3273dc; margin: 0; }}
+.about-section {{ margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(128,128,128,0.15); }}
+.about-section:last-of-type {{ border-bottom: none; }}
+.about-section h3 {{ font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #3273dc; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }}
+.about-section p {{ font-size: 0.92rem; line-height: 1.6; margin: 0; }}
+.about-footer {{ margin-top: 1.5rem; text-align: center; }}
+.about-link {{ display: inline-flex; align-items: center; gap: 0.5rem; background: #3273dc; color: #fff; padding: 0.6rem 1.2rem; border-radius: 2rem; text-decoration: none; font-size: 0.88rem; font-weight: 600; transition: background 0.2s; }}
+.about-link:hover {{ background: #2366d1; color: #fff; }}
 
 /* Improved Footer */
 .site-footer {{
@@ -3530,6 +3623,10 @@ th[data-sort]:hover {{
     <button class="fab-item" id="help-btn">
       <i class="fas fa-question-circle"></i><span>Aide</span>
     </button>
+    <button class="fab-item" id="about-btn" aria-label="À propos">
+      <i class="fas fa-circle-info"></i>
+      <span>À propos</span>
+    </button>
   </div>
 </div>
 
@@ -3540,6 +3637,47 @@ th[data-sort]:hover {{
     <video controls preload="none" class="modal-video" id="modal-video">
       <source src="{SUBSCRIBE_VIDEO_URL}" type="video/mp4">
     </video>
+  </div>
+</div>
+
+<div class="about-modal" id="about-modal">
+  <div class="about-modal-backdrop" id="about-modal-backdrop"></div>
+  <div class="about-modal-content">
+    <button class="about-modal-close" id="about-modal-close">&times;</button>
+    <div class="about-header">
+      <span class="about-emoji">🩵</span>
+      <h2>À propos du Défi Mars Bleu</h2>
+    </div>
+    <div class="about-section">
+      <h3><i class="fas fa-person-running"></i> Le Défi</h3>
+      <p>Durant tout le mois de mars, des milliers de courageux chaussent leurs baskets —
+        ou enfilent leurs chaussons — pour accumuler des kilomètres ensemble.
+        Marche, course, vélo, natation : tout compte !<br><br>
+        L'objectif ? Bouger, se connecter, et prouver qu'on peut sauver des vies
+        en sueur et en bonne humeur. Parce que rester assis sur son canapé n'a
+        jamais guéri personne (médicalement parlant).</p>
+    </div>
+    <div class="about-section">
+      <h3><i class="fas fa-ribbon"></i> Le Cancer Colorectal : Les Chiffres qui Piquent</h3>
+      <p>2ème cancer le plus fréquent en France. 1 personne sur 17 sera concernée
+        un jour dans sa vie. Chaque année, plus de 43 000 nouveaux cas diagnostiqués.<br><br>
+        La bonne nouvelle ? Dépisté tôt, il se guérit dans <strong>9 cas sur 10</strong>.
+        Oui, vous avez bien lu. Neuf sur dix. Votre côlon mérite qu'on s'y intéresse.</p>
+    </div>
+    <div class="about-section">
+      <h3><i class="fas fa-circle-check"></i> Pourquoi Se Dépister ?</h3>
+      <p>À partir de 50 ans (et jusqu'à 74 ans), le test de dépistage est
+        <strong>gratuit, discret et réalisable chez soi</strong>. Pas d'excuse !<br><br>
+        Demandez votre kit à votre médecin traitant et rejoignez le camp
+        des gens qui prennent soin d'eux. Votre famille vous en remerciera.
+        Votre côlon aussi, même s'il est pudique.</p>
+    </div>
+    <div class="about-footer">
+      <a href="https://www.marsbleuconnecte.fr/#top" target="_blank" rel="noopener" class="about-link">
+        <i class="fas fa-arrow-up-right-from-square"></i>
+        En savoir plus sur marsbleuconnecte.fr
+      </a>
+    </div>
   </div>
 </div>
 
@@ -3815,6 +3953,10 @@ document.querySelectorAll('th[data-sort]').forEach(function(th) {{
   var videoModalClose = document.getElementById('video-modal-close');
   var videoModalBackdrop = document.getElementById('video-modal-backdrop');
   var modalVideo = document.getElementById('modal-video');
+  var aboutBtn = document.getElementById('about-btn');
+  var aboutModal = document.getElementById('about-modal');
+  var aboutModalClose = document.getElementById('about-modal-close');
+  var aboutModalBackdrop = document.getElementById('about-modal-backdrop');
 
   // Theme init
   var saved = localStorage.getItem('theme');
@@ -3854,6 +3996,16 @@ document.querySelectorAll('th[data-sort]').forEach(function(th) {{
     fabDropdown.classList.remove('open');
   }});
 
+  // About modal
+  aboutBtn.addEventListener('click', function() {{
+    aboutModal.classList.add('open');
+    fabDropdown.classList.remove('open');
+    fabToggle.setAttribute('aria-expanded', 'false');
+  }});
+  [aboutModalClose, aboutModalBackdrop].forEach(function(el) {{
+    el.addEventListener('click', function() {{ aboutModal.classList.remove('open'); }});
+  }});
+
   function closeModal() {{
     videoModal.classList.remove('open');
     modalVideo.pause();
@@ -3881,19 +4033,21 @@ def main():
                 )
         return
 
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+
     print("Scraping des résultats Mars Bleu...")
     participants = scrape_all()
     print(f"\nTotal : {len(participants)} participants")
 
     print("Génération du HTML classique...")
     html_content = generate_html(participants, is_fun=False)
-    with open("index.html", "w", encoding="utf-8") as f:
+    with open(os.path.join(OUTPUT_DIR, "index.html"), "w", encoding="utf-8") as f:
         f.write(html_content)
     print("index.html généré avec succès.")
 
     print("Génération du HTML délire...")
     fun_html_content = generate_html(participants, is_fun=True)
-    with open("fun.html", "w", encoding="utf-8") as f:
+    with open(os.path.join(OUTPUT_DIR, "fun.html"), "w", encoding="utf-8") as f:
         f.write(fun_html_content)
     print("fun.html généré avec succès.")
 
@@ -3906,7 +4060,7 @@ def main():
         members = equipe_members[team["equipe"].lower()]
         for is_fun in [False, True]:
             suffix = "-fun" if is_fun else ""
-            filename = f"equipe-{slug}{suffix}.html"
+            filename = os.path.join(OUTPUT_DIR, f"equipe-{slug}{suffix}.html")
             team_html = generate_team_page(team, idx, members, is_fun)
             with open(filename, "w", encoding="utf-8") as f:
                 f.write(team_html)
