@@ -1365,9 +1365,23 @@ body {{ background: var(--bg); color: var(--text); font-family: var(--font-body)
         pas les comptabiliser. Votre GPS mérite d'être entendu !</p>
     </div>
     <div class="about-section">
+      <h3><i class="fas fa-user-plus"></i> S'inscrire au Défi</h3>
+      <p>Pas encore inscrit ? Les inscriptions se font directement en ligne —
+        rejoignez les équipes et commencez à accumuler des kilomètres pour la bonne cause !</p>
+      <div style="margin-top:0.75rem; text-align:center;">
+        <a href="https://www.sport-up.fr/www/inscription_en_ligne_2.0/inscription-39684-ORG-JAVGH.htm"
+           target="_blank" rel="noopener" class="about-link" style="font-size:0.82rem;">
+          <i class="fas fa-arrow-up-right-from-square"></i>
+          S'inscrire sur sport-up.fr
+        </a>
+      </div>
+    </div>
+    <div class="about-section">
       <h3><i class="fas fa-heart"></i> Réalisé par</h3>
-      <p>Ce site a été concocté par <strong>@samchmou</strong> des
-        <strong>@nicerunners</strong> pour aider à la motivation des équipes —
+      <p>Ce site a été concocté par
+        <a href="https://www.instagram.com/samchmou/" target="_blank" rel="noopener">@samchmou</a> des
+        <a href="https://www.instagram.com/nicerunners06/" target="_blank" rel="noopener">@nicerunners</a>
+        pour aider à la motivation des équipes —
         parce qu'un tableau de bord bien visible, ça donne des ailes
         (ou au moins des jambes).</p>
     </div>
@@ -3698,9 +3712,23 @@ th[data-sort]:hover {{
         pas les comptabiliser. Votre GPS mérite d'être entendu !</p>
     </div>
     <div class="about-section">
+      <h3><i class="fas fa-user-plus"></i> S'inscrire au Défi</h3>
+      <p>Pas encore inscrit ? Les inscriptions se font directement en ligne —
+        rejoignez les équipes et commencez à accumuler des kilomètres pour la bonne cause !</p>
+      <div style="margin-top:0.75rem; text-align:center;">
+        <a href="https://www.sport-up.fr/www/inscription_en_ligne_2.0/inscription-39684-ORG-JAVGH.htm"
+           target="_blank" rel="noopener" class="about-link" style="font-size:0.82rem;">
+          <i class="fas fa-arrow-up-right-from-square"></i>
+          S'inscrire sur sport-up.fr
+        </a>
+      </div>
+    </div>
+    <div class="about-section">
       <h3><i class="fas fa-heart"></i> Réalisé par</h3>
-      <p>Ce site a été concocté par <strong>@samchmou</strong> des
-        <strong>@nicerunners</strong> pour aider à la motivation des équipes —
+      <p>Ce site a été concocté par
+        <a href="https://www.instagram.com/samchmou/" target="_blank" rel="noopener">@samchmou</a> des
+        <a href="https://www.instagram.com/nicerunners06/" target="_blank" rel="noopener">@nicerunners</a>
+        pour aider à la motivation des équipes —
         parce qu'un tableau de bord bien visible, ça donne des ailes
         (ou au moins des jambes).</p>
     </div>
