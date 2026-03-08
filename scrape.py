@@ -810,8 +810,8 @@ def generate_team_page(team, rank, members, is_fun=False):
     team_km = float(team_km_str.replace(",", "."))
     nb_members = team["nb_equipier"]
     slug = slugify(team_name)
-    medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"]
-    medal = medals[rank - 1] if rank <= 5 else ""
+    medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
+    medal = medals[rank - 1] if rank <= 10 else ""
 
     esc = html_mod.escape
 
@@ -1606,7 +1606,7 @@ def generate_html(participants, is_fun=False):
         team_slug = slugify(t["equipe"])
         members = equipe_members.get(t["equipe"].lower(), [])
         team_page_link = ""
-        if idx <= 5:
+        if idx <= 10:
             team_page_link = (
                 f' <a href="equipe-{team_slug}{suffix}.html" class="tag tag-km" '
                 f'style="text-decoration:none;margin-left:0.5rem;" '
@@ -3897,11 +3897,11 @@ def main():
         f.write(fun_html_content)
     print("fun.html généré avec succès.")
 
-    # Générer les pages individuelles pour les 5 premières équipes
+    # Générer les pages individuelles pour les 10 premières équipes
     participants_sorted = sorted(participants, key=km_float, reverse=True)
     teams, equipe_members = build_teams(participants_sorted)
-    print(f"\nGénération des pages équipes (top {min(5, len(teams))})...")
-    for idx, team in enumerate(teams[:5], 1):
+    print(f"\nGénération des pages équipes (top {min(10, len(teams))})...")
+    for idx, team in enumerate(teams[:10], 1):
         slug = slugify(team["equipe"])
         members = equipe_members[team["equipe"].lower()]
         for is_fun in [False, True]:
