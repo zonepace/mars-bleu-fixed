@@ -785,6 +785,12 @@ JOURNEY_MILESTONES = [
     # Paliers absurdes 40k-200k
     (40_000, "🌍", "Tour de la Terre", "On est passé voir, elle est toujours ronde."),
     (
+        40_075,
+        "\U0001f310",
+        "Tour de la Terre (officiel)",
+        "Un tour complet du globe ! \U0001f92f",
+    ),
+    (
         50_000,
         "🔌",
         "Le câble derrière le bureau",
@@ -879,19 +885,6 @@ JOURNEY_MILESTONES = [
         "🌍🌍🌍🌍🌍",
         "Cinq tours de la Terre",
         "À ce stade vous connaissez les continents par cœur.",
-    ),
-    # Retour aux paliers géographiques
-    (
-        40_075,
-        "\U0001f310",
-        "Tour de la Terre (officiel)",
-        "Un tour complet du globe ! \U0001f92f",
-    ),
-    (
-        80_000,
-        "\U0001f310\U0001f310",
-        "2x le tour de la Terre",
-        "On repart pour un tour ?! Vous \u00eates malades ! \U0001f92a",
     ),
     (
         384_400,
@@ -1975,6 +1968,8 @@ def generate_html(participants, is_fun=False):
                 passed_steps.append(step_html)
             else:
                 journey_steps.append(step_html)
+                if not reached and i > last_reached_idx + 2:
+                    break
         if not current_milestone_msg:
             current_milestone_msg = "C'est parti de Nice ! On lace les baskets ! 👟"
         passed_html = ""
