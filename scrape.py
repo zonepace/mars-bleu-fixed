@@ -245,262 +245,227 @@ def km_float(p):
 BADGE_THRESHOLDS = list(range(20, 1000 + 20, 20))
 
 BADGE_REWARDS = [
+    # Tuples: (label_m, label_f, message_m, message_f)
     # index 0 : < 20 km
-    ("Roi du Canapé 🛋️", "Tu as lâché la télécommande. Héroïque."),
+    ("Roi du Canapé 🛋️", "Reine du Canapé 🛋️",
+     "Tu as lâché la télécommande. Héroïque.",
+     "Tu as lâché la télécommande. Héroïque."),
     # 20 km
-    (
-        "Trotteur Prudent 🐢",
-        "Le premier pas, c’est le plus dur. Le deuxième aussi. Le troisième pareil. Mais bon.",
-    ),
+    ("Trotteur Prudent 🐢", "Trotteuse Prudente 🐢",
+     "Le premier pas, c’est le plus dur. Le deuxième aussi. Le troisième pareil. Mais bon.",
+     "Le premier pas, c’est le plus dur. Le deuxième aussi. Le troisième pareil. Mais bon."),
     # 40 km
-    (
-        "Joggeur du Dimanche 🚶",
-        "Tu cours. Officiellement. Ta famille ne te croit pas encore.",
-    ),
+    ("Joggeur du Dimanche 🚶", "Joggeuse du Dimanche 🚶",
+     "Tu cours. Officiellement. Ta famille ne te croit pas encore.",
+     "Tu cours. Officiellement. Ta famille ne te croit pas encore."),
     # 60 km
-    ("Mollets en Devenir 🦵", "Tes chaussures ont commencé à te respecter timidement."),
+    ("Mollets en Devenir 🦵", "Mollets en Devenir 🦵",
+     "Tes chaussures ont commencé à te respecter timidement.",
+     "Tes chaussures ont commencé à te respecter timidement."),
     # 80 km
-    (
-        "Candidat Sérieux 📋",
-        "Tu as dépensé plus en running qu’en pizza. La rupture est en cours.",
-    ),
+    ("Candidat Sérieux 📋", "Candidate Sérieuse 📋",
+     "Tu as dépensé plus en running qu’en pizza. La rupture est en cours.",
+     "Tu as dépensé plus en running qu’en pizza. La rupture est en cours."),
     # 100 km
-    (
-        "Boule d'Acier 🍑",
-        "Tu peux faire du vélo pendant plus de 200km sans avoir de douleur.",
-    ),
+    ("Boule d’Acier 🍑", "Boule d’Acier 🍑",
+     "Tu peux faire du vélo pendant plus de 200km sans avoir de douleur.",
+     "Tu peux faire du vélo pendant plus de 200km sans avoir de douleur."),
     # 120 km
-    (
-        "Killian Jornet en Carton 🏃💨",
-        "Cours Killian, cours. Mais à ton rythme, hein, pas la peine de se blesser.",
-    ),
+    ("Killian Jornet en Carton 🏃💨", "Killian Jornet en Carton 🏃💨",
+     "Cours Killian, cours. Mais à ton rythme, hein, pas la peine de se blesser.",
+     "Cours Killian, cours. Mais à ton rythme, hein, pas la peine de se blesser."),
     # 140 km
-    (
-        "Brûleur de Semelles 🔥",
-        "Le vent commence à te regarder bizarrement. Il sent la concurrence.",
-    ),
+    ("Brûleur de Semelles 🔥", "Brûleuse de Semelles 🔥",
+     "Le vent commence à te regarder bizarrement. Il sent la concurrence.",
+     "Le vent commence à te regarder bizarrement. Il sent la concurrence."),
     # 160 km
-    (
-        "Cyborg des Faubourgs 🦾",
-        "Mi-humain, mi-moteur diesel. Le mécanicien est impressionné.",
-    ),
+    ("Cyborg des Faubourgs 🦾", "Cyborg des Faubourgs 🦾",
+     "Mi-humain, mi-moteur diesel. Le mécanicien est impressionné.",
+     "Mi-humaine, mi-moteur diesel. Le mécanicien est impressionné."),
     # 180 km
-    ("Rocket Man 🚀", "La NASA a mis ton dossier dans la pile ‘à surveiller’."),
+    ("Rocket Man 🚀", "Rocket Woman 🚀",
+     "La NASA a mis ton dossier dans la pile ‘à surveiller’.",
+     "La NASA a mis ton dossier dans la pile ‘à surveiller’."),
     # 200 km
-    (
-        "Explorateur du Macadam 🌍",
-        "200 km. Tu aurais pu aller jusqu’en Belgique. Tu aurais pu.",
-    ),
+    ("Explorateur du Macadam 🌍", "Exploratrice du Macadam 🌍",
+     "200 km. Tu aurais pu aller jusqu’en Belgique. Tu aurais pu.",
+     "200 km. Tu aurais pu aller jusqu’en Belgique. Tu aurais pu."),
     # 220 km
-    (
-        "Alien du Sport 👽",
-        "Tes collègues se demandent si tu dors vraiment ou si tu cours pendant ce temps-là.",
-    ),
+    ("Alien du Sport 👽", "Alien du Sport 👽",
+     "Tes collègues se demandent si tu dors vraiment ou si tu cours pendant ce temps-là.",
+     "Tes collègues se demandent si tu dors vraiment ou si tu cours pendant ce temps-là."),
     # 240 km
-    ("Marathonien Autoproclamé 🏛️", "L’Olympe a reçu ton CV. Ils étudient le dossier."),
+    ("Marathonien Autoproclamé 🏛️", "Marathonienne Autoproclamée 🏛️",
+     "L’Olympe a reçu ton CV. Ils étudient le dossier.",
+     "L’Olympe a reçu ton CV. Ils étudient le dossier."),
     # 260 km
-    (
-        "Conquérant des Ronds-Points 🛤️",
-        "Tu connais chaque craquelure du bitume par son prénom.",
-    ),
+    ("Conquérant des Ronds-Points 🛤️", "Conquérante des Ronds-Points 🛤️",
+     "Tu connais chaque craquelure du bitume par son prénom.",
+     "Tu connais chaque craquelure du bitume par son prénom."),
     # 280 km
-    (
-        "Avaleur de Bornes 🎯",
-        "Les panneaux kilométriques font des cauchemars avec toi dedans.",
-    ),
+    ("Avaleur de Bornes 🎯", "Avaleuse de Bornes 🎯",
+     "Les panneaux kilométriques font des cauchemars avec toi dedans.",
+     "Les panneaux kilométriques font des cauchemars avec toi dedans."),
     # 300 km
-    (
-        "Phénomène Météo 🌪️",
-        "Météo France t’a officiellement classé ‘perturbation localisée’.",
-    ),
+    ("Phénomène Météo 🌪️", "Phénomène Météo 🌪️",
+     "Météo France t’a officiellement classé ‘perturbation localisée’.",
+     "Météo France t’a officiellement classée ‘perturbation localisée’."),
     # 320 km
-    (
-        "Chameau Turbo 🏜️",
-        "Même les chameaux t’ont demandé ton secret. Tu as refusé de répondre.",
-    ),
+    ("Chameau Turbo 🏜️", "Chameau Turbo 🏜️",
+     "Même les chameaux t’ont demandé ton secret. Tu as refusé de répondre.",
+     "Même les chameaux t’ont demandé ton secret. Tu as refusé de répondre."),
     # 340 km
-    (
-        "Coureur Quantique ⚛️",
-        "Tu existes sur plusieurs parcours simultanément. Schrödinger était moins actif.",
-    ),
+    ("Coureur Quantique ⚛️", "Coureuse Quantique ⚛️",
+     "Tu existes sur plusieurs parcours simultanément. Schrödinger était moins actif.",
+     "Tu existes sur plusieurs parcours simultanément. Schrödinger était moins active."),
     # 360 km
-    (
-        "Gladiateur du Goudron ⚔️",
-        "Ave César ! Les km te saluent. César aussi, à contrecœur.",
-    ),
+    ("Gladiateur du Goudron ⚔️", "Gladiatrice du Goudron ⚔️",
+     "Ave César ! Les km te saluent. César aussi, à contrecœur.",
+     "Ave César ! Les km te saluent. César aussi, à contrecœur."),
     # 380 km
-    (
-        "Comète Humaine ☄️",
-        "Tu laisses une traînée de sueur cosmique. Spectaculaire et légèrement repoussant.",
-    ),
+    ("Comète Humaine ☄️", "Comète Humaine ☄️",
+     "Tu laisses une traînée de sueur cosmique. Spectaculaire et légèrement repoussant.",
+     "Tu laisses une traînée de sueur cosmique. Spectaculaire et légèrement repoussante."),
     # 400 km
-    (
-        "GPS Dépassé 🦾",
-        "Le GPS a rendu les armes. Tu vas dans des endroits qu’il ne connaît pas.",
-    ),
+    ("GPS Dépassé 🦾", "GPS Dépassé 🦾",
+     "Le GPS a rendu les armes. Tu vas dans des endroits qu’il ne connaît pas.",
+     "Le GPS a rendu les armes. Tu vas dans des endroits qu’il ne connaît pas."),
     # 420 km
-    (
-        "Prophète de la Foulée 📜",
-        "Tes kilomètres sont cités dans des groupes WhatsApp que tu ne soupçonnes pas.",
-    ),
+    ("Prophète de la Foulée 📜", "Prophétesse de la Foulée 📜",
+     "Tes kilomètres sont cités dans des groupes WhatsApp que tu ne soupçonnes pas.",
+     "Tes kilomètres sont cités dans des groupes WhatsApp que tu ne soupçonnes pas."),
     # 440 km
-    (
-        "Sphinx du Running 🦁",
-        "Personne ne comprend comment tu fais. Toi non plus, mais tu continues.",
-    ),
+    ("Sphinx du Running 🦁", "Sphinx du Running 🦁",
+     "Personne ne comprend comment tu fais. Toi non plus, mais tu continues.",
+     "Personne ne comprend comment tu fais. Toi non plus, mais tu continues."),
     # 460 km
-    (
-        "Nomade Cosmique 🌌",
-        "Tu cours entre les étoiles. Ou presque. C’est surtout le périphérique, mais dans ta tête…",
-    ),
+    ("Nomade Cosmique 🌌", "Nomade Cosmique 🌌",
+     "Tu cours entre les étoiles. Ou presque. C’est surtout le périphérique, mais dans ta tête…",
+     "Tu cours entre les étoiles. Ou presque. C’est surtout le périphérique, mais dans ta tête…"),
     # 480 km
-    (
-        "Légende en Fabrication ⚡",
-        "Dans 1000 ans, les historiens auront une section entière sur toi.",
-    ),
+    ("Légende en Fabrication ⚡", "Légende en Fabrication ⚡",
+     "Dans 1000 ans, les historiens auront une section entière sur toi.",
+     "Dans 1000 ans, les historiens auront une section entière sur toi."),
     # 500 km
-    (
-        "Forgeron de l’Endurance 🔨",
-        "500 km forgés à la sueur. Ton enclume, c’est le bitume.",
-    ),
+    ("Forgeron de l’Endurance 🔨", "Forgeronne de l’Endurance 🔨",
+     "500 km forgés à la sueur. Ton enclume, c’est le bitume.",
+     "500 km forgés à la sueur. Ton enclume, c’est le bitume."),
     # 520 km
-    (
-        "Titan des Kilomètres 🗿",
-        "Les montagnes s’écartent. Les collines font une haie d’honneur.",
-    ),
+    ("Titan des Kilomètres 🗿", "Titanide des Kilomètres 🗿",
+     "Les montagnes s’écartent. Les collines font une haie d’honneur.",
+     "Les montagnes s’écartent. Les collines font une haie d’honneur."),
     # 540 km
-    (
-        "Dompteur d’Horizons 🌅",
-        "L’horizon recule chaque fois que tu approches. Il a peur.",
-    ),
+    ("Dompteur d’Horizons 🌅", "Dompteuse d’Horizons 🌅",
+     "L’horizon recule chaque fois que tu approches. Il a peur.",
+     "L’horizon recule chaque fois que tu approches. Il a peur."),
     # 560 km
-    (
-        "Phénix de l’Asphalte 🔥🦅",
-        "Tu renais à chaque kilomètre. Et tu es encore plus agaçant qu’avant.",
-    ),
+    ("Phénix de l’Asphalte 🔥🦅", "Phénix de l’Asphalte 🔥🦅",
+     "Tu renais à chaque kilomètre. Et tu es encore plus agaçant qu’avant.",
+     "Tu renais à chaque kilomètre. Et tu es encore plus agaçante qu’avant."),
     # 580 km
-    (
-        "Demi-Dieu en Approche 👑",
-        "Zeus a commandé tes chaussures pour voir ce que ça fait.",
-    ),
+    ("Demi-Dieu en Approche 👑", "Demi-Déesse en Approche 👑",
+     "Zeus a commandé tes chaussures pour voir ce que ça fait.",
+     "Héra a commandé tes chaussures pour voir ce que ça fait."),
     # === TIER LÉGENDAIRE (600 km+) ===
     # 600 km
-    (
-        "⭐ LÉGENDAIRE ⭐ Seigneur des Foulées 🐉",
-        "Les médecins étudient tes mollets en cours magistral. La salle est comble.",
-    ),
+    ("⭐ LÉGENDAIRE ⭐ Seigneur des Foulées 🐉", "⭐ LÉGENDAIRE ⭐ Dame des Foulées 🐉",
+     "Les médecins étudient tes mollets en cours magistral. La salle est comble.",
+     "Les médecins étudient tes mollets en cours magistral. La salle est comble."),
     # 620 km
-    (
-        "⭐ LÉGENDAIRE ⭐ Arpenteur des Galaxies 🪐",
-        "Pluton t’a envoyé un message : ‘Respect. Sincèrement.’",
-    ),
+    ("⭐ LÉGENDAIRE ⭐ Arpenteur des Galaxies 🪐", "⭐ LÉGENDAIRE ⭐ Arpenteuse des Galaxies 🪐",
+     "Pluton t’a envoyé un message : ‘Respect. Sincèrement.’",
+     "Pluton t’a envoyé un message : ‘Respect. Sincèrement.’"),
     # 640 km
-    (
-        "⭐ LÉGENDAIRE ⭐ Requin du Bitume 🦈",
-        "La route disparaît sous tes pieds avant que tu arrives dessus.",
-    ),
+    ("⭐ LÉGENDAIRE ⭐ Requin du Bitume 🦈", "⭐ LÉGENDAIRE ⭐ Requin du Bitume 🦈",
+     "La route disparaît sous tes pieds avant que tu arrives dessus.",
+     "La route disparaît sous tes pieds avant que tu arrives dessus."),
     # 660 km
-    (
-        "⭐ LÉGENDAIRE ⭐ Architecte de l’Impossible 🏗️",
-        "Tu construis l’impossible un km à la fois. Le chantier est rentable.",
-    ),
+    ("⭐ LÉGENDAIRE ⭐ Architecte de l’Impossible 🏗️", "⭐ LÉGENDAIRE ⭐ Architecte de l’Impossible 🏗️",
+     "Tu construis l’impossible un km à la fois. Le chantier est rentable.",
+     "Tu construis l’impossible un km à la fois. Le chantier est rentable."),
     # 680 km
-    (
-        "⭐ LÉGENDAIRE ⭐ Voyageur Interstellaire 🛸",
-        "Houston, on l’a perdu. Il est beaucoup trop loin. On abandonne le suivi.",
-    ),
+    ("⭐ LÉGENDAIRE ⭐ Voyageur Interstellaire 🛸", "⭐ LÉGENDAIRE ⭐ Voyageuse Interstellaire 🛸",
+     "Houston, on l’a perdu. Il est beaucoup trop loin. On abandonne le suivi.",
+     "Houston, on l’a perdue. Elle est beaucoup trop loin. On abandonne le suivi."),
     # 700 km
-    (
-        "⭐ LÉGENDAIRE ⭐ Entité Cosmique 🌌",
-        "La NASA a annulé un satellite pour te suivre en direct. Budget bien utilisé.",
-    ),
+    ("⭐ LÉGENDAIRE ⭐ Entité Cosmique 🌌", "⭐ LÉGENDAIRE ⭐ Entité Cosmique 🌌",
+     "La NASA a annulé un satellite pour te suivre en direct. Budget bien utilisé.",
+     "La NASA a annulé un satellite pour te suivre en direct. Budget bien utilisé."),
     # 720 km
-    (
-        "⭐ LÉGENDAIRE ⭐ Chuck Norris du Running 🥋",
-        "Chuck Norris court derrière TOI. Il essaie de prendre des notes.",
-    ),
+    ("⭐ LÉGENDAIRE ⭐ Chuck Norris du Running 🥋", "⭐ LÉGENDAIRE ⭐ Wonder Woman du Running 🥋",
+     "Chuck Norris court derrière TOI. Il essaie de prendre des notes.",
+     "Wonder Woman court derrière TOI. Elle essaie de prendre des notes."),
     # 740 km
-    (
-        "⭐ LÉGENDAIRE ⭐ Déclaration d’Intention 🏆",
-        "Tu ne cours plus. Tu déclares solennellement une intention de te déplacer vite.",
-    ),
+    ("⭐ LÉGENDAIRE ⭐ Déclaration d’Intention 🏆", "⭐ LÉGENDAIRE ⭐ Déclaration d’Intention 🏆",
+     "Tu ne cours plus. Tu déclares solennellement une intention de te déplacer vite.",
+     "Tu ne cours plus. Tu déclares solennellement une intention de te déplacer vite."),
     # 760 km
-    (
-        "⭐ LÉGENDAIRE ⭐ Tempête Certifiée 🌩️",
-        "Même les jours où tu ne cours pas, le sol tremble par habitude.",
-    ),
+    ("⭐ LÉGENDAIRE ⭐ Tempête Certifiée 🌩️", "⭐ LÉGENDAIRE ⭐ Tempête Certifiée 🌩️",
+     "Même les jours où tu ne cours pas, le sol tremble par habitude.",
+     "Même les jours où tu ne cours pas, le sol tremble par habitude."),
     # 780 km
-    (
-        "⭐ LÉGENDAIRE ⭐ Aimant Gravitationnel 🧲",
-        "Les kilomètres viennent à toi maintenant. Tu n’as plus à les chercher.",
-    ),
+    ("⭐ LÉGENDAIRE ⭐ Aimant Gravitationnel 🧲", "⭐ LÉGENDAIRE ⭐ Aimant Gravitationnel 🧲",
+     "Les kilomètres viennent à toi maintenant. Tu n’as plus à les chercher.",
+     "Les kilomètres viennent à toi maintenant. Tu n’as plus à les chercher."),
     # 800 km
-    (
-        "⭐ LÉGENDAIRE ⭐ Dieu Vivant du Bitume 👑",
-        "Les ronds-points portent ton prénom. Officieusement, mais quand même.",
-    ),
+    ("⭐ LÉGENDAIRE ⭐ Dieu Vivant du Bitume 👑", "⭐ LÉGENDAIRE ⭐ Déesse Vivante du Bitume 👑",
+     "Les ronds-points portent ton prénom. Officieusement, mais quand même.",
+     "Les ronds-points portent ton prénom. Officieusement, mais quand même."),
     # 820 km
-    (
-        "⭐ LÉGENDAIRE ⭐ Carburant Illimité ⛽",
-        "Les scientifiques veulent étudier ton métabolisme. Elon Musk veut le breveter.",
-    ),
+    ("⭐ LÉGENDAIRE ⭐ Carburant Illimité ⛽", "⭐ LÉGENDAIRE ⭐ Carburant Illimité ⛽",
+     "Les scientifiques veulent étudier ton métabolisme. Elon Musk veut le breveter.",
+     "Les scientifiques veulent étudier ton métabolisme. Elon Musk veut le breveter."),
     # 840 km
-    (
-        "⭐ LÉGENDAIRE ⭐ Usine à Records 🏭",
-        "Tu produis des km comme d’autres produisent des excuses. Industriellement.",
-    ),
+    ("⭐ LÉGENDAIRE ⭐ Usine à Records 🏭", "⭐ LÉGENDAIRE ⭐ Usine à Records 🏭",
+     "Tu produis des km comme d’autres produisent des excuses. Industriellement.",
+     "Tu produis des km comme d’autres produisent des excuses. Industriellement."),
     # 860 km
-    (
-        "⭐ LÉGENDAIRE ⭐ Boss Absolu 👊",
-        "La discipline ne te sert plus le café. Elle te demande la permission de te parler.",
-    ),
+    ("⭐ LÉGENDAIRE ⭐ Boss Absolu 👊", "⭐ LÉGENDAIRE ⭐ Boss Absolue 👊",
+     "La discipline ne te sert plus le café. Elle te demande la permission de te parler.",
+     "La discipline ne te sert plus le café. Elle te demande la permission de te parler."),
     # 880 km
-    (
-        "⭐ LÉGENDAIRE ⭐ Collectionneur de Saisons 📅",
-        "Tu ne coches plus des cases. Tu remplis des encyclopédies.",
-    ),
+    ("⭐ LÉGENDAIRE ⭐ Collectionneur de Saisons 📅", "⭐ LÉGENDAIRE ⭐ Collectionneuse de Saisons 📅",
+     "Tu ne coches plus des cases. Tu remplis des encyclopédies.",
+     "Tu ne coches plus des cases. Tu remplis des encyclopédies."),
     # 900 km
-    (
-        "⭐ MYTHIQUE ⭐ Transcendance Totale 🔮",
-        "Tu es devenu quelque chose que la science ne peut pas encore nommer. Les linguistes travaillent dessus.",
-    ),
+    ("⭐ MYTHIQUE ⭐ Transcendance Totale 🔮", "⭐ MYTHIQUE ⭐ Transcendance Totale 🔮",
+     "Tu es devenu quelque chose que la science ne peut pas encore nommer. Les linguistes travaillent dessus.",
+     "Tu es devenue quelque chose que la science ne peut pas encore nommer. Les linguistes travaillent dessus."),
     # 920 km
-    (
-        "⭐ MYTHIQUE ⭐ Anti-Matière du Sport 🌀",
-        "La flemme a non seulement déménagé — elle a changé de planète et coupé le contact.",
-    ),
+    ("⭐ MYTHIQUE ⭐ Anti-Matière du Sport 🌀", "⭐ MYTHIQUE ⭐ Anti-Matière du Sport 🌀",
+     "La flemme a non seulement déménagé — elle a changé de planète et coupé le contact.",
+     "La flemme a non seulement déménagé — elle a changé de planète et coupé le contact."),
     # 940 km
-    (
-        "⭐ MYTHIQUE ⭐ Monstre Incompris 🧟",
-        "Ton entourage dit ‘mais pourquoi ?’ Tu réponds avec les yeux d’un être supérieur.",
-    ),
+    ("⭐ MYTHIQUE ⭐ Monstre Incompris 🧟", "⭐ MYTHIQUE ⭐ Monstre Incomprise 🧟",
+     "Ton entourage dit ‘mais pourquoi ?’ Tu réponds avec les yeux d’un être supérieur.",
+     "Ton entourage dit ‘mais pourquoi ?’ Tu réponds avec les yeux d’un être supérieur."),
     # 960 km
-    (
-        "⭐ MYTHIQUE ⭐ Mythe Vivant 🏛️",
-        "On parle de toi au café du coin. Et dans les cafés des coins adjacents.",
-    ),
+    ("⭐ MYTHIQUE ⭐ Mythe Vivant 🏛️", "⭐ MYTHIQUE ⭐ Mythe Vivante 🏛️",
+     "On parle de toi au café du coin. Et dans les cafés des coins adjacents.",
+     "On parle de toi au café du coin. Et dans les cafés des coins adjacents."),
     # 980 km
-    (
-        "⭐ MYTHIQUE ⭐ Force de la Nature 🌊",
-        "Tu n’es plus une personne. Tu es un phénomène météorologique qui court.",
-    ),
+    ("⭐ MYTHIQUE ⭐ Force de la Nature 🌊", "⭐ MYTHIQUE ⭐ Force de la Nature 🌊",
+     "Tu n’es plus une personne. Tu es un phénomène météorologique qui court.",
+     "Tu n’es plus une personne. Tu es un phénomène météorologique qui court."),
     # 1000 km
-    (
-        "☠️ ULTIME LÉGENDAIRE ☠️ 1000 km Accomplis ✅",
-        "Les dieux de l’Olympe ont annulé leur abonnement salle de sport par honte. Bravo.",
-    ),
+    ("☠️ ULTIME LÉGENDAIRE ☠️ 1000 km Accomplis ✅", "☠️ ULTIME LÉGENDAIRE ☠️ 1000 km Accomplis ✅",
+     "Les dieux de l’Olympe ont annulé leur abonnement salle de sport par honte. Bravo.",
+     "Les déesses de l’Olympe ont annulé leur abonnement salle de sport par honte. Bravo."),
 ]
 
 
-def get_fun_badge(km: float):
-    """Retourne (badge, message) selon les kilomètres."""
+def get_fun_badge(km: float, sexe: str = "M"):
+    """Retourne (badge, message) selon les kilomètres et le genre."""
     i = 0
     while i < len(BADGE_THRESHOLDS) and km >= BADGE_THRESHOLDS[i]:
         i += 1
-    return BADGE_REWARDS[min(i, len(BADGE_REWARDS) - 1)]
+    reward = BADGE_REWARDS[min(i, len(BADGE_REWARDS) - 1)]
+    if sexe == "F":
+        return (reward[1], reward[3])
+    return (reward[0], reward[2])
 
 
-def get_badge_progress(km):
+def get_badge_progress(km, sexe: str = "M"):
     """Retourne (percent, km_restants, prochain_badge_label) ou None si au max."""
     if km >= BADGE_THRESHOLDS[-1]:
         return None
@@ -516,7 +481,7 @@ def get_badge_progress(km):
     progress_km = km - current_threshold
     percent = min(100, max(0, (progress_km / range_km) * 100)) if range_km > 0 else 0
     km_restants = next_threshold - km
-    next_badge_label, _ = get_fun_badge(next_threshold)
+    next_badge_label, _ = get_fun_badge(next_threshold, sexe)
     return (percent, km_restants, next_badge_label)
 
 
@@ -930,14 +895,14 @@ def generate_team_page(team, rank, members, is_fun=False):
             details_parts.append(denivele_str)
         badge_html = ""
         if is_fun:
-            badge_label, badge_motiv = get_fun_badge(km_float(p))
+            badge_label, badge_motiv = get_fun_badge(km_float(p), p.get("sexe", "M"))
             denivele_comment = get_denivele_comment(denivele_val)
             denivele_html = (
                 f'<small class="fun-denivele">{denivele_comment}</small>'
                 if denivele_comment
                 else ""
             )
-            progress = get_badge_progress(km_float(p))
+            progress = get_badge_progress(km_float(p), p.get("sexe", "M"))
             progress_html = ""
             if progress:
                 pct, km_rest, next_badge = progress
@@ -1696,7 +1661,7 @@ def generate_html(participants, is_fun=False):
                 f'<td data-label="Entreprise">{esc(p.get("entreprise", ""))}</td>'
             )
             if is_fun:
-                badge_label, badge_motiv = get_fun_badge(km_float(p))
+                badge_label, badge_motiv = get_fun_badge(km_float(p), p.get("sexe", "M"))
                 denivele_val = p.get("denivele", "")
                 denivele_comment = get_denivele_comment(denivele_val)
                 denivele_html = (
@@ -1704,7 +1669,7 @@ def generate_html(participants, is_fun=False):
                     if denivele_comment
                     else ""
                 )
-                progress = get_badge_progress(km_float(p))
+                progress = get_badge_progress(km_float(p), p.get("sexe", "M"))
                 progress_html = ""
                 if progress:
                     pct, km_rest, next_badge = progress
