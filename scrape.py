@@ -50,9 +50,9 @@ def slugify(text):
     return text.strip("-")
 
 
-def get_paris_time():
-    """Retourne l'heure actuelle en heure de Paris (CET/CEST)."""
-    utc_now = datetime.now(timezone.utc)
+def get_paris_time(delta_minutes=0):
+    """Retourne l'heure actuelle (+ delta_minutes) en heure de Paris (CET/CEST)."""
+    utc_now = datetime.now(timezone.utc) + timedelta(minutes=delta_minutes)
     # Déterminer si on est en heure d'été (CEST) ou d'hiver (CET)
     # Transition : dernier dimanche de mars à 2h UTC et dernier dimanche d'octobre à 3h UTC
     year = utc_now.year
@@ -269,7 +269,7 @@ BADGE_REWARDS = [
     # 100 km
     ("Boule d’Acier 🍑", "Boule d’Acier 🍑",
      "100 km. Tu en parles à tout le monde. Tout le monde. Sans exception.",
-     "100 km. Un gars t’a demandé si tu faisais ça ‘pour maigrir’. Tu n’as pas répondu. Tu as couru."),
+     "100 km. Tu en parles à tout le monde. Tout le monde. Sans exception."),
     # 120 km
     ("Killian Jornet en Carton 🏃💨", "Killian Jornet en Carton 🏃💨",
      "Cours Killian. Mais t’as quand même vérifié ton allure 47 fois.",
@@ -305,7 +305,7 @@ BADGE_REWARDS = [
     # 280 km
     ("Avaleur de Bornes 🎯", "Avaleuse de Bornes 🎯",
      "Les panneaux kilométriques font des cauchemars avec toi et tes commentaires Strava.",
-     "Les panneaux kilométriques font des cauchemars. Un type avait parié que tu tiendrais pas 100 km."),
+     "Les panneaux kilométriques font des cauchemars. Tes chaussures aussi, d'ailleurs."),
     # 300 km
     ("Phénomène Météo 🌪️", "Phénomène Météo 🌪️",
      "Météo France t’a classé ‘perturbation localisée’. Tu as partagé la notif.",
@@ -349,7 +349,7 @@ BADGE_REWARDS = [
     # 500 km
     ("Forgeron de l’Endurance 🔨", "Forgeronne de l’Endurance 🔨",
      "500 km forgés à la sueur. Et au moins 500 photos de tes chaussures.",
-     "500 km. Quelqu’un t’a demandé si tu ‘comptais faire un vrai marathon un jour’. Tu as souri. Tu as couru."),
+     "500 km. Les gens arrêtent de te demander ‘tu cours combien ?’. Ils le savent déjà."),
     # 520 km
     ("Titan des Kilomètres 🗿", "Titanide des Kilomètres 🗿",
      "Les montagnes s’écartent. Les collines font une haie d’honneur. T’as filmé.",
@@ -869,6 +869,7 @@ JOURNEY_MILESTONES = [
 def generate_team_page(team, rank, members, is_fun=False):
     """Génère une page HTML autonome pour une équipe du top 5."""
     now = get_paris_time()
+    next_run = get_paris_time(10)
     team_name = team["equipe"]
     team_km_str = team["km"]
     team_km = float(team_km_str.replace(",", "."))
@@ -1504,6 +1505,9 @@ body {{ background: var(--bg); color: var(--text); font-family: var(--font-body)
     <span class="footer-refresh-timestamp">
       Dernière mise à jour : {now}
     </span>
+    <span class="footer-refresh-timestamp">
+      Prochaine mise à jour : {next_run}
+    </span>
   </div>
 </footer>
 
@@ -1588,6 +1592,7 @@ body {{ background: var(--bg); color: var(--text); font-family: var(--font-body)
 def generate_html(participants, is_fun=False):
     """Génère le fichier HTML avec Bulma (mode standard ou fun)."""
     now = get_paris_time()
+    next_run = get_paris_time(10)
     participants_sorted = sorted(participants, key=km_float, reverse=True)
     total_km = sum(km_float(p) for p in participants)
     total_participants = len(participants)
@@ -3895,6 +3900,9 @@ th[data-sort]:hover {{
     </span>
     <span class="footer-refresh-timestamp">
       Dernière mise à jour : {now}
+    </span>
+    <span class="footer-refresh-timestamp">
+      Prochaine mise à jour : {next_run}
     </span>
   </div>
   <p class="footer-vibed">
