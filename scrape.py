@@ -271,9 +271,9 @@ BADGE_REWARDS = [
      "100 km. Tu en parles à tout le monde. Tout le monde. Sans exception.",
      "100 km. Tu en parles à tout le monde. Tout le monde. Sans exception."),
     # 120 km
-    ("Killian Jornet en Carton 🏃💨", "Killian Jornet en Carton 🏃💨",
+    ("Killian Jornet en Carton 🏃💨", "Marie-José Pérec de l’Ultra 🏃💨",
      "Cours Killian. Mais t’as quand même vérifié ton allure 47 fois.",
-     "120 km. Ton allure fait plisser les yeux à ceux qui te voient passer. C’est agréable."),
+     "Marie-José faisait 400m en 48 secondes. Toi tu en fais 120 km. Elle a appelé pour des conseils. Tu n’avais pas le temps."),
     # 140 km
     ("Brûleur de Semelles 🔥", "Brûleuse de Semelles 🔥",
      "Le vent sent la concurrence. Tu lui fais signe.",
