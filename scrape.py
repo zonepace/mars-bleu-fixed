@@ -261,7 +261,7 @@ BADGE_REWARDS = [
     # 60 km
     ("Mollets en Devenir 🦵", "Mollets en Devenir 🦵",
      "Tes mollets ont commencé à avoir une opinion sur ton rythme.",
-     "Tu cours, tu gères les enfants, les courses, et les remarques des gens. Les mollets suivent."),
+     "Tu cours. Tes mollets ont désormais une opinion bien arrêtée sur le bon rythme. Et c'est eux qui gagnent."),
     # 80 km
     ("Candidat Sérieux 📋", "Candidate Sérieuse 📋",
      "Tu as dépensé plus en running qu’en pizza. Ça t’a coûté cher en ego aussi.",
@@ -273,7 +273,7 @@ BADGE_REWARDS = [
     # 120 km
     ("Killian Jornet en Carton 🏃💨", "Killian Jornet en Carton 🏃💨",
      "Cours Killian. Mais t’as quand même vérifié ton allure 47 fois.",
-     "Cours. Killian ne t’a jamais dit ‘vite pour une femme’. Contrairement à d’autres."),
+     "120 km. Ton allure fait plisser les yeux à ceux qui te voient passer. C’est agréable."),
     # 140 km
     ("Brûleur de Semelles 🔥", "Brûleuse de Semelles 🔥",
      "Le vent sent la concurrence. Tu lui fais signe.",
@@ -281,11 +281,11 @@ BADGE_REWARDS = [
     # 160 km
     ("Cyborg des Faubourgs 🦾", "Cyborg des Faubourgs 🦾",
      "Mi-humain, mi-moteur diesel. Le mécanicien est impressionné.",
-     "Mi-humaine, mi-machine. Le gars qui t’avait dit ‘fais attention à ne pas te blesser’ court derrière toi."),
+     "Mi-humaine, mi-machine. La route n’a plus de secrets. Elle te respecte depuis un moment."),
     # 180 km
     ("Rocket Man 🚀", "Rocket Woman 🚀",
      "La NASA surveille ton dossier. Ton ego le leur a envoyé.",
-     "La NASA surveille ton dossier. Elles n’arrivent pas à expliquer comment tu cours autant entre deux réunions d’école."),
+     "La NASA surveille ton dossier. Elles n’arrivent pas à expliquer la constance. Tu pourrais, mais tu es déjà repartie."),
     # 200 km
     ("Explorateur du Macadam 🌍", "Exploratrice du Macadam 🌍",
      "200 km. Tu aurais pu aller jusqu’en Belgique. Tu aurais pris des photos de chaque km.",
@@ -297,7 +297,7 @@ BADGE_REWARDS = [
     # 240 km
     ("Marathonien Autoproclamé 🏛️", "Marathonienne Autoproclamée 🏛️",
      "L’Olympe a reçu ton CV. Il était accompagné de tes stats Strava.",
-     "L’Olympe a reçu ton CV. Les déesses ont demandé comment tu fais avec les enfants en plus. Bonne question."),
+     "L’Olympe a reçu ton CV. Les déesses ont demandé ton programme d’entraînement. Elles prennent des notes."),
     # 260 km
     ("Conquérant des Ronds-Points 🛤️", "Conquérante des Ronds-Points 🛤️",
      "Tu connais chaque craquelure du bitume. Tu les as nommées.",
@@ -317,11 +317,11 @@ BADGE_REWARDS = [
     # 340 km
     ("Coureur Quantique ⚛️", "Coureuse Quantique ⚛️",
      "Tu existes sur plusieurs parcours simultanément. Schrödinger était moins actif et moins bavard.",
-     "Tu existes sur plusieurs parcours simultanément. Schrödinger n’avait pas à planifier une baby-sitter avant."),
+     "Tu existes sur plusieurs parcours simultanément. Schrödinger avait moins d’énergie et un chat moins actif."),
     # 360 km
     ("Gladiateur du Goudron ⚔️", "Gladiatrice du Goudron ⚔️",
      "Ave César ! Les km te saluent. Tu as fait un discours de remerciement.",
-     "Ave César ! Tu as couru 360 km pendant que des gens t’expliquaient que c’est ‘trop dur pour les femmes’."),
+     "Ave César ! 360 km. L’arène, la sueur, la gloire. Et tu n’as demandé la permission à personne."),
     # 380 km
     ("Comète Humaine ☄️", "Comète Humaine ☄️",
      "Tu laisses une traînée de sueur cosmique et 3 segments Strava battus.",
@@ -333,11 +333,11 @@ BADGE_REWARDS = [
     # 420 km
     ("Prophète de la Foulée 📜", "Prophétesse de la Foulée 📜",
      "Tes km sont cités dans des groupes WhatsApp. Tu en as créé un exprès pour ça.",
-     "Tes km sont cités dans des groupes WhatsApp de mères. ‘La prof de CM2 elle a fait 420 km ce mois’."),
+     "Tes km sont cités dans des conversations que tu n’as jamais eues. La légende précède l’athlète."),
     # 440 km
     ("Sphinx du Running 🦁", "Sphinx du Running 🦁",
      "Personne ne comprend comment tu fais. Toi non plus, mais t’as un podcast là-dessus.",
-     "Personne ne comprend comment tu fais. Toi si : tu te lèves à 5h30 avant que le reste de la maison s’éveille."),
+     "Personne ne comprend comment tu fais. Toi si : un programme, une régularité, et une résolution d’acier."),
     # 460 km
     ("Nomade Cosmique 🌌", "Nomade Cosmique 🌌",
      "Tu cours entre les étoiles. Ou le périph. T’as mis 5 étoiles à ton segment.",
@@ -345,7 +345,7 @@ BADGE_REWARDS = [
     # 480 km
     ("Légende en Fabrication ⚡", "Légende en Fabrication ⚡",
      "Dans 1000 ans, les historiens auront une section sur toi. Tu leur as soumis un plan.",
-     "Dans 1000 ans, les historiens diront ‘elle faisait ça en plus du reste’. Comme toujours."),
+     "Dans 1000 ans, les historiens auront un chapitre entier. Il sera long. Il sera mérité."),
     # 500 km
     ("Forgeron de l’Endurance 🔨", "Forgeronne de l’Endurance 🔨",
      "500 km forgés à la sueur. Et au moins 500 photos de tes chaussures.",
@@ -370,7 +370,7 @@ BADGE_REWARDS = [
     # 600 km
     ("⭐ LÉGENDAIRE ⭐ Seigneur des Foulées 🐉", "⭐ LÉGENDAIRE ⭐ Dame des Foulées 🐉",
      "Les médecins étudient tes mollets en cours magistral. Tu leur as envoyé tes données.",
-     "Les médecins étudient tes mollets. Une interne a dit ‘c’est une femme qui fait ça ?’. Oui. Et alors."),
+     "Les médecins étudient tes mollets. Ils ont publié un article. La conclusion : ‘remarquable’."),
     # 620 km
     ("⭐ LÉGENDAIRE ⭐ Arpenteur des Galaxies 🪐", "⭐ LÉGENDAIRE ⭐ Arpenteuse des Galaxies 🪐",
      "Pluton t’a envoyé un message. Tu l’as vu mais pas encore répondu — t’étais en sortie.",
@@ -386,11 +386,11 @@ BADGE_REWARDS = [
     # 680 km
     ("⭐ LÉGENDAIRE ⭐ Voyageur Interstellaire 🛸", "⭐ LÉGENDAIRE ⭐ Voyageuse Interstellaire 🛸",
      "Houston, on l’a perdu. Il envoie des photos quand même.",
-     "Houston, on l’a perdue. Elle est revenue, a préparé le dîner et recouché les enfants. On n’a rien compris."),
+     "Houston, on l’a perdue. Elle était sur un segment à 18 km/h. Houston a raccroché et est allé se coucher."),
     # 700 km
     ("⭐ LÉGENDAIRE ⭐ Entité Cosmique 🌌", "⭐ LÉGENDAIRE ⭐ Entité Cosmique 🌌",
      "La NASA a annulé un satellite pour te suivre. T’as postulé consultant.",
-     "La NASA a annulé un satellite pour te suivre. Tu avais fini avant qu’ils le lancent. Puis t’es rentrée faire les devoirs."),
+     "La NASA a annulé un satellite pour te suivre. Tu avais fini avant qu’ils le lancent. Trop rapide pour la technologie."),
     # 720 km
     ("⭐ LÉGENDAIRE ⭐ Chuck Norris du Running 🥋", "⭐ LÉGENDAIRE ⭐ Wonder Woman du Running 🥋",
      "Chuck Norris court derrière TOI. Il prend des notes. Et un peu la honte.",
@@ -398,7 +398,7 @@ BADGE_REWARDS = [
     # 740 km
     ("⭐ LÉGENDAIRE ⭐ Déclaration d’Intention 🏆", "⭐ LÉGENDAIRE ⭐ Déclaration d’Intention 🏆",
      "Tu ne cours plus. Tu déclares une intention. Avec présentation PowerPoint.",
-     "Tu ne cours plus. Tu avances. Le reste — les avis, les regards, les ‘vite pour une femme’ — c’est du bruit."),
+     "Tu ne cours plus. Tu avances. Avec la régularité d’un métronome et l’assurance de quelqu’un qui sait."),
     # 760 km
     ("⭐ LÉGENDAIRE ⭐ Tempête Certifiée 🌩️", "⭐ LÉGENDAIRE ⭐ Tempête Certifiée 🌩️",
      "Le sol tremble même les jours où tu ne cours pas. Par habitude pavlovienne.",
@@ -410,7 +410,7 @@ BADGE_REWARDS = [
     # 800 km
     ("⭐ LÉGENDAIRE ⭐ Dieu Vivant du Bitume 👑", "⭐ LÉGENDAIRE ⭐ Déesse Vivante du Bitume 👑",
      "Les ronds-points portent ton prénom. Tu l’as vérifié sur Google Maps.",
-     "Les ronds-points portent ton prénom. Le type qui t’avait dit ‘tu vas tenir combien de temps ?’ habite juste à côté."),
+     "Les ronds-points portent ton prénom. Tu leur as donné des noms. Ils n’ont pas protesté."),
     # 820 km
     ("⭐ LÉGENDAIRE ⭐ Carburant Illimité ⛽", "⭐ LÉGENDAIRE ⭐ Carburant Illimité ⛽",
      "Les scientifiques veulent étudier ton métabolisme. Elon Musk veut le breveter. Tu négocies.",
@@ -418,7 +418,7 @@ BADGE_REWARDS = [
     # 840 km
     ("⭐ LÉGENDAIRE ⭐ Usine à Records 🏭", "⭐ LÉGENDAIRE ⭐ Usine à Records 🏭",
      "Tu produis des km comme d’autres produisent des excuses. Et tu les documentes mieux.",
-     "Tu produis des km comme certains produisent des mansplaining sur la course à pied. Mais toi, les tiens sont réels."),
+     "Tu produis des km. Régulièrement. Solidement. Sans en faire une philosophie de vie. Juste des km."),
     # 860 km
     ("⭐ LÉGENDAIRE ⭐ Boss Absolu 👊", "⭐ LÉGENDAIRE ⭐ Boss Absolue 👊",
      "La discipline te demande la permission de te parler. Tu lis ses messages plus tard.",
@@ -442,7 +442,7 @@ BADGE_REWARDS = [
     # 960 km
     ("⭐ MYTHIQUE ⭐ Mythe Vivant 🏛️", "⭐ MYTHIQUE ⭐ Mythe Vivante 🏛️",
      "On parle de toi au café. Tu le sais. T’as regardé les mentions.",
-     "On parle de toi au café. ‘Elle fait ça comment avec tout ce qu’elle gère ?’ Bonne question. Personne sait."),
+     "On parle de toi au café. ‘Elle fait ça comment ?’ Bonne question. La réponse : entraînement, constance, aucune excuse."),
     # 980 km
     ("⭐ MYTHIQUE ⭐ Force de la Nature 🌊", "⭐ MYTHIQUE ⭐ Force de la Nature 🌊",
      "Tu es un phénomène météorologique qui court. Et qui file des interviews.",
