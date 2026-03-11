@@ -360,31 +360,31 @@ BADGE_REWARDS = [
     ),
     # 320 km
     (
-        "Chameau Turbo 🏜️",
-        "Chameau Turbo 🏜️",
-        "Les chameaux t’ont demandé ton secret. Tu leur as fait un topo de 40 minutes.",
-        "Les chameaux t’ont demandé ton secret. Tu as haussé les épaules. Ils sont encore en train de chercher.",
+        "Activité Suspecte 🚨",
+        "Activité Suspecte 🚨",
+        "Strava a enregistré ta sortie. Puis l’a requalifiée en déplacement motorisé.",
+        "Strava a vu ton allure. Il hésite encore entre course à pied et véhicule léger.",
     ),
     # 340 km
     (
-        "Coureur Quantique ⚛️",
-        "Coureuse Quantique ⚛️",
-        "Tu existes sur plusieurs parcours simultanément. Schrödinger était moins actif et moins bavard.",
-        "Tu existes sur plusieurs parcours simultanément. Schrödinger avait moins d’énergie et un chat moins actif.",
+        "Installation Vivante 🖼️",
+        "Installation Vivante 🖼️",
+        "Tu traverses la ville comme une œuvre contemporaine. Personne ne comprend tout, mais tout le monde regarde.",
+        "Tu traverses la ville comme une œuvre contemporaine. Personne ne comprend tout, mais tout le monde regarde.",
     ),
     # 360 km
     (
-        "Gladiateur du Goudron ⚔️",
-        "Gladiatrice du Goudron ⚔️",
-        "Ave César ! Les km te saluent. Tu as fait un discours de remerciement.",
-        "Ave César ! 360 km. L’arène, la sueur, la gloire. Et tu n’as demandé la permission à personne.",
+        "Kipchoge du Bitume 🥇",
+        "Kipchoge du Bitume 🥇",
+        "Tu n’as pas fait une sortie longue. Tu as juste mis la pression à tout le marathon olympique.",
+        "Tu n’as pas fait une sortie longue. Tu as juste mis la pression à tout le marathon olympique.",
     ),
     # 380 km
     (
         "Comète Humaine ☄️",
         "Comète Humaine ☄️",
         "Tu laisses une traînée de sueur cosmique et 3 segments Strava battus.",
-        "Tu laisses une traînée de sueur cosmique. Et au passage tu as doublé 4 hommes sans leur dire.",
+        "Tu laisses une traînée de sueur cosmique et 3 segments Strava battus.",
     ),
     # 400 km
     (
